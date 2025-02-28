@@ -1,0 +1,59 @@
+import ResourceLoader from "./ResourceLoader.js";
+// root class for dolls (attackers) and targets (defenders)
+class Unit {
+    constructor(name, defense) { // some dolls use their defense stats for damage
+        this.name = name;
+        this.defense = defense;
+        // stat buffs that are important for both target and attacker
+        this.defenseBuffs = 0;
+        // track buff name, buff data, turns/stacks left, isTurnBased
+        this.currentBuffs = [];
+    }
+
+    setDefense(x) {this.defense = x;}
+    getDefense() {return this.defense;}
+    getName() {return this.name;}
+    // process buffs using json data
+    applyBuffEffects(buffData) {
+        if(buffData.hasOwnProperty("Defense%"))
+            this.defenseBuffs += buffData["Defense%"];
+    }
+    removeBuffEffects(buffData) {
+        if(buffData.hasOwnProperty("Defense%"))
+            this.defenseBuffs -= buffData["Defense%"];
+    }
+    // these are called when buffs are added/removed
+    addBuff(buffName, duration) {
+        let buffData = ResourceLoader.getInstance().getBuffData(buffName);
+        if (buffData) {
+            this.currentBuffs.push([buffName, buffData, duration, buffData["turnBased"]]);
+            this.applyBuffEffects(buffData);
+        }
+    }
+    removeBuff(buffName) {
+        // sanity check by checking if the buff exists in the array first
+        this.currentBuffs.forEach((d,i) => {
+            if (d[0] == buffName) {
+                this.removeBuffEffects(d[1]);
+                this.currentBuffs.splice(i, 1);
+                return; // exit loop early once buff has been found
+            }
+        });
+    }
+    // target defense buffs are added to attacker's defense ignore so we need to be able to get it
+    getDefenseBuffs() {return this.defenseBuffs;}
+    
+    endTurn() {
+        this.currentBuffs.forEach(d => {
+            if (d[3]) {
+                // tick down all turn-based buffs by 1
+                d[2]--;
+                if (d[2] == 0) {
+                    this.removeBuff(d[0]);
+                }
+            }
+        })
+    }
+}
+
+export default Unit;

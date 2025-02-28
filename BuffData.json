@@ -1,0 +1,46 @@
+{
+    "Blazing Assault" : {
+        "Attack%" : 0.15,
+        "turnBased" : 1
+    },
+    "Attack Up 2" : {
+        "Attack%" : 0.15,
+        "turnBased" : 1
+    },
+    "Defense Down 1" : {
+        "Defense%" : -0.2,
+        "turnBased" : 1
+    },
+    "Defense Down 2" : {
+        "Defense%" : -0.3,
+        "turnBased" : 1
+    },
+    "Acid Corrosion 2" : {
+        "Defense%" : -0.3,
+        "turnBased" : 1
+    },
+    "Tenacity" : {
+        "Defense%" : -0.5,
+        "StabilityDamage" : 1,
+        "turnBased" : 1
+    },
+    "Defense Up 1" : {
+        "Defense%" : 0.2,
+        "turnBased" : 1
+    },
+    "Defense Up 2" : {
+        "Defense%" : 0.3,
+        "turnBased" : 1
+    },
+    "Defense Up 3" : {
+        "Defense%" : 0.4,
+        "turnBased" : 1
+    },
+    "Edifice" : {
+        "Defense%" : 0.25,
+        "Stackable" : 1,
+        "StackLimit" : 3,
+        "Cleanseable" : 1,
+        "turnBased" : 0
+    }
+}
