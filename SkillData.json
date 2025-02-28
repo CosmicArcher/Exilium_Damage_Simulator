@@ -1,3 +1,66 @@
 {
-    
+    "Qiongjiu" : {
+        "Basic" : {
+            "Multiplier" : 0.8,
+            "Crit_Modifier" : 0,
+            "Crit_Damage_Modifier" : 0,
+            "Fixed Damage" : 0,
+            "Damage_Type" : "Targeted",
+            "Melee" : 0,
+            "Cover_Ignore" : 0,
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Multiplier" : 1.5,
+            "Crit_Modifier" : 0,
+            "Crit_Damage_Modifier" : 0,
+            "Fixed Damage" : 0,
+            "Damage_Type" : "Targeted",
+            "Melee" : 0,
+            "Cover_Ignore" : 0,
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Burn",
+            "Post_Self_Buff" : {
+                "Name" : "Support Boost 1",
+                "Stacks" : 1
+            }
+        },
+        "Skill3" : {
+            "Multiplier" : 1.1,
+            "Crit_Modifier" : 0,
+            "Crit_Damage_Modifier" : 0,
+            "Fixed Damage" : 0,
+            "Damage_Type" : "AoE",
+            "Melee" : 0,
+            "Cover_Ignore" : 0,
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "None",
+            "Element" : "Burn",
+            "Post_Target_Buff" : {
+                "Name" : "Overburn",
+                "Duration" : 2
+            }
+        },
+        "Ult" : {
+            "Post_Self_Buff" : {
+                "Name" : "Support Boost 2",
+                "Stacks" : 3
+            }
+        },
+        "Support" : {
+            "Multiplier" : 0.9,
+            "Crit_Modifier" : 0,
+            "Crit_Damage_Modifier" : 0,
+            "Fixed Damage" : 0,
+            "Damage_Type" : "Targeted",
+            "Melee" : 0,
+            "Cover_Ignore" : 0,
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        }
+    }
 }

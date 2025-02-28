@@ -38,7 +38,37 @@ class GameStateManager {
         if (GameStateManagerSingleton) {
             GameStateManagerSingleton.totalDamage = 0;
             GameStateManagerSingleton.target = null;
+            GameStateManagerSingleton.coverValue = 0;
         }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // game state manager holds reference to the target
+    registerTarget(target) {
+        if (GameStateManagerSingleton) {
+            GameStateManagerSingleton.target = target;
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    getTarget() {
+        if (GameStateManagerSingleton) {
+            return GameStateManagerSingleton.target;
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // cover is assumed to always be facing the attacker and indestructible
+    addCover(coverValue) {
+        if (GameStateManagerSingleton) {
+            GameStateManagerSingleton.coverValue = coverValue;
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    getCover() {
+        if (GameStateManagerSingleton)
+            return GameStateManagerSingleton.coverValue;
         else
             console.error("Singleton not yet initialized");
     }

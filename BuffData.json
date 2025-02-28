@@ -41,6 +41,7 @@
         "Stackable" : 1,
         "StackLimit" : 3,
         "Cleanseable" : 1,
-        "turnBased" : 0
+        "turnBased" : 0,
+        "defenseConsumed" : 1
     }
 }

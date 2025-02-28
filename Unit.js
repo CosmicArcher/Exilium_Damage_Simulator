@@ -6,7 +6,7 @@ class Unit {
         this.defense = defense;
         // stat buffs that are important for both target and attacker
         this.defenseBuffs = 0;
-        // track buff name, buff data, turns/stacks left, isTurnBased
+        // track buff name, buff data, turns/stacks left, isTurnBased, isDefenseConsumed
         this.currentBuffs = [];
     }
 
@@ -26,7 +26,7 @@ class Unit {
     addBuff(buffName, duration) {
         let buffData = ResourceLoader.getInstance().getBuffData(buffName);
         if (buffData) {
-            this.currentBuffs.push([buffName, buffData, duration, buffData["turnBased"]]);
+            this.currentBuffs.push([buffName, buffData, duration, buffData["turnBased"], buffData["defenseConsumed"]]);
             this.applyBuffEffects(buffData);
         }
     }
@@ -42,6 +42,7 @@ class Unit {
     }
     // target defense buffs are added to attacker's defense ignore so we need to be able to get it
     getDefenseBuffs() {return this.defenseBuffs;}
+    setDefenseBuffs(x) {this.defenseBuffs = x;} // only use for quick calcs, direct buff input
     
     endTurn() {
         this.currentBuffs.forEach(d => {
