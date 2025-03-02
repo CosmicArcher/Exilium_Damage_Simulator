@@ -1,7 +1,7 @@
 import Unit from "./Unit.js";
 
 class Target extends Unit {
-    constructor(name, defense, maxStability, turnsToRecoverStability, elementWeaknesses, ammoWeaknesses) {
+    constructor(name, defense, maxStability, turnsToRecoverStability, phaseWeaknesses) {
         super(name, defense);
         // have stability automatically regen after the set amount of end turns with 0 stability
         this.maxStability = maxStability;
@@ -9,8 +9,7 @@ class Target extends Unit {
         this.turnsToRecoverStability = turnsToRecoverStability;
         this.stabilityBrokenTurns = 0;
         // phase weaknesses add a 0.1 to the weakness multiplier per weakness matched by the attack
-        this.elementWeaknesses = elementWeaknesses;
-        this.ammoWeaknesses = ammoWeaknesses;
+        this.phaseWeaknesses = phaseWeaknesses;
         // damage taken buffs/debuffs are only needed for targets
         this.damageTaken = 0;
         this.aoeDamageTaken = 0;
@@ -21,10 +20,9 @@ class Target extends Unit {
         this.drWithStab = 0;
     }
     getStability() {return this.stability;} // for skills that check if stability is broken or not
-    getElementWeaknesses() {return this.elementWeaknesses;}
-    getAmmoWeaknesses() {return this.ammoWeaknesses;}
+    getPhaseWeaknesses() {return this.phaseWeaknesses;}
     // assemble total damage reduction with stability
-    getDamageTaken() {return this.damageTaken + this.drPerStab * this.stability + this.stability>0 ? 0: this.drWithStab;}
+    getDamageTaken() {return this.damageTaken + this.drPerStab * this.stability + this.stability>0 ? this.drWithStab : 0;}
     getAoEDamageTaken() {return this.aoeDamageTaken;}
     getTargetedDamageTaken() {return this.targetedDamageTaken;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}

@@ -35,10 +35,102 @@
             float: none;
             display: block;
         }
+        .column {
+            box-sizing: border-box;
+            float: left;
+            width: 50%;
+            height: 1500px;
+            padding-left: 10px;
+        }
     </style>
 </head>
 <body style="white-space: pre-line; background-color: beige;">
-    <h1>Damage Sim</h1>
+    <div style="width: 100%; display: table;">
+        <h1 style="text-align: center;">Simple Damage Sim</h1>
+        <div class="column" style="background-color: lightgray;">
+            <h2>Target Stats</h2>
+            <label for = "targetDef">Defense:</label>
+            <input type = "text" id = "targetDef"><br>
+            <label for = "ElementWeakness" id = "PhasesSelected">Phase Weaknesses: None</label>
+            <button id = "ElementWeakness">Select Element Weakness</button>
+            <button id = "AmmoWeakness">Select Ammo Weakness</button><br>
+            <label for = "targetCover">Cover Value (0.0x):</label>
+            <input type = "text" id = "targetCover"><br>
+            <label for = "targetStability">Stability:</label>
+            <input type = "text" id = "targetStability"><br>
+            <label for = "targetDefBuffs">Defense Buffs/Debuffs Sum (+- 0.0x):</label>
+            <input type = "text" id = "targetDefBuffs"><br>
+            <label for = "targetDamageTaken">Damage Taken Sum (+- 0.0x):</label>
+            <input type = "text" id = "targetDamageTaken"><br>
+            <label for = "targetTargetedDamage">Targeted Damage Taken Sum (+- 0.0x):</label>
+            <input type = "text" id = "targetTargetedDamage"><br>
+            <label for = "targetAoEDamage">AoE Damage Sum (+- 0.0x):</label>
+            <input type = "text" id = "targetAoEDamage"><br>
+            <label for = "targetStabilityMod">Stability Damage Modifier:</label>
+            <input type = "text" id = "targetStabilityMod"><br>
+            <label for = "targetDRPerStab">Damage Reduction per Stability (+- 0.0x):</label>
+            <input type = "text" id = "targetDRPerStab"><br>
+            <label for = "targetDRWithStab">Damage Reduction with Stability (+- 0.0x):</label>
+            <input type = "text" id = "targetDRWithStab"><br>
+        </div>
+        <div class= "column" style="background-color: lightslategray;">
+            <h2>Doll Stats</h2>
+            <label for = "Doll" id = "DollSelected">Doll:</label>
+            <button id = "Doll">Select Doll</button><br>
+            <label for = "Skill" id = "SkillSelected">Skill:</label>
+            <button id = "Skill">Select Skill</button><br>
+            <label for = "Attack">Attack:</label>
+            <input type = "text" id = "Attack"><br>
+            <label for = "CritRate">Crit Rate (0.0x):</label>
+            <input type = "text" id = "CritRate"><br>
+            <label for = "CritDamage">Crit Damage (1.0x):</label>
+            <input type = "text" id = "CritDamage"><br>
+            <label for = "DefIgnore">Defense Ignore (0.0x):</label>
+            <input type = "text" id = "DefIgnore"><br>
+            <label for = "DamageDealt">Damage Dealt (+- 0.0x):</label>
+            <input type = "text" id = "DamageDealt"><br>
+            <label for = "TargetedDamageDealt">Targeted Damage Dealt (+- 0.0x):</label>
+            <input type = "text" id = "TargetedDamageDealt"><br>
+            <label for = "AoEDamageDealt">AoE Damage Dealt (+- 0.0x):</label>
+            <input type = "text" id = "AoEDamageDealt"><br>
+            <label for = "ExposedDamageDealt">Exposed Damage Dealt (+- 0.0x):</label>
+            <input type = "text" id = "ExposedDamageDealt"><br>
+            <label for = "SupportDamageDealt">Support Damage Dealt (+- 0.0x):</label>
+            <input type = "text" id = "SupportDamageDealt"><br>
+            <label for = "CoverIgnore">Cover Ignore (0.0x):</label>
+            <input type = "text" id = "CoverIgnore"><br>
+            <label for = "StabilityDamage">Stability Damage (+- x):</label>
+            <input type = "text" id = "StabilityDamage"><br>
+            <label for = "Defense">Defense:</label>
+            <input type = "text" id = "Defense"><br>
+            <button id = "PhaseDamage">Element Damage (0.0x):
+            </button>
+            <div id = "PhaseInput" style="display: none;">
+                <label for = "AllDamage">(All) Phase Damage:</label>
+                <input type = "text" id = "AllDamage"><br>
+                <label for = "PhysicalDamage">Physical Damage:</label>
+                <input type = "text" id = "PhysicalDamage"><br>
+                <label for = "FreezeDamage">Freeze Damage:</label>
+                <input type = "text" id = "FreezeDamage"><br>
+                <label for = "BurnDamage">Burn Damage:</label>
+                <input type = "text" id = "BurnDamage"><br>
+                <label for = "CorrosionDamage">Corrosion Damage:</label>
+                <input type = "text" id = "CorrosionDamage"><br>
+                <label for = "HydroDamage">Hydro Damage:</label>
+                <input type = "text" id = "HydroDamage"><br>
+                <label for = "ElectricDamage">Electric Damage:</label>
+                <input type = "text" id = "ElectricDamage"><br>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: table; width: 100%;">
+        <button type = "button" id = "calculateButton" style="float: left;">Calculate Damage</button>
+        <div style="width: 25%; float: left; text-align: center;" id = "DPSDealt">Expected Damage: </div>
+        <div style="width: 25%; float: left; text-align: center;" id = "NoCrit">No Crit Damage: </div>
+        <div style="width: 25%; float: left; text-align: center;" id = "CritDealt">Crit Damage: </div>
+    </div>
+    
     <script type="module" src="main.js">
     </script>
 </body>

@@ -23,7 +23,7 @@ class ResourceLoader {
     loadSkillJSON(){
         d3.json("SkillData.json").then(d => ResourceLoaderSingleton.skillJSON = d);
     }
-    // give the resulting json corresponding to buff or skill
+    // give the resulting json corresponding to buff or doll
     getBuffData(buffName) {
         if (ResourceLoaderSingleton) {
             if (ResourceLoaderSingleton.buffJSON.hasOwnProperty(buffName))
@@ -34,13 +34,20 @@ class ResourceLoader {
         else
             console.error("Singleton not yet initialized");
     }
-
     getSkillData(dollName) {
         if (ResourceLoaderSingleton) {
             if (ResourceLoaderSingleton.skillJSON.hasOwnProperty(dollName))
                 return ResourceLoaderSingleton.skillJSON[dollName];
             else
                 console.error("Doll Name does not exist");
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // for unit selection dropdown
+    getAllDolls() {
+        if (ResourceLoaderSingleton) {
+            return Object.keys(ResourceLoaderSingleton.skillJSON);
         }
         else
             console.error("Singleton not yet initialized");

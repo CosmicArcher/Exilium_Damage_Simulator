@@ -1,10 +1,8 @@
 {
     "Qiongjiu" : {
         "Basic" : {
+            "Type" : "Attack",
             "Multiplier" : 0.8,
-            "Crit_Modifier" : 0,
-            "Crit_Damage_Modifier" : 0,
-            "Fixed Damage" : 0,
             "Damage_Type" : "Targeted",
             "Melee" : 0,
             "Cover_Ignore" : 0,
@@ -14,9 +12,6 @@
         },
         "Skill2" : {
             "Multiplier" : 1.5,
-            "Crit_Modifier" : 0,
-            "Crit_Damage_Modifier" : 0,
-            "Fixed Damage" : 0,
             "Damage_Type" : "Targeted",
             "Melee" : 0,
             "Cover_Ignore" : 0,
@@ -45,6 +40,7 @@
             }
         },
         "Ult" : {
+            "Type" : "Buff",
             "Post_Self_Buff" : {
                 "Name" : "Support Boost 2",
                 "Stacks" : 3
@@ -62,5 +58,8 @@
             "Ammo_Type" : "Medium",
             "Element" : "Physical"
         }
+    },
+    "Makiatto" : {
+
     }
 }
