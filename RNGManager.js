@@ -16,7 +16,7 @@ class RNGManager {
             new RNGManager();
         return RNGManagerSingleton;
     }
-    // use RNG when a "real" battle is being simulated
+    // use RNG when a "real" battle is being simulated, will remake with a seeded pseudo rng algo some other time
     getRNG() {
         return Math.random(); // check if value is below crit chance, crit if true, not crit otherwise
     }

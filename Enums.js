@@ -41,4 +41,19 @@ const SkillJSONKeys = {
     POST_SUPPORT_BUFF: "Post_Support_Buff"
 }
 
-export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys};
+const SkillNames = {
+    BASIC: "Basic",
+    SKILL2: "Skill2",
+    SKILL3: "Skill3",
+    ULT: "Ultimate",
+    SUPPORT: "Support"
+}
+
+const CalculationTypes = {
+    EXPECTED: "Expected",
+    CRIT: "Crit",
+    NOCRIT: "NoCrit",
+    SIMULATION: "Simulation"
+}
+
+export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes};

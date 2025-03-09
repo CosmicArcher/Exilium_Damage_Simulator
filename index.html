@@ -38,7 +38,7 @@
         .column {
             box-sizing: border-box;
             float: left;
-            width: 50%;
+            width: 33%;
             height: 1500px;
             padding-left: 10px;
         }
@@ -79,8 +79,8 @@
             <button id = "Doll">Select Doll</button><br>
             <label for = "Skill" id = "SkillSelected">Skill:</label>
             <button id = "Skill">Select Skill</button><br>
-            <label for = "Attack">Attack:</label>
-            <input type = "text" id = "Attack"><br>
+            <label for = "dollAttack">Attack:</label>
+            <input type = "text" id = "dollAttack"><br>
             <label for = "CritRate">Crit Rate (0.0x):</label>
             <input type = "text" id = "CritRate"><br>
             <label for = "CritDamage">Crit Damage (1.0x):</label>
@@ -101,8 +101,8 @@
             <input type = "text" id = "CoverIgnore"><br>
             <label for = "StabilityDamage">Stability Damage (+- x):</label>
             <input type = "text" id = "StabilityDamage"><br>
-            <label for = "Defense">Defense:</label>
-            <input type = "text" id = "Defense"><br>
+            <label for = "dollDefense">Defense:</label>
+            <input type = "text" id = "dollDefense"><br>
             <button id = "PhaseDamage">Element Damage (0.0x):
             </button>
             <div id = "PhaseInput" style="display: none;">
@@ -122,14 +122,15 @@
                 <input type = "text" id = "ElectricDamage"><br>
             </div>
         </div>
+        <div class="column" style="background-color: lightgoldenrodyellow;">
+            <div id = "DPSDealt">Expected Damage: </div>
+            <div id = "CritDealt">Crit Damage: </div>
+            <div id = "NoCrit">No Crit Damage: </div>
+            <button type = "button" id = "calculateButton">Calculate Damage</button>
+        </div>
     </div>
 
-    <div style="display: table; width: 100%;">
-        <button type = "button" id = "calculateButton" style="float: left;">Calculate Damage</button>
-        <div style="width: 25%; float: left; text-align: center;" id = "DPSDealt">Expected Damage: </div>
-        <div style="width: 25%; float: left; text-align: center;" id = "NoCrit">No Crit Damage: </div>
-        <div style="width: 25%; float: left; text-align: center;" id = "CritDealt">Crit Damage: </div>
-    </div>
+    
     
     <script type="module" src="main.js">
     </script>
