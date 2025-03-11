@@ -209,6 +209,9 @@ d3.select("#calculateButton").on("click", () => {
     newTarget.setStabilityDamageModifier(targetStats[8]);
     newTarget.applyDRPerStab(targetStats[9]);
     newTarget.applyDRWithStab(targetStats[10]);
+    // since attacks will reduce stability but we need to reuse the same initial target state for the 3 calculations, clone the created target
+    let newTarget2 = newTarget.cloneUnit();
+    let newTarget3 = newTarget.cloneUnit();
     let newDoll = new Doll(dollStats[0], dollStats[13], dollStats[2], dollStats[3], dollStats[4], 0);
     newDoll.setDamageDealt(dollStats[6]);
     newDoll.setDefenseIgnore(dollStats[5]);
@@ -217,7 +220,7 @@ d3.select("#calculateButton").on("click", () => {
     newDoll.setExposedDamage(dollStats[9]);
     newDoll.setSupportDamage(dollStats[10]);
     newDoll.setCoverIgnore(dollStats[11]);
-    newDoll.setStabilityDamage(dollStats[12]);
+    newDoll.setStabilityDamageModifier(dollStats[12]);
     newDoll.setPhaseDamage(dollStats[14]);
     newDoll.setElementDamage("Physical", dollStats[15]);
     newDoll.setElementDamage("Freeze", dollStats[16]);
@@ -226,12 +229,11 @@ d3.select("#calculateButton").on("click", () => {
     newDoll.setElementDamage("Hydro", dollStats[19]);
     newDoll.setElementDamage("Electric", dollStats[20]);
 
-    let damage = newDoll.getSkillDamage(dollStats[1], CalculationTypes.EXPECTED, 0);
-    //damage = DamageManager.getInstance().calculateDamage(newDoll, 2400*1.1, "Burn", "None", "AoE", 0, 0, 0);
+    let damage = newDoll.getSkillDamage(dollStats[1], newTarget, CalculationTypes.EXPECTED, 0);
     d3.select("#DPSDealt").text(`Expected Damage: ${damage}`);
-    damage = newDoll.getSkillDamage(dollStats[1], CalculationTypes.NOCRIT, 0);
+    damage = newDoll.getSkillDamage(dollStats[1], newTarget2, CalculationTypes.NOCRIT, 0);
     d3.select("#NoCrit").text(`No Crit Damage: ${damage}`);
-    damage = newDoll.getSkillDamage(dollStats[1], CalculationTypes.CRIT, 0);
+    damage = newDoll.getSkillDamage(dollStats[1], newTarget3, CalculationTypes.CRIT, 0);
     d3.select("#CritDealt").text(`Crit Damage: ${damage}`);
 })
 d3.select("body").append("button").on("click", () => {

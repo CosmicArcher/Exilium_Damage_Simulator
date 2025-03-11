@@ -22,7 +22,7 @@ class Target extends Unit {
     getStability() {return this.stability;} // for skills that check if stability is broken or not
     getPhaseWeaknesses() {return this.phaseWeaknesses;}
     // assemble total damage reduction with stability
-    getDamageTaken() {return this.damageTaken + this.drPerStab * this.stability + this.stability>0 ? this.drWithStab : 0;}
+    getDamageTaken() {return this.damageTaken + this.drPerStab * this.stability + (this.stability>0 ? this.drWithStab : 0);}
     getAoEDamageTaken() {return this.aoeDamageTaken;}
     getTargetedDamageTaken() {return this.targetedDamageTaken;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
@@ -68,8 +68,9 @@ class Target extends Unit {
             }
         });
     }
-    // stability is lower bounded to 0
-    reduceStability(x) {Math.max(this.stability - x, 0);}
+    // stability is lower bounded to 0, modifier is applied externally
+    reduceStability(x) {console.log([this.stability, Math.max(this.stability - x, 0), x]);
+        this.stability = Math.max(this.stability - x, 0);}
 
     endTurn() {
         super.endTurn();
@@ -82,6 +83,22 @@ class Target extends Unit {
                 this.stabilityBrokenTurns = 0;
             }
         }
+    }
+    // will figure out the best way to separate buff effects and their durations from direct set functions some other time
+    cloneUnit() {
+        let targetClone = new Target(this.name, this.defense, this.maxStability, this.turnsToRecoverStability, this.phaseWeaknesses);
+        targetClone.setDamageTaken(this.damageTaken);
+        targetClone.setAoEDamageTaken(this.aoeDamageTaken);
+        targetClone.setTargetedDamageTaken(this.targetedDamageTaken);
+        targetClone.setStabilityDamageModifier(this.stabilityDamageModifier);
+        targetClone.applyDRPerStab(this.drPerStab);
+        targetClone.applyDRWithStab(this.drWithStab);
+        targetClone.setDefenseBuffs(this.defenseBuffs);
+        this.currentBuffs.forEach(d => {
+            targetClone.addBuff(d[0], d[2], d[5]);
+        });
+
+        return targetClone;
     }
 }
 

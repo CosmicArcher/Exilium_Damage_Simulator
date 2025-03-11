@@ -42,6 +42,7 @@ class Doll extends Unit {
 
     getDefenseIgnore() {return this.defenseIgnore;}
     getDamageDealt() {return this.damageDealt;}
+    getStabilityDamageModifier() {return this.stabilityDamageModifier;}
 
     // for direct buff input
     setDefenseIgnore(x) {this.defenseIgnore = x;}
@@ -53,7 +54,7 @@ class Doll extends Unit {
     setPhaseDamage(x) {this.phaseDamageDealt = x;}
     setElementDamage(elementName, x) {this.elementDamageDealt[elementName] = x;}
     setCoverIgnore(x) {this.coverIgnore = x;}
-    setStabilityDamage(x) {this.stabilityDamageModifier = x;}
+    setStabilityDamageModifier(x) {this.stabilityDamageModifier = x;}
 
     initializeSkillData() {
         this.skillData = ResourceLoader.getInstance().getSkillData(this.name);
@@ -72,31 +73,16 @@ class Doll extends Unit {
         super.removeBuffEffects(buffData);
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
-    getSkillDamage(skillName, calculationType = CalculationTypes.SIMULATION, conditionalTriggered) {
-        let skill;
-        // set whether the attack crits or not
-        let isCrit;
-        let tempCritDmg;
-        switch(calculationType) {
-            case CalculationTypes.CRIT:
-                isCrit = 1;
-                tempCritDmg = this.crit_damage;
-                break;
-            case CalculationTypes.NOCRIT:
-                isCrit = 0;
-                tempCritDmg = this.crit_damage;
-                break;
-            case CalculationTypes.EXPECTED: // get the expected value of the attack through linear interpolation from 1 to crit damage using crit rate
-                isCrit = 1;
-                tempCritDmg = (this.crit_damage - 1) * Math.max(Math.min(this.crit_chance, 1), 0) + 1; // the effective value of crit rate should be bounded to 0-1
-                break;
-            case CalculationTypes.SIMULATION:
-                isCrit = RNGManager.getInstance().getRNG() <= this.crit_chance; // simulate a crit rng roll
-                tempCritDmg = this.crit_damage;
-                break;
-            default:
-                console.error(`${calculationType} is not a valid calculation type`);
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = 0) {
+        // in the case of support attacks, target has 2 entries, the target and the supported unit
+        let enemyTarget = target;
+        let supportTarget;
+        if (target.constructor == Array) {
+            enemyTarget = target[0];
+            supportTarget = target[1];
         }
+
+        let skill;
         // get the data of the chosen skill
         switch (skillName) {
             case SkillNames.BASIC:
@@ -118,12 +104,21 @@ class Doll extends Unit {
                 console.error(`${skillName} is not in the skill names enum`);
         }
 
+
+
         if (skill[SkillJSONKeys.TYPE] == "Attack") {
-            let fixedDamage = 0;
-            if (skill.hasOwnProperty(SkillJSONKeys.FIXED_DAMAGE))
-                fixedDamage = skill[SkillJSONKeys.FIXED_DAMAGE];
-            return DamageManager.getInstance().calculateDamage(this, this.attack * skill[SkillJSONKeys.MULTIPLIER], skill[SkillJSONKeys.ELEMENT], 
-                skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], skill[SkillJSONKeys.COVER_IGNORE], isCrit, tempCritDmg, fixedDamage);
+            let damage = this.processAttack(skill, calculationType, target);
+
+            if (skill.hasOwnProperty(SkillJSONKeys.POST_TARGET_BUFF)) {
+                let statusEffect = skill[SkillJSONKeys.POST_TARGET_BUFF];
+                enemyTarget.addBuff(statusEffect["Name"], statusEffect["duration"], this);
+            }
+
+            if (skill.hasOwnProperty(SkillJSONKeys.EXTRA_ATTACK)) {
+                damage += this.processAttack(skill[SkillJSONKeys.EXTRA_ATTACK], calculationType, target);
+            }
+
+            return damage;
         }
         // if a buffing skill rather than attack, return 0 damage
         else {
@@ -133,6 +128,55 @@ class Doll extends Unit {
 
     endTurn() {
         super.endTurn();
+    }
+
+    processAttack(skill, calculationType, target) {
+        // set whether the attack crits or not
+        let isCrit;
+        let tempCritDmg = this.crit_damage;
+        let tempCritRate = this.crit_chance;
+        // if attack modifies crit, add it before incorporating it into the calculation type
+        if (skill.hasOwnProperty(SkillJSONKeys.CRIT_DAMAGE_MODIFIER))
+            tempCritDmg += skill[SkillJSONKeys.CRIT_DAMAGE_MODIFIER];
+        if (skill.hasOwnProperty(SkillJSONKeys.CRIT_MODIFIER))
+            tempCritRate += skill[SkillJSONKeys.CRIT_MODIFIER];
+        switch(calculationType) {
+            case CalculationTypes.CRIT:
+                isCrit = 1;
+                tempCritDmg = this.crit_damage;
+                break;
+            case CalculationTypes.NOCRIT:
+                isCrit = 0;
+                tempCritDmg = this.crit_damage;
+                break;
+            case CalculationTypes.EXPECTED: // get the expected value of the attack through linear interpolation from 1 to crit damage using crit rate
+                isCrit = 1;
+                tempCritDmg = (this.crit_damage - 1) * Math.max(Math.min(tempCritRate, 1), 0) + 1; // the effective value of crit rate should be bounded to 0-1
+                break;
+            case CalculationTypes.SIMULATION:
+                isCrit = RNGManager.getInstance().getRNG() <= tempCritRate; // simulate a crit rng roll
+                tempCritDmg = this.crit_damage;
+                break;
+            default:
+                console.error(`${calculationType} is not a valid calculation type`);
+        }
+
+        // get fixed damage of attack
+        let fixedDamage = 0;
+        if (skill.hasOwnProperty(SkillJSONKeys.FIXED_DAMAGE)) {
+            fixedDamage = skill[SkillJSONKeys.FIXED_DAMAGE];
+        }
+        // get cover ignore of the attack
+        let coverIgnore = 0;
+        if (skill.hasOwnProperty(SkillJSONKeys.COVER_IGNORE))
+            coverIgnore = skill[SkillJSONKeys.COVER_IGNORE];
+        
+        let damage = DamageManager.getInstance().calculateDamage(this, target, this.attack * skill[SkillJSONKeys.MULTIPLIER], skill[SkillJSONKeys.ELEMENT], 
+            skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore);
+
+        damage += fixedDamage;
+
+        return damage;
     }
 }
 
