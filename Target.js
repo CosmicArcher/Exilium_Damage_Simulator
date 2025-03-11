@@ -22,7 +22,7 @@ class Target extends Unit {
     getStability() {return this.stability;} // for skills that check if stability is broken or not
     getPhaseWeaknesses() {return this.phaseWeaknesses;}
     // assemble total damage reduction with stability
-    getDamageTaken() {return this.damageTaken + this.drPerStab * this.stability + (this.stability>0 ? this.drWithStab : 0);}
+    getDamageTaken() {return this.damageTaken - this.drPerStab * this.stability - (this.stability>0 ? this.drWithStab : 0);}
     getAoEDamageTaken() {return this.aoeDamageTaken;}
     getTargetedDamageTaken() {return this.targetedDamageTaken;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
@@ -69,8 +69,7 @@ class Target extends Unit {
         });
     }
     // stability is lower bounded to 0, modifier is applied externally
-    reduceStability(x) {console.log([this.stability, Math.max(this.stability - x, 0), x]);
-        this.stability = Math.max(this.stability - x, 0);}
+    reduceStability(x) {this.stability = Math.max(this.stability - x, 0);}
 
     endTurn() {
         super.endTurn();

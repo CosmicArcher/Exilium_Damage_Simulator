@@ -39,11 +39,17 @@ class Doll extends Unit {
     getAttack() {return this.attack;}
     getCritRate() {return this.crit_chance;}
     getCritDamage() {return this.crit_damage;}
-
+    // get any stats relevant to damage calculation
     getDefenseIgnore() {return this.defenseIgnore;}
     getDamageDealt() {return this.damageDealt;}
+    getTargetedDamage() {return this.targetedDamageDealt;}
+    getAoEDamage() {return this.aoeDamageDealt;}
+    getExposedDamage() {return this.exposedDamageDealt;}
+    getSupportDamage() {return this.supportDamageDealt;}
+    getPhaseDamage() {return this.phaseDamageDealt;}
+    getElementDamage(elementName) {return this.elementDamageDealt[elementName];}
+    getCoverIgnore() {return this.coverIgnore;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
-
     // for direct buff input
     setDefenseIgnore(x) {this.defenseIgnore = x;}
     setDamageDealt(x) {this.damageDealt = x;}
@@ -107,7 +113,12 @@ class Doll extends Unit {
 
 
         if (skill[SkillJSONKeys.TYPE] == "Attack") {
+            // if support attack, temporarily increase damage dealt stat then undo once damage has been calculated
+            if (skillName == SkillNames.SUPPORT)
+                this.damageDealt += this.supportDamageDealt;
             let damage = this.processAttack(skill, calculationType, target);
+            if (skillName == SkillNames.SUPPORT)
+                this.damageDealt -= this.supportDamageDealt;
 
             if (skill.hasOwnProperty(SkillJSONKeys.POST_TARGET_BUFF)) {
                 let statusEffect = skill[SkillJSONKeys.POST_TARGET_BUFF];

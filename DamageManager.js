@@ -30,25 +30,39 @@ class DamageManager {
         });
         // stability damage is increased by 2 per phase weakness, this is done after stability modifier buffs on the target or doll
         let totalStabDamage = Math.max(0, stabilityDamage + target.getStabilityDamageModifier() + attacker.getStabilityDamageModifier());
-        console.log(totalStabDamage);
         totalStabDamage += parseInt(20 * (weaknessModifier - 1)); // instead of recounting the number of phase weaknesses, just get the decimal and multiply by 20
-        console.log([totalStabDamage, 20 * (weaknessModifier - 1), weaknessModifier])
         // if any phase weakness is exploited, stability damage happens before the attack rather than after
         if (weaknessModifier > 1)
             target.reduceStability(totalStabDamage);
-        console.log(target.getStability());
-        let defenseBuffs = Math.max(0, 1 + target.getDefenseBuffs() + attacker.getDefenseIgnore());
+        let defenseBuffs = Math.max(0, 1 + target.getDefenseBuffs() - attacker.getDefenseIgnore());
         let defModifier = attacker.getAttack() / (attacker.getAttack() + target.getDefense() * defenseBuffs);
 
         let coverValue = GameStateManager.getInstance().getCover();
-        let coverModifier = 1 - Math.max(coverValue - coverIgnore, 0) - (target.getStability() > 0 && 
+        let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - (target.getStability() > 0 && 
                                                                             !(damageType == AttackTypes.AOE || ammoType == AmmoTypes.MELEE) ? 0.6 : 0);
 
         let critModifier = isCrit ? critDamage : 1;
-
+        // there are a lot of damage dealt/taken effects that are specific to certain conditions
         let totalBuffs = 1;
         totalBuffs += target.getDamageTaken();
         totalBuffs += attacker.getDamageDealt();
+        if (damageType == AttackTypes.TARGETED) {
+            totalBuffs += target.getTargetedDamageTaken();
+            totalBuffs += attacker.getTargetedDamage();
+        }
+        else {
+            totalBuffs += target.getAoEDamageTaken();
+            totalBuffs += attacker.getAoEDamage();
+        }
+        if (target.getStability() == 0)
+            totalBuffs += attacker.getExposedDamage();
+        if (element == Elements.PHYSICAL) {
+            totalBuffs += attacker.getElementDamage(Elements.PHYSICAL);
+        }
+        else {
+            totalBuffs += attacker.getPhaseDamage();
+            totalBuffs += attacker.getElementDamage(element);
+        }
         // make sure that totalbuffs doesn't become negative
         totalBuffs = Math.max(0, totalBuffs); 
         console.log([target, baseDamage, defModifier, coverModifier, critModifier, weaknessModifier, totalBuffs]);
@@ -67,7 +81,7 @@ class DamageManager {
     // will pass the damage to an event observer manager later
     applyFixedDamage(damage) {
         GameStateManager.getInstance().getTarget().takeDamage();
-        console.log(damage);
+        console.log(`fixed damage: ${damage}`);
     }
 }
 

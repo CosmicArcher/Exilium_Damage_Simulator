@@ -222,12 +222,12 @@ d3.select("#calculateButton").on("click", () => {
     newDoll.setCoverIgnore(dollStats[11]);
     newDoll.setStabilityDamageModifier(dollStats[12]);
     newDoll.setPhaseDamage(dollStats[14]);
-    newDoll.setElementDamage("Physical", dollStats[15]);
-    newDoll.setElementDamage("Freeze", dollStats[16]);
-    newDoll.setElementDamage("Burn", dollStats[17]);
-    newDoll.setElementDamage("Corrosion", dollStats[18]);
-    newDoll.setElementDamage("Hydro", dollStats[19]);
-    newDoll.setElementDamage("Electric", dollStats[20]);
+    newDoll.setElementDamage(Elements.PHYSICAL, dollStats[15]);
+    newDoll.setElementDamage(Elements.FREEZE, dollStats[16]);
+    newDoll.setElementDamage(Elements.BURN, dollStats[17]);
+    newDoll.setElementDamage(Elements.CORROSION, dollStats[18]);
+    newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
+    newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
 
     let damage = newDoll.getSkillDamage(dollStats[1], newTarget, CalculationTypes.EXPECTED, 0);
     d3.select("#DPSDealt").text(`Expected Damage: ${damage}`);
