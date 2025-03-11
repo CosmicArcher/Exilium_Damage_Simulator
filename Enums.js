@@ -26,7 +26,7 @@ const SkillJSONKeys = {
     MULTIPLIER: "Multiplier",
     CRIT_MODIFIER: "Crit_Modifier",
     CRIT_DAMAGE_MODIFIER: "Crit_Damage_Modifier",
-    FIXED_DAMAGE: "Fixed Damage",
+    FIXED_DAMAGE: "Fixed_Damage",
     DAMAGE_TYPE: "Damage_Type",
     MELEE: "Melee",
     COVER_IGNORE: "Cover_Ignore",
@@ -38,7 +38,9 @@ const SkillJSONKeys = {
     PRE_SUPPORT_BUFF: "Pre_Support_Buff",
     POST_TARGET_BUFF: "Post_Target_Buff",
     POST_SELF_BUFF: "Post_Self_Buff",
-    POST_SUPPORT_BUFF: "Post_Support_Buff"
+    POST_SUPPORT_BUFF: "Post_Support_Buff",
+    CONDITIONAL: "Conditional",
+    EXTRA_ATTACK: "Extra_Attack"
 }
 
 const SkillNames = {

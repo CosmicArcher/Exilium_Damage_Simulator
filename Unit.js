@@ -1,4 +1,5 @@
 import ResourceLoader from "./ResourceLoader.js";
+import DamageManager from "./DamageManager.js";
 // root class for dolls (attackers) and targets (defenders)
 class Unit {
     constructor(name, defense) { // some dolls use their defense stats for damage
@@ -6,7 +7,7 @@ class Unit {
         this.defense = defense;
         // stat buffs that are important for both target and attacker
         this.defenseBuffs = 0;
-        // track buff name, buff data, turns/stacks left, isTurnBased, isDefenseConsumed
+        // track buff name, buff data, turns/stacks left, isTurnBased, isDefenseConsumed, source (for overburn damage)
         this.currentBuffs = [];
     }
 
@@ -23,10 +24,13 @@ class Unit {
             this.defenseBuffs -= buffData["Defense%"];
     }
     // these are called when buffs are added/removed
-    addBuff(buffName, duration) {
+    addBuff(buffName, duration, source) {
         let buffData = ResourceLoader.getInstance().getBuffData(buffName);
         if (buffData) {
-            this.currentBuffs.push([buffName, buffData, duration, buffData["turnBased"], buffData["defenseConsumed"]]);
+            this.currentBuffs.push([buffName, buffData, duration, buffData["Turn_Based"], buffData["Defense_Consumed"], source]);
+            if (buffName == "Overburn") {
+                DamageManager.getInstance().applyFixedDamage(source.getAttack() * 0.1);
+            }
             this.applyBuffEffects(buffData);
         }
     }
@@ -47,6 +51,10 @@ class Unit {
     endTurn() {
         this.currentBuffs.forEach(d => {
             if (d[3]) {
+                // apply overburn damage over time effect, damage updates as the source's attack stat changes
+                if (d[0] == "Overburn") {
+                    DamageManager.getInstance().applyFixedDamage(d[5].getAttack() * 0.1);
+                }
                 // tick down all turn-based buffs by 1
                 d[2]--;
                 if (d[2] == 0) {

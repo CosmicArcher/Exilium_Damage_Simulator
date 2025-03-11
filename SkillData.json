@@ -42,18 +42,59 @@
         "Support" : {
             "Type" : "Attack",
             "Multiplier" : 0.9,
-            "Crit_Modifier" : 0,
-            "Crit_Damage_Modifier" : 0,
-            "Fixed Damage" : 0,
             "Damage_Type" : "Targeted",
-            "Melee" : 0,
-            "Cover_Ignore" : 0,
             "StabilityDamage" : 2,
             "Ammo_Type" : "Medium",
             "Element" : "Physical"
         }
     },
     "Makiatto" : {
-
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.6,
+            "Crit_Damage_Modifier" : 0.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Freeze",
+            "Post_Self_Buff" : {
+                "Name" : "Cold Snap"
+            }
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.1,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Freeze",
+            "Post_Target_Buff" : {
+                "Name" : "Overburn",
+                "Duration" : 2
+            }
+        },
+        "Ultimate" : {
+            "Type" : "Buff",
+            "Post_Self_Buff" : {
+                "Name" : "Support Boost 2",
+                "Stacks" : 3
+            }
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.9,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        }
     }
 }

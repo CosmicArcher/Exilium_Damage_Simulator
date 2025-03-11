@@ -1,47 +1,81 @@
 {
     "Blazing Assault" : {
         "Attack%" : 0.15,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Buff",
+        "Stat" : "Attack",
+        "Element" : "Burn"
     },
     "Attack Up 2" : {
         "Attack%" : 0.15,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Buff",
+        "Stat" : "Attack"
     },
     "Defense Down 1" : {
         "Defense%" : -0.2,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Debuff",
+        "Stat" : "Defense"
     },
     "Defense Down 2" : {
         "Defense%" : -0.3,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Debuff",
+        "Stat" : "Defense"
     },
     "Acid Corrosion 2" : {
         "Defense%" : -0.3,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Debuff",
+        "Stat" : "Defense",
+        "Element" : "Corrosion"
     },
     "Tenacity" : {
         "Defense%" : -0.5,
         "StabilityDamage" : 1,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Debuff",
+        "Stat" : "Defense"
     },
     "Defense Up 1" : {
         "Defense%" : 0.2,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Buff",
+        "Stat" : "Defense"
     },
     "Defense Up 2" : {
         "Defense%" : 0.3,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Buff",
+        "Stat" : "Defense"
     },
     "Defense Up 3" : {
         "Defense%" : 0.4,
-        "turnBased" : 1
+        "Turn_Based" : 1,
+        "Buff_Type" : "Buff",
+        "Stat" : "Defense"
     },
     "Edifice" : {
         "Defense%" : 0.25,
-        "Stackable" : 1,
         "StackLimit" : 3,
         "Cleanseable" : 1,
-        "turnBased" : 0,
-        "defenseConsumed" : 1
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 1,
+        "Buff_Type" : "Buff",
+        "Stat" : "Defense"
+    },
+    "Overburn" : {
+        "Buff_Type" : "Debuff",
+        "Element" : "Burn"
+    },
+    "Frozen" : {
+        "Buff_Type" : "Debuff",
+        "Element" : "Freeze",
+        "StackLimit" : 2
+    },
+    "Frigid" : {
+        "Buff_Type" : "Debuff",
+        "Element" : "Freeze"
     }
 }
