@@ -1,78 +1,78 @@
 {
     "Blazing Assault" : {
-        "Attack%" : 0.15,
+        "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Buff_Type" : "Buff",
+        "Attack%" : 0.15,
         "Stat" : "Attack",
         "Element" : "Burn"
     },
     "Attack Up 2" : {
-        "Attack%" : 0.15,
+        "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Buff_Type" : "Buff",
+        "Attack%" : 0.15,
         "Stat" : "Attack"
     },
     "Defense Down 1" : {
-        "Defense%" : -0.2,
+        "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Buff_Type" : "Debuff",
+        "Defense%" : -0.2,
         "Stat" : "Defense"
     },
     "Defense Down 2" : {
-        "Defense%" : -0.3,
+        "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Buff_Type" : "Debuff",
+        "Defense%" : -0.3,
         "Stat" : "Defense"
     },
     "Acid Corrosion 2" : {
-        "Defense%" : -0.3,
+        "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Buff_Type" : "Debuff",
+        "Defense%" : -0.3,
         "Stat" : "Defense",
         "Element" : "Corrosion"
     },
     "Tenacity" : {
-        "Defense%" : -0.5,
+        "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
+        "Defense%" : -0.5,        
         "StabilityDamage" : 1,
-        "Buff_Type" : "Debuff",
         "Stat" : "Defense"
     },
     "Defense Up 1" : {
-        "Defense%" : 0.2,
+        "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Buff_Type" : "Buff",
+        "Defense%" : 0.2,
         "Stat" : "Defense"
     },
     "Defense Up 2" : {
-        "Defense%" : 0.3,
+        "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Buff_Type" : "Buff",
+        "Defense%" : 0.3, 
         "Stat" : "Defense"
     },
     "Defense Up 3" : {
-        "Defense%" : 0.4,
+        "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Buff_Type" : "Buff",
+        "Defense%" : 0.4,        
         "Stat" : "Defense"
     },
     "Edifice" : {
-        "Defense%" : 0.25,
+        "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 1,
+        "Defense%" : 0.25,
         "StackLimit" : 3,
         "Stackable" : 1,
         "Cleanseable" : 1,
-        "Buff_Type" : "Buff",
         "Stat" : "Defense"
     },
     "Overburn" : {
@@ -102,5 +102,15 @@
         "Support%" : 0.3,
         "Exposed%" : 0.1,
         "StackLimit" : -1
+    },
+    "Alert" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0
+    },
+    "Frost Shield" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0
     }
 }

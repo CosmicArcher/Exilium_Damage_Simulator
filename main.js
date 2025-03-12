@@ -4,11 +4,13 @@ import ResourceLoader from "./ResourceLoader.js";
 import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
 import Target from "./Target.js";
-import {Elements, AmmoTypes, SkillNames, CalculationTypes} from "./Enums.js";
+import {Elements, AmmoTypes, SkillNames, CalculationTypes, SkillJSONKeys} from "./Enums.js";
 
 var selectedPhases = [];
 var selectedDoll;
 var selectedSkill;
+
+var skillOptions;
 
 // an error gets thrown when putting resourceloader.getinstance() directly in the .on(click) functions
 function getDolls() {
@@ -67,6 +69,44 @@ function getDollStats() {
     dollStats[20] = getValuefromInput("#ElectricDamage");
 
     return dollStats;
+}
+
+function checkSkillConditional(skillName) {
+    return ResourceLoader.getInstance().getSkillData(selectedDoll)[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL);
+}
+
+function getDollSkills() {
+    let dollSkills = ResourceLoader.getInstance().getSkillData(selectedDoll);
+    return Object.keys(dollSkills);
+}
+
+function createSkillDropdown() {
+    let skills = getDollSkills();
+    // clear the selected skill text because of the new doll chosen
+    if (skillOptions)
+        skillOptions.remove();
+    selectedSkill = "";
+    d3.select("#SkillSelected").text("Skill: ");
+    d3.select("#ConditionalHolder").style("display", "none");
+    document.getElementById("ConditionalOverride").checked = false;
+    // change selected skill text when dropdown option is clicked
+    skillOptions = d3.select("#Skill").append("div").attr("class", "dropdownBox").style("display", "none");
+    skills.forEach(d => {
+        skillOptions.append("a")
+                    .text(d)
+                    .on("click", () => {
+                        selectedSkill = d;
+                        d3.select("#SkillSelected").text("Skill: " + d);
+                        // if the skill has a conditional, show the override tickbox, otherwise hide and deselect it
+                        if (checkSkillConditional(d)) {
+                            d3.select("#ConditionalHolder").style("display", "block");
+                        }
+                        else {
+                            d3.select("#ConditionalHolder").style("display", "none");
+                            document.getElementById("ConditionalOverride").checked = false;
+                        }
+                    });
+    });
 }
 
 // initialize the singletons
@@ -143,7 +183,6 @@ ResourceLoader.getInstance().loadSkillJSON();
 // doll stats dropdowns
 {
     var dollOptions;
-    var skillOptions;
     var phaseDiv;
     // if doll selection button is clicked, show a dropdown of all dolls in the skill json
     d3.select("#Doll").on("click", () => {
@@ -157,6 +196,7 @@ ResourceLoader.getInstance().loadSkillJSON();
                             .on("click", () => {
                                 selectedDoll = d;
                                 d3.select("#DollSelected").text("Doll: " + d);
+                                createSkillDropdown();
                             })
             });
         }
@@ -166,16 +206,7 @@ ResourceLoader.getInstance().loadSkillJSON();
         else
             dollOptions.style("display", "none");
     });
-    // change selected skill text when dropdown option is clicked
-    skillOptions = d3.select("#Skill").append("div").attr("class", "dropdownBox").style("display", "none");
-    ["Basic", "Skill2", "Skill3", "Ultimate", "Support"].forEach(d => {
-        skillOptions.append("a")
-                    .text(d)
-                    .on("click", () => {
-                        selectedSkill = d;
-                        d3.select("#SkillSelected").text("Skill: " + d);
-                    });
-    });
+    
     // elemental damage show/hide toggle, construct the dropdown here so that it does not affect the size of the button
     phaseDiv = d3.select("#PhaseInput");
     d3.select("#PhaseDamage").on("click", () => {
@@ -186,7 +217,7 @@ ResourceLoader.getInstance().loadSkillJSON();
             phaseDiv.style("display", "block");
         }
     });
-    // if skill button is clicked, show a dropdown of the 5 possible actions of a doll
+    // if skill button is clicked, show a dropdown of the possible actions of a doll
     d3.select("#Skill").on("click", () => {
         if (skillOptions.style("display") == "none")
             skillOptions.style("display", "block");

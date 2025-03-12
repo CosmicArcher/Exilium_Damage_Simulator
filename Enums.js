@@ -53,7 +53,9 @@ const SkillNames = {
     SKILL2: "Skill2",
     SKILL3: "Skill3",
     ULT: "Ultimate",
-    SUPPORT: "Support"
+    SUPPORT: "Support",
+    INTERCEPT: "Intercept",
+    COUNTERATTACK: "CounterAttack"
 }
 
 const CalculationTypes = {
