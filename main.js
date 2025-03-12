@@ -88,7 +88,7 @@ function createSkillDropdown() {
     selectedSkill = "";
     d3.select("#SkillSelected").text("Skill: ");
     d3.select("#ConditionalHolder").style("display", "none");
-    document.getElementById("ConditionalOverride").checked = false;
+    d3.select("#ConditionalOverride").node().checked = false;
     // change selected skill text when dropdown option is clicked
     skillOptions = d3.select("#Skill").append("div").attr("class", "dropdownBox").style("display", "none");
     skills.forEach(d => {
@@ -97,13 +97,15 @@ function createSkillDropdown() {
                     .on("click", () => {
                         selectedSkill = d;
                         d3.select("#SkillSelected").text("Skill: " + d);
+                        // activate the damage calculation button once a skill has been selected
+                        d3.select("#calculateButton").node().disabled = false;
                         // if the skill has a conditional, show the override tickbox, otherwise hide and deselect it
                         if (checkSkillConditional(d)) {
                             d3.select("#ConditionalHolder").style("display", "block");
                         }
                         else {
                             d3.select("#ConditionalHolder").style("display", "none");
-                            document.getElementById("ConditionalOverride").checked = false;
+                            d3.select("#ConditionalOverride").checked = false;
                         }
                     });
     });
@@ -196,6 +198,10 @@ ResourceLoader.getInstance().loadSkillJSON();
                             .on("click", () => {
                                 selectedDoll = d;
                                 d3.select("#DollSelected").text("Doll: " + d);
+                                // enable the skill dropdown button since a doll is now selected
+                                d3.select("#Skill").node().disabled = false;
+                                // disable the calculate damage button because a skill for the new doll has not yet been selected
+                                d3.select("#calculateButton").node().disabled = true;
                                 createSkillDropdown();
                             })
             });
@@ -260,7 +266,7 @@ d3.select("#calculateButton").on("click", () => {
     newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
     newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
 
-    let conditionalOverride = document.getElementById("ConditionalOverride").checked;
+    let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
     let damage = newDoll.getSkillDamage(dollStats[1], newTarget, CalculationTypes.EXPECTED, conditionalOverride);
     d3.select("#DPSDealt").text(`Expected Damage: ${damage}`);
     damage = newDoll.getSkillDamage(dollStats[1], newTarget2, CalculationTypes.NOCRIT, conditionalOverride);

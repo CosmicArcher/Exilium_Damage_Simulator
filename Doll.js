@@ -106,6 +106,12 @@ class Doll extends Unit {
             case SkillNames.SUPPORT:
                 skill = this.skillData[SkillNames.SUPPORT];
                 break;
+            case SkillNames.INTERCEPT:
+                skill = this.skillData[SkillNames.INTERCEPT];
+                break;
+            case SkillNames.COUNTERATTACK:
+                skill = this.skillData[SkillNames.COUNTERATTACK];
+                break;
             default:
                 console.error(`${skillName} is not in the skill names enum`);
         }
