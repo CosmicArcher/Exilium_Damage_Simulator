@@ -36,7 +36,13 @@
             "Type" : "Buff",
             "Post_Self_Buff" : {
                 "Name" : "Support Boost 2",
-                "Stacks" : 3
+                "Duration" : 3
+            },
+            "Conditional" : {
+                "Post_Self_Buff" : {
+                    "Name" :"Support Boost 2",
+                    "Duration" : 4
+                }
             }
         },
         "Support" : {
@@ -72,29 +78,35 @@
         "Skill3" : {
             "Type" : "Attack",
             "Multiplier" : 1.1,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
             "Ammo_Type" : "Heavy",
-            "Element" : "Freeze",
-            "Post_Target_Buff" : {
-                "Name" : "Overburn",
-                "Duration" : 2
+            "Element" : "Physical",
+            "Conditional" : {
+                "Post_Target_Buff" : {
+                    "Name" : "Lone Wolf",
+                    "Duration" : 1
+                }
             }
         },
         "Ultimate" : {
             "Type" : "Buff",
-            "Post_Self_Buff" : {
-                "Name" : "Support Boost 2",
-                "Stacks" : 3
-            }
+            "Post_Self_Buff" : [{
+                "Name" : "Alert",
+                "Duration" : 2
+            },
+            {
+                "Name" : "Frost Shield",
+                "Duration" : 2
+            }]
         },
         "Support" : {
             "Type" : "Attack",
             "Multiplier" : 0.9,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
-            "Ammo_Type" : "Medium",
-            "Element" : "Physical"
+            "Ammo_Type" : "Heavy",
+            "Element" : "Freeze"
         }
     }
 }

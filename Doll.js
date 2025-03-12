@@ -109,10 +109,17 @@ class Doll extends Unit {
             default:
                 console.error(`${skillName} is not in the skill names enum`);
         }
-
-
+        // if conditional is triggered, overwrite the parts of the object that correspond to the keys in the conditional value
+        if (conditionalTriggered && skill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+            let conditionalData = skill[SkillJSONKeys.CONDITIONAL];
+            let conditionalOverrides = Object.keys(conditionalData);
+            conditionalOverrides.forEach(d => {
+                skill[d] = conditionalData[d];
+            })
+        }
 
         if (skill[SkillJSONKeys.TYPE] == "Attack") {
+            this.processPrePostBuffs(skill, enemyTarget, supportTarget, 1);
             // if support attack, temporarily increase damage dealt stat then undo once damage has been calculated
             if (skillName == SkillNames.SUPPORT)
                 this.damageDealt += this.supportDamageDealt;
@@ -120,19 +127,24 @@ class Doll extends Unit {
             if (skillName == SkillNames.SUPPORT)
                 this.damageDealt -= this.supportDamageDealt;
 
-            if (skill.hasOwnProperty(SkillJSONKeys.POST_TARGET_BUFF)) {
-                let statusEffect = skill[SkillJSONKeys.POST_TARGET_BUFF];
-                enemyTarget.addBuff(statusEffect["Name"], statusEffect["duration"], this);
-            }
-
+            this.processPrePostBuffs(skill, enemyTarget, supportTarget, 0);
+            // some skills have an extra attack which, unless stated otherwise, have the same data as the first attack 
             if (skill.hasOwnProperty(SkillJSONKeys.EXTRA_ATTACK)) {
-                damage += this.processAttack(skill[SkillJSONKeys.EXTRA_ATTACK], calculationType, target);
+                let extraAttack = skill[SkillJSONKeys.EXTRA_ATTACK];
+
+                this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 1);
+
+                damage += this.processAttack(extraAttack, calculationType, target);
+
+                this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 0);
             }
 
             return damage;
         }
-        // if a buffing skill rather than attack, return 0 damage
+        // if a buffing skill rather than attack, return 0 damage after processing buff data
         else {
+            this.processPrePostBuffs(skill, null, supportTarget, 0);
+            console.log(this.currentBuffs);
             return 0;
         }
     }
@@ -172,10 +184,21 @@ class Doll extends Unit {
                 console.error(`${calculationType} is not a valid calculation type`);
         }
 
-        // get fixed damage of attack
+        // get fixed damage of attack, they typically scale off of one of our stats with a multiplier
         let fixedDamage = 0;
         if (skill.hasOwnProperty(SkillJSONKeys.FIXED_DAMAGE)) {
-            fixedDamage = skill[SkillJSONKeys.FIXED_DAMAGE];
+            let data = skill[SkillJSONKeys.FIXED_DAMAGE];
+            switch (data[SkillJSONKeys.FIXED_DAMAGE_STAT]) {
+                case "Defense":
+                    fixedDamage = this.defense;
+                    break;
+                case "Attack":
+                    fixedDamage = this.attack;
+                    break;
+                default:
+                    console.error([`${data[SkillJSONKeys.FIXED_DAMAGE_STAT]} fixed damage scaling for is not covered`, this]);
+            }
+            fixedDamage *= data[SkillJSONKeys.FIXED_DAMAGE_SCALING];
         }
         // get cover ignore of the attack
         let coverIgnore = 0;
@@ -186,8 +209,67 @@ class Doll extends Unit {
             skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore);
 
         damage += fixedDamage;
+        target.takeDamage();
 
         return damage;
+    }
+
+    processPrePostBuffs(skill, target, supportTarget, isPreBuff) {
+        if (isPreBuff) {
+            // if the skill applies buffs before the attack
+            if (skill.hasOwnProperty(SkillJSONKeys.PRE_SELF_BUFF)) {
+                let statusEffect = skill[SkillJSONKeys.PRE_SELF_BUFF];
+                this.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+            }
+            if (skill.hasOwnProperty(SkillJSONKeys.PRE_TARGET_BUFF)) {
+                let statusEffect = skill[SkillJSONKeys.PRE_TARGET_BUFF];
+                target.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+            }
+            if (skill.hasOwnProperty(SkillJSONKeys.PRE_SUPPORT_BUFF)) {
+                if (supportTarget) {
+                    let statusEffect = skill[SkillJSONKeys.PRE_SUPPORT_BUFF];
+                    supportTarget.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+                }
+                else
+                    console.error(["Support Target not found for pre-support buff", this]);
+            }
+        }
+        else {
+            // if the skill applies buffs after the attack
+            if (skill.hasOwnProperty(SkillJSONKeys.POST_TARGET_BUFF)) {
+                let statusEffect = skill[SkillJSONKeys.POST_TARGET_BUFF];
+                target.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+            }
+            if (skill.hasOwnProperty(SkillJSONKeys.POST_SELF_BUFF)) {
+                let statusEffect = skill[SkillJSONKeys.POST_SELF_BUFF];
+                this.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+            }
+            if (skill.hasOwnProperty(SkillJSONKeys.POST_SUPPORT_BUFF)) {
+                if (supportTarget) {
+                    let statusEffect = skill[SkillJSONKeys.POST_SUPPORT_BUFF];
+                    supportTarget.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+                }
+                else
+                    console.error(["Support Target not found for pre-support buff", this]);
+            }
+        }
+    }
+
+    getSkillData(skillName) {
+        switch (skillName) {
+            case SkillNames.BASIC:
+                return this.skillData[SkillNames.BASIC];
+            case SkillNames.SKILL2:
+                return this.skillData[SkillNames.SKILL2];
+            case SkillNames.SKILL3:
+                return this.skillData[SkillNames.SKILL3];
+            case SkillNames.ULT:
+                return this.skillData[SkillNames.ULT];
+            case SkillNames.SUPPORT:
+                return this.skillData[SkillNames.SUPPORT];
+            default:
+                console.error(`${skillName} is not in the skill names enum`);
+        }
     }
 }
 
