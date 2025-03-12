@@ -15,10 +15,10 @@
             "StabilityDamage" : 3,
             "Ammo_Type" : "Medium",
             "Element" : "Burn",
-            "Post_Self_Buff" : {
+            "Post_Self_Buff" : [{
                 "Name" : "Support Boost 1",
                 "Stacks" : 1
-            }
+            }]
         },
         "Skill3" : {
             "Type" : "Attack",
@@ -27,22 +27,22 @@
             "StabilityDamage" : 3,
             "Ammo_Type" : "None",
             "Element" : "Burn",
-            "Post_Target_Buff" : {
+            "Post_Target_Buff" : [{
                 "Name" : "Overburn",
                 "Duration" : 2
-            }
+            }]
         },
         "Ultimate" : {
             "Type" : "Buff",
-            "Post_Self_Buff" : {
+            "Post_Self_Buff" : [{
                 "Name" : "Support Boost 2",
                 "Duration" : 3
-            },
+            }],
             "Conditional" : {
-                "Post_Self_Buff" : {
+                "Post_Self_Buff" : [{
                     "Name" :"Support Boost 2",
                     "Duration" : 4
-                }
+                }]
             }
         },
         "Support" : {
@@ -71,9 +71,10 @@
             "StabilityDamage" : 1,
             "Ammo_Type" : "Heavy",
             "Element" : "Freeze",
-            "Post_Self_Buff" : {
-                "Name" : "Cold Snap"
-            }
+            "Post_Self_Buff" : [{
+                "Name" : "Cold Snap",
+                "Duration" : -1
+            }]
         },
         "Skill3" : {
             "Type" : "Attack",
@@ -83,10 +84,10 @@
             "Ammo_Type" : "Heavy",
             "Element" : "Physical",
             "Conditional" : {
-                "Post_Target_Buff" : {
+                "Post_Target_Buff" : [{
                     "Name" : "Lone Wolf",
                     "Duration" : 1
-                }
+                }]
             }
         },
         "Ultimate" : {
@@ -100,7 +101,7 @@
                 "Duration" : 2
             }]
         },
-        "Support" : {
+        "Intercept" : {
             "Type" : "Attack",
             "Multiplier" : 0.9,
             "Damage_Type" : "Targeted",

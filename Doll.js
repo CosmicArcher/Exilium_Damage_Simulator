@@ -218,17 +218,24 @@ class Doll extends Unit {
         if (isPreBuff) {
             // if the skill applies buffs before the attack
             if (skill.hasOwnProperty(SkillJSONKeys.PRE_SELF_BUFF)) {
-                let statusEffect = skill[SkillJSONKeys.PRE_SELF_BUFF];
-                this.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+                let statusEffects = skill[SkillJSONKeys.PRE_SELF_BUFF];
+                // some skills apply multiple buffs so run a foreach loop to ensure all buffs are applies
+                statusEffects.forEach(d => {
+                    this.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.PRE_TARGET_BUFF)) {
-                let statusEffect = skill[SkillJSONKeys.PRE_TARGET_BUFF];
-                target.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+                let statusEffects = skill[SkillJSONKeys.PRE_TARGET_BUFF];
+                statusEffects.forEach(d => {
+                    target.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.PRE_SUPPORT_BUFF)) {
                 if (supportTarget) {
-                    let statusEffect = skill[SkillJSONKeys.PRE_SUPPORT_BUFF];
-                    supportTarget.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+                    let statusEffects = skill[SkillJSONKeys.PRE_SUPPORT_BUFF];
+                    statusEffects.forEach(d => {
+                        supportTarget.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                    });
                 }
                 else
                     console.error(["Support Target not found for pre-support buff", this]);
@@ -237,38 +244,27 @@ class Doll extends Unit {
         else {
             // if the skill applies buffs after the attack
             if (skill.hasOwnProperty(SkillJSONKeys.POST_TARGET_BUFF)) {
-                let statusEffect = skill[SkillJSONKeys.POST_TARGET_BUFF];
-                target.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+                let statusEffects = skill[SkillJSONKeys.POST_TARGET_BUFF];
+                statusEffects.forEach(d => {
+                    target.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.POST_SELF_BUFF)) {
-                let statusEffect = skill[SkillJSONKeys.POST_SELF_BUFF];
-                this.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+                let statusEffects = skill[SkillJSONKeys.POST_SELF_BUFF];
+                statusEffects.forEach(d => {
+                    this.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.POST_SUPPORT_BUFF)) {
                 if (supportTarget) {
-                    let statusEffect = skill[SkillJSONKeys.POST_SUPPORT_BUFF];
-                    supportTarget.addBuff(statusEffect[SkillJSONKeys.BUFF_NAME], statusEffect[SkillJSONKeys.BUFF_DURATION], this);
+                    let statusEffects = skill[SkillJSONKeys.POST_SUPPORT_BUFF];
+                    statusEffects.forEach(d => {
+                        supportTarget.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                    });
                 }
                 else
                     console.error(["Support Target not found for pre-support buff", this]);
             }
-        }
-    }
-
-    getSkillData(skillName) {
-        switch (skillName) {
-            case SkillNames.BASIC:
-                return this.skillData[SkillNames.BASIC];
-            case SkillNames.SKILL2:
-                return this.skillData[SkillNames.SKILL2];
-            case SkillNames.SKILL3:
-                return this.skillData[SkillNames.SKILL3];
-            case SkillNames.ULT:
-                return this.skillData[SkillNames.ULT];
-            case SkillNames.SUPPORT:
-                return this.skillData[SkillNames.SUPPORT];
-            default:
-                console.error(`${skillName} is not in the skill names enum`);
         }
     }
 }
