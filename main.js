@@ -229,11 +229,12 @@ d3.select("#calculateButton").on("click", () => {
     newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
     newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
 
-    let damage = newDoll.getSkillDamage(dollStats[1], newTarget, CalculationTypes.EXPECTED, 0);
+    let conditionalOverride = document.getElementById("ConditionalOverride").checked;
+    let damage = newDoll.getSkillDamage(dollStats[1], newTarget, CalculationTypes.EXPECTED, conditionalOverride);
     d3.select("#DPSDealt").text(`Expected Damage: ${damage}`);
-    damage = newDoll.getSkillDamage(dollStats[1], newTarget2, CalculationTypes.NOCRIT, 0);
+    damage = newDoll.getSkillDamage(dollStats[1], newTarget2, CalculationTypes.NOCRIT, conditionalOverride);
     d3.select("#NoCrit").text(`No Crit Damage: ${damage}`);
-    damage = newDoll.getSkillDamage(dollStats[1], newTarget3, CalculationTypes.CRIT, 0);
+    damage = newDoll.getSkillDamage(dollStats[1], newTarget3, CalculationTypes.CRIT, conditionalOverride);
     d3.select("#CritDealt").text(`Crit Damage: ${damage}`);
 })
 d3.select("body").append("button").on("click", () => {
