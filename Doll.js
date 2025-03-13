@@ -1,6 +1,6 @@
 import Unit from "./Unit.js";
 import ResourceLoader from "./ResourceLoader.js";
-import { SkillNames, CalculationTypes, SkillJSONKeys } from "./Enums.js";
+import { SkillNames, CalculationTypes, SkillJSONKeys, Elements } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 import DamageManager from "./DamageManager.js";
 import RNGManager from "./RNGManager.js";
@@ -32,6 +32,24 @@ class Doll extends Unit {
         };
         this.coverIgnore = 0;
         this.stabilityDamageModifier = 0;
+        // base values changed by direct input rather than automatic from buff applications
+        this.baseDefenseIgnore = 0;
+        this.baseDamageDealt = 0;
+        this.baseAoEDamageDealt = 0;
+        this.baseTargetedDamageDealt = 0;
+        this.baseExposedDamageDealt = 0;
+        this.baseSupportDamageDealt = 0;
+        this.basePhaseDamageDealt = 0;
+        this.baseElementDamageDealt = {
+            "Freeze" : 0,
+            "Burn" : 0,
+            "Corrosion" : 0,
+            "Hydro" : 0,
+            "Electric" : 0,
+            "Physical" : 0
+        };
+        this.baseCoverIgnore = 0;
+        this.baseStabilityDamageModifier = 0;
 
         this.initializeSkillData();
     }
@@ -51,16 +69,97 @@ class Doll extends Unit {
     getCoverIgnore() {return this.coverIgnore;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
     // for direct buff input
-    setDefenseIgnore(x) {this.defenseIgnore = x;}
-    setDamageDealt(x) {this.damageDealt = x;}
-    setAoEDamage(x) {this.aoeDamageDealt = x;}
-    setTargetedDamage(x) {this.targetedDamageDealt = x;}
-    setExposedDamage(x) {this.exposedDamageDealt = x;}
-    setSupportDamage(x) {this.supportDamageDealt = x;}
-    setPhaseDamage(x) {this.phaseDamageDealt = x;}
-    setElementDamage(elementName, x) {this.elementDamageDealt[elementName] = x;}
-    setCoverIgnore(x) {this.coverIgnore = x;}
-    setStabilityDamageModifier(x) {this.stabilityDamageModifier = x;}
+    setDefenseIgnore(x) {
+        this.resetDefenseIgnore();
+        this.baseDefenseIgnore = x;
+        this.defenseIgnore += x;
+    }
+    setDamageDealt(x) {
+        this.resetDamageDealt();
+        this.baseDamageDealt = x;
+        this.damageDealt += x;
+    }
+    setAoEDamage(x) {
+        this.resetAoEDamage();
+        this.baseAoEDamageDealt = x;
+        this.aoeDamageDealt += x;
+    }
+    setTargetedDamage(x) {
+        this.resetTargetedDamage();
+        this.baseTargetedDamageDealt = x;
+        this.targetedDamageDealt += x;
+    }
+    setExposedDamage(x) {
+        this.resetExposedDamage();
+        this.baseExposedDamageDealt = x;
+        this.exposedDamageDealt += x;
+    }
+    setSupportDamage(x) {
+        this.resetSupportDamage();
+        this.baseSupportDamageDealt = x;
+        this.supportDamageDealt += x;
+    }
+    setPhaseDamage(x) {
+        this.resetPhaseDamage();
+        this.basePhaseDamageDealt = x;
+        this.phaseDamageDealt += x;
+    }
+    setElementDamage(elementName, x) {
+        this.resetElementDamage(elementName);
+        this.baseElementDamageDealt[elementName] = x;
+        this.elementDamageDealt[elementName] += x;
+    }
+    setCoverIgnore(x) {
+        this.resetCoverIgnore();
+        this.baseCoverIgnore = x;
+        this.coverIgnore += x;
+    }
+    setStabilityDamageModifier(x) {
+        this.resetStabilityDamageModifier();
+        this.baseStabilityDamageModifier = x;
+        this.stabilityDamageModifier += x;
+    }
+    // when using the setters, undo the addition of the previous base multipliers
+    resetDefenseIgnore() {
+        this.defenseIgnore -= this.baseDefenseIgnore;
+        this.baseDefenseIgnore = 0;
+    }
+    resetDamageDealt() {
+        this.damageDealt -= this.baseDamageDealt;
+        this.baseDamageDealt = 0;
+    }
+    resetAoEDamage() {
+        this.aoeDamageDealt -= this.baseAoEDamageDealt;
+        this.baseAoEDamageDealt = 0;
+    }
+    resetTargetedDamage() {
+        this.targetedDamageDealt -= this.baseTargetedDamageDealt;
+        this.baseTargetedDamageDealt = 0;
+    }
+    resetExposedDamage() {
+        this.exposedDamageDealt -= this.baseExposedDamageDealt;
+        this.baseExposedDamageDealt = 0;
+    }
+    resetSupportDamage() {
+        this.supportDamageDealt -= this.baseSupportDamageDealt;
+        this.baseSupportDamageDealt = 0;
+    }
+    resetPhaseDamage() {
+        this.phaseDamageDealt -= this.basePhaseDamageDealt;
+        this.basePhaseDamageDealt = 0;
+    }
+    resetElementDamage(elementName) {
+        this.elementDamageDealt[elementName] -= this.baseElementDamageDealt[elementName];
+        this.baseElementDamageDealt[elementName] = 0;
+    }
+    resetCoverIgnore() {
+        this.coverIgnore -= this.baseCoverIgnore;
+        this.baseCoverIgnore = 0;
+    }
+    resetStabilityDamageModifier() {
+        this.stabilityDamageModifier -= this.baseStabilityDamageModifier;
+        this.baseStabilityDamageModifier = 0;
+    }
 
     initializeSkillData() {
         this.skillData = ResourceLoader.getInstance().getSkillData(this.name);
@@ -79,6 +178,7 @@ class Doll extends Unit {
         super.removeBuffEffects(buffData);
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
+    // conditionals in skills are set automatically by the respective doll class or by an override checkbox in the menu
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = 0) {
         // in the case of support attacks, target has 2 entries, the target and the supported unit
         let enemyTarget = target;
@@ -272,6 +372,31 @@ class Doll extends Unit {
                     console.error(["Support Target not found for pre-support buff", this]);
             }
         }
+    }
+
+    cloneUnit() {
+        let newDoll = new Doll(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification);
+        newDoll.setDefenseIgnore(this.baseDefenseIgnore);
+        newDoll.setDamageDealt(this.baseDamageDealt); 
+        newDoll.setAoEDamage(this.baseAoEDamageDealt); 
+        newDoll.setTargetedDamage(this.baseTargetedDamageDealt); 
+        newDoll.setExposedDamage(this.baseExposedDamageDealt);
+        newDoll.setSupportDamage(this.baseSupportDamageDealt); 
+        newDoll.setPhaseDamage(this.basePhaseDamageDealt); 
+        Object.values(Elements).forEach(d => {
+            newDoll.setElementDamage(d, this.baseElementDamageDealt[d]);
+        });
+        newDoll.setCoverIgnore(this.baseCoverIgnore); 
+        newDoll.setStabilityDamageModifier(this.baseStabilityDamageModifier);
+
+        if (!this.buffsEnabled)
+            newDoll.disableBuffs();
+        else
+            this.currentBuffs.forEach(d => {
+                newDoll.addBuff(d[0], d[2], d[5]);
+            });
+
+        return newDoll;
     }
 }
 

@@ -29,7 +29,7 @@ class ResourceLoader {
             if (ResourceLoaderSingleton.buffJSON.hasOwnProperty(buffName))
                 return ResourceLoaderSingleton.buffJSON[buffName];
             else
-                console.error("Buff Name does not exist");
+                console.error(`${buffName} Buff Name does not exist`);
         }
         else
             console.error("Singleton not yet initialized");

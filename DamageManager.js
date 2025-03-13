@@ -64,8 +64,8 @@ class DamageManager {
             totalBuffs += attacker.getElementDamage(element);
         }
         // make sure that totalbuffs doesn't become negative
-        totalBuffs = Math.max(0, totalBuffs); 
-        console.log([target, baseDamage, defModifier, coverModifier, critModifier, weaknessModifier, totalBuffs]);
+        totalBuffs = Math.max(0, totalBuffs);
+        console.log([target, attacker, baseDamage, defModifier, coverModifier, critModifier, weaknessModifier, totalBuffs]);
         // damage has a minimum value of 1
         let damage = Math.max(baseDamage * defModifier * critModifier * weaknessModifier * totalBuffs * coverModifier, 1);
         // round resulting damage

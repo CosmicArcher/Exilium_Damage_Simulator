@@ -15,6 +15,11 @@ class Target extends Unit {
         this.aoeDamageTaken = 0;
         this.targetedDamageTaken = 0;
         this.stabilityDamageModifier = 0;
+        // base stats for modifying without using buffs
+        this.baseDamageTaken = 0;
+        this.baseAoEDamageTaken = 0;
+        this.baseTargetedDamageTaken = 0;
+        this.baseStabilityDamageModifier = 0;
         // some bosses have damage reduction based on stability
         this.drPerStab = 0;
         this.drWithStab = 0;
@@ -27,10 +32,46 @@ class Target extends Unit {
     getTargetedDamageTaken() {return this.targetedDamageTaken;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
     // only use these setters for quick direct buff input calcs
-    setDamageTaken(x) {this.damageTaken = x;}
-    setAoEDamageTaken(x) {this.aoeDamageTaken = x;}
-    setTargetedDamageTaken(x) {this.targetedDamageTaken = x;}
-    setStabilityDamageModifier(x) {this.stabilityDamageModifier = x;}
+    setDamageTaken(x) {
+        this.resetDamageTaken();
+        this.baseDamageTaken = x;
+        this.damageTaken += x;
+    }
+    setAoEDamageTaken(x) {
+        this.resetAoEDamageTaken();
+        this.baseAoEDamageTaken = x;
+        this.aoeDamageTaken += x;
+    }
+    setTargetedDamageTaken(x) {
+        this.resetTargetedDamageTaken();
+        this.baseTargetedDamageTaken = x;
+        this.targetedDamageTaken += x;
+    }
+    setStabilityDamageModifier(x) {
+        this.resetStabilityDamageModifier();
+        this.baseStabilityDamageModifier = x;
+        this.stabilityDamageModifier += x;
+    }
+    // changing the base buffs requires resetting the added value to 0 first
+    resetDamageTaken() {
+        this.damageTaken -= this.baseDamageTaken;
+        this.baseDamageTaken = 0;
+    }
+    resetAoEDamageTaken() {
+        this.aoeDamageTaken -= this.aoeDamageTaken;
+        this.baseAoEDamageTaken = 0;
+    }
+    resetTargetedDamageTaken() {
+        this.targetedDamageTaken -= this.baseTargetedDamageTaken;
+        this.baseTargetedDamageTaken = 0;
+    }
+    resetStabilityDamageModifier() {
+        this.stabilityDamageModifier -= this.baseStabilityDamageModifier;
+        this.baseStabilityDamageModifier = 0;
+    }
+    // setters for use when cloning
+    setStability(x) {this.stability = x;}
+    setBrokenTurns(x) {this.stabilityBrokenTurns = x;}
     // process buffs using json data
     applyBuffEffects(buffData) {
         super.applyBuffEffects(buffData);
@@ -69,7 +110,7 @@ class Target extends Unit {
         });
     }
     // stability is lower bounded to 0, modifier is applied externally
-    reduceStability(x) {this.stability = Math.max(this.stability - x, 0);}
+    reduceStability(x) {if (this.stability > 0) this.stability = Math.max(this.stability - x, 0);}
 
     endTurn() {
         super.endTurn();
@@ -86,16 +127,20 @@ class Target extends Unit {
     // will figure out the best way to separate buff effects and their durations from direct set functions some other time
     cloneUnit() {
         let targetClone = new Target(this.name, this.defense, this.maxStability, this.turnsToRecoverStability, this.phaseWeaknesses);
-        targetClone.setDamageTaken(this.damageTaken);
-        targetClone.setAoEDamageTaken(this.aoeDamageTaken);
-        targetClone.setTargetedDamageTaken(this.targetedDamageTaken);
-        targetClone.setStabilityDamageModifier(this.stabilityDamageModifier);
+        targetClone.setDamageTaken(this.baseDamageTaken);
+        targetClone.setAoEDamageTaken(this.baseAoEDamageTaken);
+        targetClone.setTargetedDamageTaken(this.baseTargetedDamageTaken);
+        targetClone.setStabilityDamageModifier(this.baseStabilityDamageModifier);
         targetClone.applyDRPerStab(this.drPerStab);
         targetClone.applyDRWithStab(this.drWithStab);
         targetClone.setDefenseBuffs(this.defenseBuffs);
-        this.currentBuffs.forEach(d => {
-            targetClone.addBuff(d[0], d[2], d[5]);
-        });
+        // buffs are enabled by default so check if they are disabled when cloning
+        if (!this.buffsEnabled)
+            targetClone.disableBuffs();
+        else
+            this.currentBuffs.forEach(d => {
+                targetClone.addBuff(d[0], d[2], d[5]);
+            });
 
         return targetClone;
     }
