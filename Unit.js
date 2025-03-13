@@ -9,6 +9,8 @@ class Unit {
         this.defenseBuffs = 0;
         // track buff name, buff data, turns/stacks left, isTurnBased, isDefenseConsumed, source (for overburn damage)
         this.currentBuffs = [];
+        // some modes of the calculator will be purely manual input of buff effects while others will be automatic from the addBuff() function
+        this.buffsEnabled = 1;
     }
 
     setDefense(x) {this.defense = x;}
@@ -26,7 +28,7 @@ class Unit {
     // these are called when buffs are added/removed
     addBuff(buffName, duration, source) {
         let buffData = ResourceLoader.getInstance().getBuffData(buffName);
-        if (buffData) {
+        if (buffData && this.buffsEnabled) {
             this.currentBuffs.push([buffName, buffData, duration, buffData["Turn_Based"], buffData["Defense_Consumed"], source]);
             if (buffName == "Overburn") {
                 DamageManager.getInstance().applyFixedDamage(source.getAttack() * 0.1);
@@ -63,6 +65,9 @@ class Unit {
             }
         })
     }
+    // enable/disable buffs, will not retroactively apply the buffs that were missed since this is meant to be set at the beginning and kept the same throughout
+    enableBuffs() {this.buffsEnabled = 1;}
+    disableBuffs() {this.buffsEnabled = 0;}
 }
 
 export default Unit;

@@ -95,6 +95,14 @@
         "Defense_Consumed" : 0,
         "Element" : "Freeze"
     },
+    "Support Boost 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "Support%" : 0.15,
+        "Exposed%" : 0.1,
+        "StackLimit" : -1
+    },
     "Support Boost 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
@@ -112,5 +120,14 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0
+    },
+    "Cold Snap" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "Attack%" : 0.15,
+        "Stat" : "Attack",
+        "Stackable" : 1,
+        "StackLimit" : 3
     }
 }

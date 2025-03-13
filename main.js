@@ -238,6 +238,8 @@ d3.select("#calculateButton").on("click", () => {
     let dollStats = getDollStats();
     GameStateManager.getInstance().registerTarget(new Target("6p62", targetStats[0], targetStats[3], 2, targetStats[1]));
     let newTarget = GameStateManager.getInstance().getTarget();
+    // this webpage has all buffs manually input rather than automatic
+    newTarget.disableBuffs();
     GameStateManager.getInstance().addCover(targetStats[2]);
     newTarget.setDefenseBuffs(targetStats[4]);
     newTarget.setDamageTaken(targetStats[5]);
@@ -250,6 +252,7 @@ d3.select("#calculateButton").on("click", () => {
     let newTarget2 = newTarget.cloneUnit();
     let newTarget3 = newTarget.cloneUnit();
     let newDoll = new Doll(dollStats[0], dollStats[13], dollStats[2], dollStats[3], dollStats[4], 0);
+    newDoll.disableBuffs();
     newDoll.setDamageDealt(dollStats[6]);
     newDoll.setDefenseIgnore(dollStats[5]);
     newDoll.setTargetedDamage(dollStats[7]);
@@ -265,21 +268,15 @@ d3.select("#calculateButton").on("click", () => {
     newDoll.setElementDamage(Elements.CORROSION, dollStats[18]);
     newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
     newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
+    // make 3 copies of the doll as well for the same reason as the target
+    let newDoll2 = newDoll.cloneUnit();
+    let newDoll3 = newDoll.cloneUnit();
 
     let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
     let damage = newDoll.getSkillDamage(dollStats[1], newTarget, CalculationTypes.EXPECTED, conditionalOverride);
     d3.select("#DPSDealt").text(`Expected Damage: ${damage}`);
-    damage = newDoll.getSkillDamage(dollStats[1], newTarget2, CalculationTypes.NOCRIT, conditionalOverride);
+    damage = newDoll2.getSkillDamage(dollStats[1], newTarget2, CalculationTypes.NOCRIT, conditionalOverride);
     d3.select("#NoCrit").text(`No Crit Damage: ${damage}`);
-    damage = newDoll.getSkillDamage(dollStats[1], newTarget3, CalculationTypes.CRIT, conditionalOverride);
+    damage = newDoll3.getSkillDamage(dollStats[1], newTarget3, CalculationTypes.CRIT, conditionalOverride);
     d3.select("#CritDealt").text(`Crit Damage: ${damage}`);
 })
-d3.select("body").append("button").on("click", () => {
-    GameStateManager.getInstance().registerTarget(new Target("6p62", 8046, 65, 2, ["Ice"], ["Medium", "Heavy"]));
-    GameStateManager.getInstance().addCover(0.2);
-    GameStateManager.getInstance().getTarget().setDefenseBuffs(-0.3);
-    let newDoll = new Doll("Qiongjiu", 0, 2400, 0.2, 1.2, "none", 0);
-    newDoll.setDamageDealt(0.2);
-    let damage = DamageManager.getInstance().calculateDamage(newDoll, 2400*1.1, "Burn", "None", "AoE", 0, 0, 0);
-    console.log(damage);
-});

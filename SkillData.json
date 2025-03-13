@@ -17,7 +17,7 @@
             "Element" : "Burn",
             "Post_Self_Buff" : [{
                 "Name" : "Support Boost 1",
-                "Stacks" : 1
+                "Duration" : 1
             }]
         },
         "Skill3" : {
@@ -78,7 +78,7 @@
         },
         "Skill3" : {
             "Type" : "Attack",
-            "Multiplier" : 1.1,
+            "Multiplier" : 1.3,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
             "Ammo_Type" : "Heavy",
@@ -107,7 +107,11 @@
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
             "Ammo_Type" : "Heavy",
-            "Element" : "Freeze"
+            "Element" : "Freeze",
+            "Post_Target_Buff" : [{
+                "Name" : "Frozen",
+                "Duration" : 2
+            }]
         }
     }
 }
