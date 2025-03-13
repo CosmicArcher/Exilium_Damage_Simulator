@@ -17,7 +17,8 @@
             "Element" : "Burn",
             "Post_Self_Buff" : [{
                 "Name" : "Support Boost 1",
-                "Duration" : 1
+                "Duration" : -1,
+                "Stacks" : 1
             }]
         },
         "Skill3" : {
@@ -34,14 +35,17 @@
         },
         "Ultimate" : {
             "Type" : "Buff",
+            "Target" : "Self",
             "Post_Self_Buff" : [{
                 "Name" : "Support Boost 2",
-                "Duration" : 3
+                "Duration" : -1,
+                "Stacks" : 3
             }],
             "Conditional" : {
                 "Post_Self_Buff" : [{
                     "Name" :"Support Boost 2",
-                    "Duration" : 4
+                    "Duration" : -1,
+                    "Stacks" : 4
                 }]
             }
         },
@@ -84,7 +88,7 @@
             "Ammo_Type" : "Heavy",
             "Element" : "Physical",
             "Conditional" : {
-                "Post_Target_Buff" : [{
+                "Post_Self_Buff" : [{
                     "Name" : "Lone Wolf",
                     "Duration" : 1
                 }]
@@ -92,6 +96,7 @@
         },
         "Ultimate" : {
             "Type" : "Buff",
+            "Target" : "Self",
             "Post_Self_Buff" : [{
                 "Name" : "Alert",
                 "Duration" : 2
@@ -112,6 +117,1068 @@
                 "Name" : "Frozen",
                 "Duration" : 2
             }]
+        }
+    },
+    "Suomi" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1,
+            "Crit_Modifier" : -1,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Light",
+            "Element" : "Freeze",
+            "Fixed_Damage" : {
+                "Scaling" : 0.5,
+                "Stat" : "Defense"
+            }
+        },
+        "Skill3" : {
+            "Type" : "Buff",
+            "Target" : "Ally",
+            "Post_Target_Buff" : [{
+                "Name" : "Frost Shield",
+                "Duration" : 2    
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Fixed_Damage" : {
+                "Scaling" : 0.5,
+                "Stat" : "Defense"
+            },
+            "Post_Self_Buff" : [{
+                "Name" : "Frost Shield",
+                "Duration" : 3
+            }],
+            "Post_Target_Buff" : [{
+                "Name" : "Avalanche",
+                "Duration" : -1,
+                "Stacks" : 2
+            }]
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        }
+    },
+    "Papasha" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.6,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "None",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        }
+    },
+    "Papasha Summon" : {
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        }
+    },
+    "Daiyan" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+            "Type" : "Buff",
+            "Target" : "Self",
+            "Post_Self_Buff" : [{
+                "Name" : "Tuning",
+                "Duration" : -1,
+                "Stacks" : 4
+            }, {
+                "Name" : "Extra Action"
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.9,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Intercept" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        }
+    },
+    "Tololo" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Hydro"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "None",
+            "Element" : "Hydro"
+        }
+    },
+    "Mosin-Nagant" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+            "Type" : "Buff",
+            "Target" : "Self",
+            "Post_Self_Buff" : [{
+                "Name" :  "Conductive",
+                "Stacks" : 1
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        }
+    },
+    "Sabrina" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "None",
+            "Element" : "Hydro",
+            "Post_Target_Buff" : [{
+                "Name" : "Movement Down 2",
+                "Duration" : 2
+            }]
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.7,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Hydro",
+            "Post_Target_Buff" : [{
+                "Name" : "Movement Down 2",
+                "Duration" : 2
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Buff",
+            "Target" : "Self",
+            "Post_Self_Buff" : [{
+                "Name" : "Feeling Full",
+                "Duration" : 3
+            }]
+        },
+        "CounterAttack" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Physical"
+        }
+    },
+    "Ullrid" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "None",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.2,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Melee",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.9,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Melee",
+            "Element" : "Physical"
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Melee",
+            "Element" : "Physical"
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 1,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 0,
+            "Ammo_Type" : "None",
+            "Element" : "Physical"
+        }
+    },
+    "Vepley" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.75,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Physical"
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "None",
+            "Element" : "Physical",
+            "Post_Target_Buff" : [{
+                "Name" : "Vulnerability 2",
+                "Duration" : 2
+            }, {
+                "Name" : "Overzealous",
+                "Duration" : 2
+            }]
+        }
+    },
+    "Peritya" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.85,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Corrosion"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.9,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Corrosion"
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.5,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        }
+    },
+    "Sharkry" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.4,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Burn",
+            "Post_Target_Buff" : [{
+                "Name" : "Overburn",
+                "Duration" : 2
+            }]
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical",
+            "Conditional" : {
+                "Element" : "Burn",
+                "Post_Target_Buff" : [{
+                    "Name" : "Flammable",
+                    "Stacks" : 2
+                }],
+                "Post_Self_Buff" : [{
+                    "Name" : "Zoom In",
+                    "Stacks" : 1
+                }]
+            }
+        },
+        "Ultimate" : {
+            "Type" : "Buff",
+            "Target" : "Self",
+            "Post_Self_Buff" : [{
+                "Name" : "Zoom In",
+                "Stacks" : 1
+            }, {
+                "Name" : "Extra Action"
+            }]
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        }
+    },
+    "Colphne" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Buff",
+            "Target" : "Ally",
+            "Post_Target_Buff" : [{
+
+            }]
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Light",
+            "Element" : "Hydro"
+        },
+        "Ultimate" : {
+            "Type" : "Buff",
+            "Target" : "Ally"
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical",
+            "Pre_Support_Buff" : [{
+                "Name" : "Attack Up 1",
+                "Duration" : 2
+            }]
+        }
+    },
+    "Cheeta" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Light",
+            "Element" : "Burn"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "None",
+            "Element" : "Physical"
+        },
+        "Ultimate" : {
+            "Type" : "Buff",
+            "Target" : "All",
+            "Post_Target_Buff" : [{
+                "Name" : "Blazing Assault 2",
+                "Duration" : 2
+            }],
+            "Post_Self_Buff" : [{
+                "Name" : "Support",
+                "Duration" : 2
+            }]
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        }
+    },
+    "Groza" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 5,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical",
+            "Post_Target_Buff" : [{
+                "Name" : "Movement Down 2",
+                "Duration" : 2
+            }]
+        },
+        "Skill3" : {
+            "Type" : "Buff",
+            "Target" : "All",
+            "Post_Target_Buff" : [{
+                "Name" : "Defense Up 2",
+                "Duration" : 2
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.9,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "None",
+            "Element" : "Physical",
+            "Post_Target_Buff" : [{
+                "Name" : "Movement Down 2",
+                "Duration" : 2
+            }]
+        },
+        "CounterAttack" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        }
+    },
+    "Krolik" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Melee",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.2,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Melee",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Melee",
+            "Element" : "Burn"
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Melee",
+            "Element" : "Burn"
+        }
+    },
+    "Ksenia" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.75,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical",
+            "Post_Target_Buff" : [{
+                "Name" : "Overburn",
+                "Duration" : 1
+            }, {
+                "Name" : "Flammable",
+                "Stacks" : 2
+            }],
+            "Conditional" : {
+                "Extra_Attack" : {
+                    "Type" : "Attack",
+                    "Multiplier" : 0.75,
+                    "Damage_Type" : "Targeted",
+                    "StabilityDamage" : 2,
+                    "Ammo_Type" : "Light",
+                    "Element" : "Burn"
+                }
+            }
+        },
+        "Skill3" : {
+            "Type" : "Buff",
+            "Target" : "Self",
+            "Post_Target_Buff" : [{
+                "Name" : "Heat Recovery",
+                "Duration" : 2
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.6,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 5,
+            "Ammo_Type" : "Light",
+            "Element" : "Burn",
+            "Pre_Self_Buff" : [{
+                "Name" : "Heat Recovery",
+                "Duration" : 2
+            }, {
+                "Name" : "Blazing Assault 2",
+                "Duration" : 2
+            }]
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical",
+            "Pre_Support_Buff" : [{
+                "Name" : "Blazing Assault 2",
+                "Duration" : 2
+            }]
+        }
+    },
+    "Littara" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.7,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.65,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.85,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.3,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        }
+    },
+    "Lotta" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.6,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Freeze",
+            "Post_Target_Buff" : [{
+                "Name" : "Frostbite",
+                "Duration" : 2
+            }]
+        },
+        "Skill3" : {
+            "Type" : "Buff",
+            "Target" : "Self",
+            "Post_Self_Buff" : [{
+                "Name" : "Attack Up 2",
+                "Duration" : 2
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "None",
+            "Element" : "Freeze",
+            "Cover_Ignore" : 1,
+            "Conditional" : {
+                "Post_Target_Buff" : [{
+                    "Name" : "Frostbite",
+                    "Duration" : 2
+                }]
+            }
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.5,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Shotgun",
+            "Element" : "Physical"
+        }
+    },
+    "Nagant Revolver" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical",
+            "Conditional" : {
+                "Post_Target_Buff" : [{
+                    "Name" : "Acid Corrosion 2",
+                    "Duration" : 1
+                }]
+            }
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.7,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "None",
+            "Element" : "Physical",
+            "Conditional" : {
+                "Extra_Attack" : {
+                    "Type" : "Attack",
+                    "Multiplier" : 0.7,
+                    "Damage_Type" : "AoE",
+                    "StabilityDamage" : 3,
+                    "Ammo_Type" : "None",
+                    "Element" : "Physical",
+                    "Pre_Target_Buff" : [{
+                        "Name" : "Acid Corrosion 2",
+                        "Duration" : 1
+                    }]
+                }
+            }
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 6,
+            "Ammo_Type" : "Light",
+            "Element" : "Corrosion",
+            "Conditional" : {
+                "Post_Target_Buff" : [{
+                    "Name" : "Vulnerability 1",
+                    "Duration" : 1
+                }]
+            }
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.5,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Light",
+            "Element" : "Physical"
+        }
+    },
+    "Nemesis" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical",
+            "Post_Target_Buff" : [{
+                "Name" : "Defense Down 2",
+                "Duration" : 1
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.7,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 4,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Corrosion"
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        }
+    },
+    "Dushevnaya" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.1,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical",
+            "Conditional" : {
+                "Multiplier" : 1.3,
+                "Cover_Ignore" : 0.15,
+                "Element" : "Freeze"
+            }
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.5,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "None",
+            "Element" : "Freeze",
+            "Conditional" : {
+                "Multiplier" : 0.7,
+                "Post_Target_Buff" : [{
+                    "Name" : "Frigid",
+                    "Duration" : 1
+                }]
+            }
+        },
+        "Ultimate" : {
+            "Type" : "Buff",
+            "Target" : "All",
+            "Post_Target_Buff" : [{
+                "Name" : "Arctic Benediction"
+            }],
+            "Post_Self_Buff" : [{
+                "Name" : "Glacial Domain",
+                "Duration" : 2
+            }]
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 2,
+            "Ammo_Type" : "Heavy",
+            "Element" : "Physical"
+        }
+    },
+    "Centaureissi" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 1.3,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 6,
+            "Ammo_Type" : "None",
+            "Element" : "Burn"
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.5,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 0,
+            "Ammo_Type" : "None",
+            "Element" : "Physical"
+        },
+        "Ultimate" : {
+            "Type" : "Buff",
+            "Target" : "All",
+            "Post_Target_Buff" : [{
+                "Name" : "Heat Recovery",
+                "Duration" : 2
+            }]
+        },
+        "Support" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical",
+            "Pre_Support_Buff" : [{
+                "Name" : "Heat Recovery",
+                "Duration" : 2
+            }]
+        }
+    },
+    "Klukai" : {
+        "Basic" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "Targeted",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Physical"
+        },
+        "Skill2" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.8,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 3,
+            "Ammo_Type" : "Medium",
+            "Element" : "Corrosion",
+            "Extra_Attack" : {
+                "Type" : "Attack",
+                "Multiplier" : 0.6,
+                "Damage_Type" : "AoE",
+                "StabilityDamage" : 3,
+                "Ammo_Type" : "Medium",
+                "Element" : "Corrosion"
+            },
+            "Conditional" : {
+                "Post_Target_Buff" : [{
+                    "Name" : "Corrosive Pressure",
+                    "Duration" : 2
+                }]
+            }
+        },
+        "Skill3" : {
+            "Type" : "Attack",
+            "Multiplier" : 0.9,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 1,
+            "Ammo_Type" : "None",
+            "Element" : "Corrosion",
+            "Post_Target_Buff" : [{
+                "Name" : "Toxic Invasion",
+                "Duration" : 2
+            }]
+        },
+        "Ultimate" : {
+            "Type" : "Attack",
+            "Multiplier" : 1,
+            "Damage_Type" : "AoE",
+            "StabilityDamage" : 0,
+            "Ammo_Type" : "None",
+            "Element" : "Corrosion"
         }
     }
 }

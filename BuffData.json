@@ -1,11 +1,18 @@
 {
-    "Blazing Assault" : {
+    "Blazing Assault 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
         "Attack%" : 0.15,
         "Stat" : "Attack",
         "Element" : "Burn"
+    },
+    "Attack Up 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0,
+        "Attack%" : 0.1,
+        "Stat" : "Attack"
     },
     "Attack Up 2" : {
         "Buff_Type" : "Buff",
@@ -82,18 +89,27 @@
         "Element" : "Burn"
         
     },
+    "Avalanche" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "Element" : "Freeze",
+        "StackLimit" : 5
+    },
     "Frozen" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
         "Element" : "Freeze",
+        "Stat" : "Movement",
         "StackLimit" : 2
     },
     "Frigid" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Element" : "Freeze"
+        "Element" : "Freeze",
+        "Stat" : "Movement"
     },
     "Support Boost 1" : {
         "Buff_Type" : "Buff",
@@ -129,5 +145,111 @@
         "Stat" : "Attack",
         "Stackable" : 1,
         "StackLimit" : 3
+    },
+    "Tuning" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "Stackable" : 1,
+        "StackLimit" : 10
+    },
+    "Permanent Tuning" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed": 0,
+        "Stackable" : 1,
+        "StackLimit" : 3
+    },
+    "Extra Action" : {
+
+    },
+    "Extra Movement" : {
+
+    },
+    "Extra Command" : {
+
+    },
+    "Movement Down 2" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Stat" : "Movement"
+    },
+    "Conductive" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "Damage%" : 0.3
+    },
+    "Feeling Full" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1
+    },
+    "Vulnerability 1" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "DamageTaken%" : 0.1,
+        "Stat" : "DamageTaken"
+    },
+    "Vulnerability 2" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "DamageTaken%" : 0.2,
+        "Stat" : "DamageTaken"
+    },
+    "Overzealous" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Stat" : "DamageTaken"
+    },
+    "Flammable" : {
+        "Buff_Type" : "Debuff",
+        "Defense_Consumed" : 1,
+        "Element" : "Burn",
+        "StabilityDamage" : 2,
+        "StackLimit" : 2
+    },
+    "Zoom In" : {
+        "Buff_Type" : "Buff",
+        "Defense_Consumed" : 0,
+        "Damage%" : 0.15,
+        "StabilityDamage" : 2,
+        "Stackable" : 1,
+        "StackLimit" : 2
+    },
+    "Support" : {
+        "Buff_Type" : "Neutral",
+        "Turn_Based" : 1
+    },
+    "Heat Recovery" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 1,
+        "StackLimit" : 1,
+        "Element" : "Burn"
+    },
+    "Frostbite" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Element" : "Freeze"
+    },
+    "Arctic Benediction" : {
+        "Buff_Type" : "Buff",
+        "Defense_Consumed" : 0,
+        "Damage%" : 0.1
+    },
+    "Glacial Domain" : {
+        "Buff_Type" : "Neutral",
+        "Turn_Based" : 1
+    },
+    "Corrosive Pressure" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Element" : "Corrosion",
+        "StackLimit" : 10
+    },
+    "Toxic Invasion" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Element" : "Corrosion"
     }
-}
+} 

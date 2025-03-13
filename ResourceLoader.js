@@ -39,7 +39,7 @@ class ResourceLoader {
             if (ResourceLoaderSingleton.skillJSON.hasOwnProperty(dollName))
                 return ResourceLoaderSingleton.skillJSON[dollName];
             else
-                console.error("Doll Name does not exist");
+                console.error(`${dollName} Doll Name does not exist`);
         }
         else
             console.error("Singleton not yet initialized");
