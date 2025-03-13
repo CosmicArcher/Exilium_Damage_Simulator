@@ -192,25 +192,25 @@ class Doll extends Unit {
         // get the data of the chosen skill
         switch (skillName) {
             case SkillNames.BASIC:
-                skill = this.skillData[SkillNames.BASIC];
+                skill = this.copySkillData(this.skillData[SkillNames.BASIC]);
                 break;
             case SkillNames.SKILL2:
-                skill = this.skillData[SkillNames.SKILL2];
+                skill = this.copySkillData(this.skillData[SkillNames.SKILL2]);
                 break;
             case SkillNames.SKILL3:
-                skill = this.skillData[SkillNames.SKILL3];
+                skill = this.copySkillData(this.skillData[SkillNames.SKILL3]);
                 break;
             case SkillNames.ULT:
-                skill = this.skillData[SkillNames.ULT];
+                skill = this.copySkillData(this.skillData[SkillNames.ULT]);
                 break;
             case SkillNames.SUPPORT:
-                skill = this.skillData[SkillNames.SUPPORT];
+                skill = this.copySkillData(this.skillData[SkillNames.SUPPORT]);
                 break;
             case SkillNames.INTERCEPT:
-                skill = this.skillData[SkillNames.INTERCEPT];
+                skill = this.copySkillData(this.skillData[SkillNames.INTERCEPT]);
                 break;
             case SkillNames.COUNTERATTACK:
-                skill = this.skillData[SkillNames.COUNTERATTACK];
+                skill = this.copySkillData(this.skillData[SkillNames.COUNTERATTACK]);
                 break;
             default:
                 console.error(`${skillName} is not in the skill names enum`);
@@ -372,6 +372,16 @@ class Doll extends Unit {
                     console.error(["Support Target not found for pre-support buff", this]);
             }
         }
+    }
+
+    copySkillData(skill) {
+        let newSkill = {};
+
+        Object.keys(skill).forEach(d => {
+            newSkill[d] = skill[d];
+        })
+
+        return newSkill;
     }
 
     cloneUnit() {

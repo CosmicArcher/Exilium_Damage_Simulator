@@ -105,7 +105,7 @@ function createSkillDropdown() {
                         }
                         else {
                             d3.select("#ConditionalHolder").style("display", "none");
-                            d3.select("#ConditionalOverride").checked = false;
+                            d3.select("#ConditionalOverride").node().checked = false;
                         }
                     });
     });
