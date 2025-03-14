@@ -52,6 +52,7 @@ class Doll extends Unit {
         this.baseStabilityDamageModifier = 0;
 
         this.initializeSkillData();
+        this.applyFortificationData();
     }
 
     getAttack() {return this.attack;}
@@ -160,10 +161,40 @@ class Doll extends Unit {
         this.stabilityDamageModifier -= this.baseStabilityDamageModifier;
         this.baseStabilityDamageModifier = 0;
     }
-
+    // get the data belonging to the doll from the loaded jsons
     initializeSkillData() {
         this.skillData = ResourceLoader.getInstance().getSkillData(this.name);
+        this.fortData = ResourceLoader.getInstance().getFortData(this.name);
+        // change skilldata from a reference to resource loader's json to directly having its own copy of the values
+        this.copySkillJSON();
     }
+    // merge the upgrades from fortification into skill data
+    applyFortificationData() {
+        for (let i = 1; i <= this.fortification; i++) {
+            // check if the fortification level modifies skill data
+            if (this.fortData.hasOwnProperty("V" + i)) {
+                let fortification = this.fortData["V" + i];
+                // some fortifications modify multiple skills at once, typically by modifying a unique buff that multiple skills apply
+                let fortificationSkills = Object.keys(fortification);
+                if (fortificationSkills.length > 1) {
+                    fortificationSkills.forEach(d => {
+                        // get the keys that will be modified
+                        Object.keys(d).forEach(skill_key => {
+                            // overwrite skillData since fortification should not change once initialized
+                            this.skillData[d][skill_key] = d[skill_key];
+                        });
+                    });
+                }
+                else {
+                    Object.keys(fortification[fortificationSkills]).forEach(skill_key => {
+                        // overwrite skillData since fortification should not change once initialized
+                        this.skillData[fortificationSkills][skill_key] = fortification[fortificationSkills][skill_key];
+                    });
+                }
+            }
+        }
+    }
+
     // process buffs using json data
     applyBuffEffects(buffData) {
         super.applyBuffEffects(buffData);
@@ -192,25 +223,25 @@ class Doll extends Unit {
         // get the data of the chosen skill
         switch (skillName) {
             case SkillNames.BASIC:
-                skill = this.copySkillData(this.skillData[SkillNames.BASIC]);
+                skill = this.copyNestedObject(this.skillData[SkillNames.BASIC]);
                 break;
             case SkillNames.SKILL2:
-                skill = this.copySkillData(this.skillData[SkillNames.SKILL2]);
+                skill = this.copyNestedObject(this.skillData[SkillNames.SKILL2]);
                 break;
             case SkillNames.SKILL3:
-                skill = this.copySkillData(this.skillData[SkillNames.SKILL3]);
+                skill = this.copyNestedObject(this.skillData[SkillNames.SKILL3]);
                 break;
             case SkillNames.ULT:
-                skill = this.copySkillData(this.skillData[SkillNames.ULT]);
+                skill = this.copyNestedObject(this.skillData[SkillNames.ULT]);
                 break;
             case SkillNames.SUPPORT:
-                skill = this.copySkillData(this.skillData[SkillNames.SUPPORT]);
+                skill = this.copyNestedObject(this.skillData[SkillNames.SUPPORT]);
                 break;
             case SkillNames.INTERCEPT:
-                skill = this.copySkillData(this.skillData[SkillNames.INTERCEPT]);
+                skill = this.copyNestedObject(this.skillData[SkillNames.INTERCEPT]);
                 break;
             case SkillNames.COUNTERATTACK:
-                skill = this.copySkillData(this.skillData[SkillNames.COUNTERATTACK]);
+                skill = this.copyNestedObject(this.skillData[SkillNames.COUNTERATTACK]);
                 break;
             default:
                 console.error(`${skillName} is not in the skill names enum`);
@@ -222,6 +253,7 @@ class Doll extends Unit {
             conditionalOverrides.forEach(d => {
                 skill[d] = conditionalData[d];
             })
+            console.log(skill)
         }
 
         if (skill[SkillJSONKeys.TYPE] == "Attack") {
@@ -272,19 +304,32 @@ class Doll extends Unit {
         switch(calculationType) {
             case CalculationTypes.CRIT:
                 isCrit = 1;
-                tempCritDmg = this.crit_damage;
+                // if this is V1+ Makiatto's second shot and the conditional flag is not true, then add the crit damage anyway since critting is the condition to add it
+                if (this.name == "Makiatto" && this.fortification > 0 && !skill.hasOwnProperty(SkillJSONKeys.EXTRA_ATTACK) && skill[SkillJSONKeys.CRIT_MODIFIER] != 1
+                    && skill[SkillJSONKeys.STABILITYDAMAGE] == 1)
+                    tempCritDmg += 0.8;
                 break;
             case CalculationTypes.NOCRIT:
                 isCrit = 0;
-                tempCritDmg = this.crit_damage;
                 break;
             case CalculationTypes.EXPECTED: // get the expected value of the attack through linear interpolation from 1 to crit damage using crit rate
                 isCrit = 1;
-                tempCritDmg = (this.crit_damage - 1) * Math.max(Math.min(tempCritRate, 1), 0) + 1; // the effective value of crit rate should be bounded to 0-1
+                // the effective value of crit rate should be bounded to 0-1
+                tempCritRate = Math.max(Math.min(tempCritRate, 1), 0); 
+                tempCritDmg = (tempCritDmg - 1) * tempCritRate + 1; 
+                // V1 Makiatto 2nd shot crit modifiers depends on the first shot to crit which messes with the expected value calculations so I have to manually
+                // calculate the expected value, first check if this doll is V1+ Makiatto then check if this is the extra attack and lastly check if the conditional
+                // override bool has not been ticked, the last one is because that bool tells us whether the first shot crit or only potentially crit
+                if (this.name == "Makiatto" && skill[SkillJSONKeys.CRIT_MODIFIER] != 1 && this.fortification > 0 && !skill.hasOwnProperty(SkillJSONKeys.EXTRA_ATTACK)
+                    && skill[SkillJSONKeys.STABILITYDAMAGE] == 1) {
+                    let noCritRate = 1 - tempCritRate;
+                    tempCritDmg = noCritRate * noCritRate; // case 1: Both first and second shots failed to crit
+                    tempCritDmg += noCritRate * tempCritRate * this.crit_damage; // case 2: First shot fails to crit and second shot crits
+                    tempCritDmg += tempCritRate * (this.crit_damage + 0.8);
+                }
                 break;
             case CalculationTypes.SIMULATION:
                 isCrit = RNGManager.getInstance().getRNG() <= tempCritRate; // simulate a crit rng roll
-                tempCritDmg = this.crit_damage;
                 break;
             default:
                 console.error(`${calculationType} is not a valid calculation type`);
@@ -373,15 +418,40 @@ class Doll extends Unit {
             }
         }
     }
-
-    copySkillData(skill) {
-        let newSkill = {};
-
-        Object.keys(skill).forEach(d => {
-            newSkill[d] = skill[d];
-        })
-
-        return newSkill;
+    // because fortification will modify the skill json, we need a copy of it rather than a reference to the resourceloader's to prevent unintended effects
+    copySkillJSON() {
+        let newJSON = {};
+        // iterate through each skill
+        Object.keys(this.skillData).forEach(skill => {
+            // each skill key has an object value
+            newJSON[skill] = this.copyNestedObject(this.skillData[skill]);
+        });
+        console.log(this.skillData);
+        this.skillData = newJSON;
+        console.log(this.skillData);
+    }
+    // buffs are made as arrays of objects
+    copyBuffArray(arr) {
+        let newArr = [];
+        arr.forEach(d => {
+            newArr.push(this.copyNestedObject(d));
+        });
+        return newArr;
+    }
+    // copies skill data, buffs, conditionals, or extra attacks for playing around without changing the original variable
+    copyNestedObject(obj) {
+        let newObj = {};
+        Object.keys(obj).forEach(d => {
+            // sometimes conditional contains buff array modifications so some values are arrays of objects
+            if (obj[d].constructor == Array)
+                newObj[d] = this.copyBuffArray(obj[d]);
+            // if the key is fixed_damage, conditional or extra_attack, copy the nested object values
+            else if (d == SkillJSONKeys.FIXED_DAMAGE || d == SkillJSONKeys.CONDITIONAL || d == SkillJSONKeys.EXTRA_ATTACK)
+                newObj[d] = this.copyNestedObject(obj[d]);
+            else
+                newObj[d] = obj[d];
+        });
+        return newObj;
     }
 
     cloneUnit() {

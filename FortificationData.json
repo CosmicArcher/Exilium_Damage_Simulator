@@ -60,6 +60,7 @@
             "Skill2" : {
                 "Type" : "Attack",
                 "Multiplier" : 1,
+                "Crit_Damage_Modifier" : 0,
                 "Damage_Type" : "Targeted",
                 "StabilityDamage" : 1,
                 "Ammo_Type" : "Heavy",
@@ -78,10 +79,22 @@
                     "Post_Self_Buff" : [{
                         "Name" : "Cold Conviction",
                         "Duration" : -1
-                    }],
-                    "Conditional" : {
+                    }]
+                },
+                "Conditional" : {
+                    "Extra_Attack" : {
+                        "Type" : "Attack",
+                        "Multiplier" : 1,
                         "Crit_Modifier" : 1,
-                        "Crit_Damage_Modifier" : 0.8
+                        "Crit_Damage_Modifier" : 0.8,
+                        "Damage_Type" : "Targeted",
+                        "StabilityDamage" : 1,
+                        "Ammo_Type" : "Heavy",
+                        "Element" : "Freeze",
+                        "Post_Self_Buff" : [{
+                            "Name" : "Cold Conviction",
+                            "Duration" : -1
+                        }]
                     }
                 }
             }

@@ -8,6 +8,7 @@ import {Elements, AmmoTypes, SkillNames, CalculationTypes, SkillJSONKeys} from "
 
 var selectedPhases = [];
 var selectedDoll;
+var selectedFortification = 0;
 var selectedSkill;
 
 var skillOptions;
@@ -72,7 +73,29 @@ function getDollStats() {
 }
 
 function checkSkillConditional(skillName) {
-    return ResourceLoader.getInstance().getSkillData(selectedDoll)[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL);
+    // check if the doll's skill has a conditional inherently
+    if (ResourceLoader.getInstance().getSkillData(selectedDoll)[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL))
+        return true;
+    else {
+        // check if the fortifications add a conditional to the skill
+        let fortificationData = ResourceLoader.getInstance().getFortData(selectedDoll);
+        for (let i = 1; i <= selectedFortification; i++) {
+            // check each fortification
+            if (fortificationData.hasOwnProperty("V"+i)) {
+                let fortification = fortificationData["V"+i];
+                // check if the fortification modifies the skill
+                if (fortification.hasOwnProperty(skillName)) {
+                    // check if the modification adds a conditional
+                    console.log(fortification);
+                    if (fortification[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL))
+                        return true;
+                    // if not, continue checking the rest of the fortifications
+                }
+            }
+        }
+    }
+    // if all fortifications have been checked and no conditional has still been found, return false
+    return false;
 }
 
 function getDollSkills() {
@@ -111,6 +134,10 @@ function createSkillDropdown() {
     });
 }
 
+function updateSelectedDoll() {
+    d3.select("#DollSelected").text("Doll: V" + selectedFortification + " " + selectedDoll);
+}
+
 // initialize the singletons
 {
 DamageManager.getInstance();
@@ -119,6 +146,7 @@ RNGManager.getInstance();
 ResourceLoader.getInstance();
 ResourceLoader.getInstance().loadBuffJSON();
 ResourceLoader.getInstance().loadSkillJSON();
+ResourceLoader.getInstance().loadFortJSON();
 }
 
 // target stats dropdowns
@@ -186,6 +214,7 @@ ResourceLoader.getInstance().loadSkillJSON();
 {
     var dollOptions;
     var phaseDiv;
+    var fortOptions;
     // if doll selection button is clicked, show a dropdown of all dolls in the skill json
     d3.select("#Doll").on("click", () => {
         // create the dropdown list if it is not yet created
@@ -197,20 +226,41 @@ ResourceLoader.getInstance().loadSkillJSON();
                             .text(d)
                             .on("click", () => {
                                 selectedDoll = d;
-                                d3.select("#DollSelected").text("Doll: " + d);
-                                // enable the skill dropdown button since a doll is now selected
+                                updateSelectedDoll();
+                                // enable the skill and fortification dropdown buttons since a doll is now selected
                                 d3.select("#Skill").node().disabled = false;
+                                d3.select("#Fortification").node().disabled = false;
                                 // disable the calculate damage button because a skill for the new doll has not yet been selected
                                 d3.select("#calculateButton").node().disabled = true;
                                 createSkillDropdown();
                             })
             });
         }
-        // create the dropdown list
+        // toggle the dropdown list
         if (dollOptions.style("display") == "none") 
             dollOptions.style("display", "block");
         else
             dollOptions.style("display", "none");
+    });
+    // if fortification button is selected, show a list from V0-V6 to set the fortification of the doll
+    d3.select("#Fortification").on("click", () => {
+        // if dropdown list has not yet been created
+        if (!fortOptions) {
+            fortOptions = d3.select("#Fortification").append("div").attr("class", "dropdownBox").style("display", "none");
+            for (let i = 0; i < 7; i++) {
+                fortOptions.append("a")
+                            .text("V" + i)
+                            .on("click", () => {
+                                selectedFortification = i;
+                                updateSelectedDoll();
+                            });
+            }
+        }
+        // toggle the dropdown list
+        if (fortOptions.style("display") == "none") 
+            fortOptions.style("display", "block");
+        else
+            fortOptions.style("display", "none");
     });
     
     // elemental damage show/hide toggle, construct the dropdown here so that it does not affect the size of the button
@@ -251,7 +301,7 @@ d3.select("#calculateButton").on("click", () => {
     // since attacks will reduce stability but we need to reuse the same initial target state for the 3 calculations, clone the created target
     let newTarget2 = newTarget.cloneUnit();
     let newTarget3 = newTarget.cloneUnit();
-    let newDoll = new Doll(dollStats[0], dollStats[13], dollStats[2], dollStats[3], dollStats[4], 0);
+    let newDoll = new Doll(dollStats[0], dollStats[13], dollStats[2], dollStats[3], dollStats[4], selectedFortification);
     newDoll.disableBuffs();
     newDoll.setDamageDealt(dollStats[6]);
     newDoll.setDefenseIgnore(dollStats[5]);
