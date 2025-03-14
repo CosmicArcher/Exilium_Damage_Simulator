@@ -3,7 +3,7 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Attack%" : 0.15,
+        "AttackPerc" : 0.15,
         "Stat" : "Attack",
         "Element" : "Burn"
     },
@@ -11,35 +11,35 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Attack%" : 0.1,
+        "AttackPerc" : 0.1,
         "Stat" : "Attack"
     },
     "Attack Up 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Attack%" : 0.15,
+        "AttackPerc" : 0.15,
         "Stat" : "Attack"
     },
     "Defense Down 1" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Defense%" : -0.2,
+        "DefensePerc" : -0.2,
         "Stat" : "Defense"
     },
     "Defense Down 2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Defense%" : -0.3,
+        "DefensePerc" : -0.3,
         "Stat" : "Defense"
     },
     "Acid Corrosion 2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Defense%" : -0.3,
+        "DefensePerc" : -0.3,
         "Stat" : "Defense",
         "Element" : "Corrosion"
     },
@@ -47,36 +47,36 @@
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Defense%" : -0.5,        
-        "StabilityDamage" : 1,
+        "DefensePerc" : -0.5,        
+        "StabilityTaken" : 1,
         "Stat" : "Defense"
     },
     "Defense Up 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Defense%" : 0.2,
+        "DefensePerc" : 0.2,
         "Stat" : "Defense"
     },
     "Defense Up 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Defense%" : 0.3, 
+        "DefensePerc" : 0.3, 
         "Stat" : "Defense"
     },
     "Defense Up 3" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0,
-        "Defense%" : 0.4,        
+        "DefensePerc" : 0.4,        
         "Stat" : "Defense"
     },
     "Edifice" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 1,
-        "Defense%" : 0.25,
+        "DefensePerc" : 0.25,
         "StackLimit" : 3,
         "Stackable" : 1,
         "Cleanseable" : 1,
@@ -115,16 +115,32 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
-        "Support%" : 0.15,
-        "Exposed%" : 0.1,
+        "SupportPerc" : 0.15,
+        "ExposedPerc" : 0.1,
+        "StackLimit" : -1
+    },
+    "Support Boost 1 V1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "SupportPerc" : 0.3,
+        "ExposedPerc" : 0.1,
         "StackLimit" : -1
     },
     "Support Boost 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
-        "Support%" : 0.3,
-        "Exposed%" : 0.1,
+        "SupportPerc" : 0.3,
+        "ExposedPerc" : 0.1,
+        "StackLimit" : -1
+    },
+    "Support Boost 2 V4" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "SupportPerc" : 0.3,
+        "ExposedPerc" : 0.1,
         "StackLimit" : -1
     },
     "Alert" : {
@@ -132,16 +148,16 @@
         "Turn_Based" : 1,
         "Defense_Consumed" : 0
     },
-    "Frost Shield" : {
+    "Frost Barrier" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 0
     },
-    "Cold Snap" : {
+    "Cold Conviction" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
-        "Attack%" : 0.15,
+        "AttackPerc" : 0.1,
         "Stat" : "Attack",
         "Stackable" : 1,
         "StackLimit" : 3
@@ -151,14 +167,32 @@
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
         "Stackable" : 1,
-        "StackLimit" : 10
+        "StackLimit" : 10,
+        "Crit" : 0.03,
+        "Crit_Damage" : 0.03
+    },
+    "Pitch Perfect" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0
     },
     "Permanent Tuning" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed": 0,
         "Stackable" : 1,
-        "StackLimit" : 3
+        "StackLimit" : 3,
+        "Crit" : 0.03,
+        "Crit_Damage" : 0.03
+    },
+    "Permanent Tuning V3" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed": 0,
+        "Stackable" : 1,
+        "StackLimit" : 6,
+        "Crit" : 0.03,
+        "Crit_Damage" : 0.03
     },
     "Extra Action" : {
 
@@ -174,11 +208,19 @@
         "Turn_Based" : 1,
         "Stat" : "Movement"
     },
-    "Conductive" : {
+    "Active Engagement" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
-        "Damage%" : 0.3
+        "StackLimit" : 99,
+        "DamagePerc" : 0.3
+    },
+    "Active Engagement V5" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "StackLimit" : 99,
+        "DamagePerc" : 0.4
     },
     "Feeling Full" : {
         "Buff_Type" : "Buff",
@@ -187,13 +229,13 @@
     "Vulnerability 1" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "DamageTaken%" : 0.1,
+        "DamageTakenPerc" : 0.1,
         "Stat" : "DamageTaken"
     },
     "Vulnerability 2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "DamageTaken%" : 0.2,
+        "DamageTakenPerc" : 0.2,
         "Stat" : "DamageTaken"
     },
     "Overzealous" : {
@@ -205,13 +247,13 @@
         "Buff_Type" : "Debuff",
         "Defense_Consumed" : 1,
         "Element" : "Burn",
-        "StabilityDamage" : 2,
+        "StabilityTaken" : 2,
         "StackLimit" : 2
     },
     "Zoom In" : {
         "Buff_Type" : "Buff",
         "Defense_Consumed" : 0,
-        "Damage%" : 0.15,
+        "DamagePerc" : 0.15,
         "StabilityDamage" : 2,
         "Stackable" : 1,
         "StackLimit" : 2
@@ -227,15 +269,16 @@
         "StackLimit" : 1,
         "Element" : "Burn"
     },
-    "Frostbite" : {
+    "Cold Snap" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Element" : "Freeze"
+        "Element" : "Freeze",
+        "Stat" : "Movement"
     },
     "Arctic Benediction" : {
         "Buff_Type" : "Buff",
         "Defense_Consumed" : 0,
-        "Damage%" : 0.1
+        "DamagePerc" : 0.1
     },
     "Glacial Domain" : {
         "Buff_Type" : "Neutral",
@@ -251,5 +294,148 @@
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Element" : "Corrosion"
+    },
+    "Damage Up 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "DamagePerc" : 0.1
+    },
+    "Damage Up 2" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "DamagePerc" : 0.2
+    },
+    "Standard Approach" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "AoEDamageTakenPerc" : 0.25,
+        "StackLimit" : 3
+    },
+    "Emergency Plan" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "AoEDamageTakenPerc" : 0.25,
+        "Stackable" : 1,
+        "StackLimit" : 3
+    },
+    "Insight" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1
+    },
+    "Rapture" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Stackable" : 1,
+        "StackLimit" : 4,
+        "DamagePerc" : 0.075
+    },
+    "Defensive Support" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Stackable" : 1,
+        "StackLimit" : 4,
+        "DefensePerc" : 0.3,
+        "Stat" : "Defense"
+    },
+    "Impact Response 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 1
+    },
+    "Wintry Bastion" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 1,
+        "DamageTakenPerc" : -0.3,
+        "StackLimit" : 5,
+        "Element" : "Freeze"
+    },
+    "Shelter" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 1,
+        "StackLimit" : 3,
+        "StabilityTaken" : -2
+    },
+    "Continuous Healing 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0
+    },
+    "Courage to Endure" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0,
+        "SupportPerc" : 0.3
+    },
+    "Courage to Endure V1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0,
+        "SupportPerc" : 0.3
+    },
+    "Power of Unity" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Stackable" : 1,
+        "StackLimit" : 3,
+        "TargetedDamage" : 0.1
+    },
+    "Tenacity to Withstand" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0
+    },
+    "Resolve to Defend" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0
+    },
+    "Lightspike" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Stackable" : 1,
+        "StackLimit" : 8,
+        "Crit" : 0.03,
+        "Crit_Damage" : 0.03
+    },
+    "Lightspike V5" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Stackable" : 1,
+        "StackLimit" : 8,
+        "Crit" : 0.05,
+        "Crit_Damage" : 0.05
+    },
+    "Conductivity" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 1,
+        "Element" : "Electric"
+    },
+    "Shock" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Element" : "Electric"
+    },
+    "Unshakable Confidence" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "StackLimit" : 4
+    },
+    "Mark of Prey" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1
+    },
+    "Camouflage" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 1,
+        "StackLimit" : 2
+    },
+    "Hunters Talent" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "StackLimit" : 99
     }
 } 

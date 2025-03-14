@@ -1,577 +1,355 @@
 {
     "Qiongjiu" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Medium",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.5,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Medium",
-            "Element" : "Burn",
-            "Post_Self_Buff" : [{
-                "Name" : "Support Boost 1",
-                "Duration" : -1,
-                "Stacks" : 1
-            }]
-        },
-        "Skill3" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.1,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "None",
-            "Element" : "Burn",
-            "Post_Target_Buff" : [{
-                "Name" : "Overburn",
-                "Duration" : 2
-            }]
-        },
-        "Ultimate" : {
-            "Type" : "Buff",
-            "Target" : "Self",
-            "Post_Self_Buff" : [{
-                "Name" : "Support Boost 2",
-                "Duration" : -1,
-                "Stacks" : 3
-            }],
-            "Conditional" : {
-                "Post_Self_Buff" : [{
-                    "Name" :"Support Boost 2",
-                    "Duration" : -1,
-                    "Stacks" : 4
-                }]
+        "V1" : {
+            "Skill2" : {
+                "Conditional" : {
+                    "Post_Self_Buff" : [{
+                        "Name" : "Support Boost 1 V1",
+                        "Duration" : -1,
+                        "Stacks" : 1
+                    }]
+                }
             }
         },
-        "Support" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.9,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Medium",
-            "Element" : "Physical"
-        }
-    },
-    "Makiatto" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.6,
-            "Crit_Damage_Modifier" : 0.3,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 1,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Freeze",
-            "Post_Self_Buff" : [{
-                "Name" : "Cold Conviction",
-                "Duration" : -1
-            }]
-        },
-        "Skill3" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.3,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical",
-            "Post_Self_Buff" : [{
-                "Name" : "Standard Approach",
-                "Stacks" : 2
-            }]
-        },
-        "Ultimate" : {
-            "Type" : "Buff",
-            "Target" : "Self",
-            "Post_Self_Buff" : [{
-                "Name" : "Alert",
-                "Duration" : 2
-            },
-            {
-                "Name" : "Frost Barrier",
-                "Duration" : 2
-            }]
-        },
-        "Intercept" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.9,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Freeze",
-            "Post_Target_Buff" : [{
-                "Name" : "Frozen",
-                "Duration" : 2
-            }]
-        }
-    },
-    "Suomi" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 1,
-            "Crit_Modifier" : -1,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 4,
-            "Ammo_Type" : "Light",
-            "Element" : "Freeze",
-            "Fixed_Damage" : {
-                "Scaling" : 0.5,
-                "Stat" : "Defense"
+        "V2" : {
+            "Skill3" : {
+                "Conditional" : {
+                    "Crit_Modifier" : 1
+                }
             }
         },
-        "Skill3" : {
-            "Type" : "Buff",
-            "Target" : "Ally",
-            "Post_Target_Buff" : [{
-                "Name" : "Frost Barrier",
-                "Duration" : 2
-            }],
-            "Conditional" : {
-                "Append" : 1,
+        "V3" : {
+            "Support" : {
                 "Post_Target_Buff" : [{
-                    "Name" : "Defensive Support",
+                    "Name" : "Overburn",
                     "Duration" : 2
                 }]
             }
         },
-        "Ultimate" : {
-            "Type" : "Attack",
-            "Fixed_Damage" : {
-                "Scaling" : 0.5,
-                "Stat" : "Defense"
-            },
-            "Post_Self_Buff" : [{
-                "Name" : "Frost Barrier",
-                "Duration" : 3
-            }, {
-                "Name" : "Wintry Bastion",
-                "Duration" : 3
-            }],
-            "Post_Target_Buff" : [{
-                "Name" : "Avalanche",
-                "Duration" : -1,
-                "Stacks" : 2
-            }]
+        "V4" : {
+            "Ultimate" : {
+                "Post_Self_Buff" : [{
+                    "Name" : "Support Boost 2 V4",
+                    "Duration" : -1,
+                    "Stacks" : 3
+                }],
+                "Conditional" : {
+                    "Post_Self_Buff" : [{
+                        "Name" :"Support Boost 2 V4",
+                        "Duration" : -1,
+                        "Stacks" : 4
+                    }]
+                }
+            }
         },
-        "Support" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical",
-            "Pre_Support_Buff" : [{
-                "Name" : "Critical Damage Up 1",
-                "Duration" : 2
-            }]
+        "V5" : {
+            "Support" : {
+                "Pre_Support_Buff" : [{
+                    "Name" : "Damage Up 2",
+                    "Duration" : 1
+                }],
+                "Pre_Target_Buff" : [{
+                    "Name" : "Damage Up 2",
+                    "Duration" : 1
+                }]
+            }
+        }
+    },
+    "Makiatto" : {
+        "V1" : {
+            "Skill2" : {
+                "Type" : "Attack",
+                "Multiplier" : 1,
+                "Damage_Type" : "Targeted",
+                "StabilityDamage" : 1,
+                "Ammo_Type" : "Heavy",
+                "Element" : "Freeze",
+                "Post_Self_Buff" : [{
+                    "Name" : "Cold Conviction",
+                    "Duration" : -1
+                }],
+                "Extra_Attack" : {
+                    "Type" : "Attack",
+                    "Multiplier" : 1,
+                    "Damage_Type" : "Targeted",
+                    "StabilityDamage" : 1,
+                    "Ammo_Type" : "Heavy",
+                    "Element" : "Freeze",
+                    "Post_Self_Buff" : [{
+                        "Name" : "Cold Conviction",
+                        "Duration" : -1
+                    }],
+                    "Conditional" : {
+                        "Crit_Modifier" : 1,
+                        "Crit_Damage_Modifier" : 0.8
+                    }
+                }
+            }
+        },
+        "V4" : {
+            "Skill3" : {
+                "Post_Self_Buff" : [{
+                    "Name" : "Emergency Plan",
+                    "Stacks" : 2
+                }]
+            }
+        },
+        "V6" : {
+            "Intercept" : {
+                "Conditional" : {
+                    "Post_Self_Buff" : [{
+                        "Name" : "Rapture",
+                        "Duration" : 1
+                    }]
+                }
+            }
+        }
+    },
+    "Suomi" : {
+        "V1" : {
+            "Ultimate" : {
+                "Post_Self_Buff" : [{
+                    "Name" : "Frost Barrier",
+                    "Duration" : 3
+                }, {
+                    "Name" : "Wintry Bastion",
+                    "Duration" : 3,
+                    "Stacks" : 2
+                }],
+                "Post_Target_Buff" : [{
+                    "Name" : "Avalanche",
+                    "Duration" : -1,
+                    "Stacks" : 3
+                }],
+                "Conditional" : {
+                    "Append" : 1,
+                    "Post_Self_Buff" : [{
+                        "Name" : "Shelter",
+                        "Duration" : 3
+                    }, {
+                        "Name" : "Continuous Healing 1",
+                        "Duration" : 3
+                    }]
+                }
+            }
+        },
+        "V3" : {
+            "Skill3" : {
+                "Post_Target_Buff" : [{
+                    "Name" : "Frost Barrier",
+                    "Duration" : 2
+                }, {
+                    "Name" : "Impact Response 1",
+                    "Duration" : 2
+                }],
+                "Conditional" : {
+                    "Append" : 1,
+                    "Post_Target_Buff" : [{
+                        "Name" : "Defensive Support",
+                        "Duration" : 2,
+                        "Stacks" : 2
+                    }]
+                }
+            }
+        },
+        "V4" : {
+            "Skill2" : {
+                "Conditional" : {
+                    "Fixed_Damage" : {
+                        "Scaling" : 1.25,
+                        "Stat" : "Defense"
+                    }
+                }
+            }
+        },
+        "V6" : {
+            "Ultimate" : {
+                "Post_Self_Buff" : [{
+                    "Name" : "Frost Barrier",
+                    "Duration" : 3
+                }, {
+                    "Name" : "Wintry Bastion",
+                    "Duration" : 3,
+                    "Stacks" : 2
+                }, {
+                    "Name" : "Defense Up 2",
+                    "Duration" : 3
+                }]
+            }
         }
     },
     "Papasha" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.6,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "None",
-            "Element" : "Physical"
-        },
-        "Skill3" : {
-
-        },
-        "Ultimate" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.5,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical"
-        }
+        
     },
     "Papasha Summon" : {
-        "Support" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical"
-        },
-        "Skill3" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.5,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical",
-            "Conditional" : {
-                "Damage_Boost" : 0.5
+        "V2" : {
+            "Skill3" : {
+                "Crit_Modifier" : 1
             }
         }
     },
     "Daiyan" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 1,
-            "Ammo_Type" : "Medium",
-            "Element" : "Physical"
+        "V1" : {
+            "Skill2" : {
+                "Conditional" : {
+                    "Post_Self_Buff" : [{
+                        "Name" : "Tuning",
+                        "Duration" : -1
+                    }]
+                }
+            }
         },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.5,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical"
+        "V2" : {
+            "Skill3" : {
+                "Post_Self_Buff" : [{
+                    "Name" : "Tuning",
+                    "Duration" : -1,
+                    "Stacks" : 6
+                }, {
+                    "Name" : "Pitch Perfect",
+                    "Duration" : 1
+                }, {
+                    "Name" : "Extra Command"
+                }]
+            }
         },
-        "Skill3" : {
-            "Type" : "Buff",
-            "Target" : "Self",
-            "Post_Self_Buff" : [{
-                "Name" : "Tuning",
-                "Duration" : -1,
-                "Stacks" : 3
-            }, {
-                "Name" : "Pitch Perfect",
-                "Duration" : 1
-            }, {
-                "Name" : "Extra Command"
-            }]
+        "V3" : {
+            "Ultimate" : {
+                "Post_Self_Buff" : [{
+                    "Name" : "Permanent Tuning V3",
+                    "Duration" : -1
+                }]
+            },
+            "Intercept" : {
+                "Post_Self_Buff" : [{
+                    "Name" : "Permanent Tuning V3",
+                    "Duration" : -1
+                }]
+            }
         },
-        "Ultimate" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.9,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Medium",
-            "Element" : "Physical",
-            "Post_Self_Buff" : [{
-                "Name" : "Permanent Tuning",
-                "Duration" : -1
-            }]
-        },
-        "Intercept" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.5,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 4,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical",
-            "Post_Self_Buff" : [{
-                "Name" : "Permanent Tuning",
-                "Duration" : -1
-            }]
+        "V4" : {
+            "Intercept" : {
+                "Multiplier" : 1.5,
+                "StabilityDamage" : 6
+            }
         }
     },
     "Tololo" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Medium",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.3,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Medium",
-            "Element" : "Hydro"
-        },
-        "Skill3" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.3,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Medium",
-            "Element" : "Physical",
-            "Conditional" : {
-                "Damage_Boost" : 0.2
+        "V1" : {
+            "Skill2" : {
+                "Conditional" : {
+                    "Cover_Ignore" : 0.15
+                }
             }
         },
-        "Ultimate" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 4,
-            "Ammo_Type" : "None",
-            "Element" : "Hydro",
-            "Conditional" : {
-                "Damage_Boost" : 0.15
+        "V2" : {
+            "Skill3" : {
+                "Conditional" : {
+                    "Element" : "Hydro"
+                }
+            }
+        },
+        "V3" : {
+            "Ultimate" : {
+                "Conditional" :  {
+                    "Damage_Boost" : 0.3
+                }
             }
         }
     },
     "Mosin-Nagant" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.3,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical",
-            "Post_Target_Buff" : [{
-                "Name" : "Conductivity",
-                "Duration" : 1
-            }]
-        },
-        "Skill3" : {
-            "Type" : "Buff",
-            "Target" : "Self",
-            "Post_Self_Buff" : [{
-                "Name" :  "Active Engagement",
-                "Duration" : -1,
-                "Stacks" : 1
-            }]
-        },
-        "Ultimate" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 4,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
-        },
-        "Support" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical",
-            "Post_Self_Buff" : [{
-                "Name" : "Insight",
-                "Duration" : 2
-            }]
-        }
-    },
-    "Sabrina" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 4,
-            "Ammo_Type" : "Shotgun",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "None",
-            "Element" : "Hydro",
-            "Post_Target_Buff" : [{
-                "Name" : "Movement Down 2",
-                "Duration" : 2
-            }]
-        },
-        "Skill3" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.7,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Shotgun",
-            "Element" : "Hydro",
-            "Post_Target_Buff" : [{
-                "Name" : "Movement Down 2",
-                "Duration" : 2
-            }]
-        },
-        "Ultimate" : {
-            "Type" : "Buff",
-            "Target" : "All",
-            "Post_Target_Buff" : [{
-                "Name" : "Shelter",
-                "Duration" : -1,
-                "Stacks" : 2
-            }],
-            "Post_Self_Buff" : [{
-                "Name" : "Feeling Full",
-                "Duration" : 3
-            }]
-        },
-        "CounterAttack" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 4,
-            "Ammo_Type" : "Shotgun",
-            "Element" : "Physical"
-        }
-    },
-    "Ullrid" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Light",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.2,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 1,
-            "Ammo_Type" : "Melee",
-            "Element" : "Physical",
-            "Post_Target_Buff" : [{
-                "Name" : "Mark of Prey",
-                "Duration" : 2
-            }]
-        },
-        "Skill3" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.9,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 1,
-            "Ammo_Type" : "Melee",
-            "Element" : "Physical"
-        },
-        "Ultimate" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Melee",
-            "Element" : "Physical",
-            "Conditional" : {
+        "V2" : {
+            "Support" : {
                 "Post_Self_Buff" : [{
-                    "Name" : "Camouflage",
-                    "Duration" : 1
+                    "Name" : "Insight",
+                    "Duration" : 2
+                }, {
+                    "Name" : "Unshakable Confidence",
+                    "Duration" : -1
                 }]
             }
         },
-        "Support" : {
-            "Type" : "Attack",
-            "Multiplier" : 1,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 0,
-            "Ammo_Type" : "None",
-            "Element" : "Physical"
+        "V4" : {
+            "Support" : {
+                "Pre_Self_Buff" : [{
+                    "Name" : "Active Engagement",
+                    "Duration" : -1,
+                    "Stacks" : 1
+                }]
+            }
+        },
+        "V5" : {
+            "Skill3" : {
+                "Post_Self_Buff" : [{
+                    "Name" :  "Active Engagement V5",
+                    "Duration" : -1,
+                    "Stacks" : 1
+                }]
+            },
+            "Support" : {
+                "Pre_Self_Buff" : [{
+                    "Name" : "Active Engagement V5",
+                    "Duration" : -1,
+                    "Stacks" : 1
+                }]
+            }
+        }
+    },
+    "Sabrina" : {
+        "V2" : {
+            "Skill3" : {
+                "Multiplier" : 0.8
+            }
+        },
+        "V4" : {
+            "CounterAttack" : {
+                "StabilityDamage" : 6
+            }
+        },
+        "V5" : {
+            "Ultimate" : {
+                "Pre_Self_Buff" : [{
+                    "Name" : "Extra Command"
+                }]
+            }
+        }
+    },
+    "Ullrid" : {
+        "V3" : {
+            "Skill2" : {
+                "Post_Target_Buff" : [{
+                    "Name" : "Mark of Prey",
+                    "Duration" : 2
+                }, {
+                    "Name" : "Movement Down 2",
+                    "Duration" : 2
+                }]
+            }
         }
     },
     "Vepley" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 1,
-            "Ammo_Type" : "Shotgun",
-            "Element" : "Physical"
+        "V2" : {
+            "Skill3" : {
+                "Conditional" : {
+                    "Crit_Modifier" : 1
+                }
+            }
         },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.75,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 1,
-            "Ammo_Type" : "Shotgun",
-            "Element" : "Physical"
-        },
-        "Skill3" : {
-            "Type" : "Attack",
-            "Multiplier" : 1.5,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Shotgun",
-            "Element" : "Physical"
-        },
-        "Ultimate" : {
-            "Type" : "Attack",
-            "Multiplier" : 1,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "None",
-            "Element" : "Physical",
-            "Post_Target_Buff" : [{
-                "Name" : "Vulnerability 2",
-                "Duration" : 2
-            }, {
-                "Name" : "Overzealous",
-                "Duration" : 2
-            }]
+        "V3" : {
+            "Ultimate" : {
+                "Post_Target_Buff" : [{
+                    "Name" : "Vulnerability 2",
+                    "Duration" : 2
+                }],
+                "Pre_Target_Buff" : [{
+                    "Name" : "Overzealous",
+                    "Duration" : 2
+                }]
+            }
         }
     },
     "Peritya" : {
-        "Basic" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.8,
-            "Damage_Type" : "Targeted",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
-        },
-        "Skill2" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.85,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 1,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Corrosion"
-        },
-        "Skill3" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.9,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 3,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
-        },
-        "Ultimate" : {
-            "Type" : "Attack",
-            "Multiplier" : 1,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 2,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Corrosion"
-        },
-        "Support" : {
-            "Type" : "Attack",
-            "Multiplier" : 0.5,
-            "Damage_Type" : "AoE",
-            "StabilityDamage" : 1,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
-        }
+        
     },
     "Sharkry" : {
         "Basic" : {
@@ -620,7 +398,7 @@
                 "Name" : "Zoom In",
                 "Stacks" : 1
             }, {
-                "Name" : "Extra Command"
+                "Name" : "Extra Action"
             }]
         },
         "Support" : {
@@ -932,7 +710,7 @@
             "Ammo_Type" : "Shotgun",
             "Element" : "Freeze",
             "Post_Target_Buff" : [{
-                "Name" : "Cold Snap",
+                "Name" : "Frostbite",
                 "Duration" : 2
             }]
         },
@@ -954,7 +732,7 @@
             "Cover_Ignore" : 1,
             "Conditional" : {
                 "Post_Target_Buff" : [{
-                    "Name" : "Cold Snap",
+                    "Name" : "Frostbite",
                     "Duration" : 2
                 }]
             }

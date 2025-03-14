@@ -23,6 +23,9 @@ class ResourceLoader {
     loadSkillJSON(){
         d3.json("SkillData.json").then(d => ResourceLoaderSingleton.skillJSON = d);
     }
+    loadFortJSON() {
+        d3.json("FortificationData.json").then(d => ResourceLoaderSingleton.fortJson = d);
+    }
     // give the resulting json corresponding to buff or doll
     getBuffData(buffName) {
         if (ResourceLoaderSingleton) {
@@ -39,7 +42,17 @@ class ResourceLoader {
             if (ResourceLoaderSingleton.skillJSON.hasOwnProperty(dollName))
                 return ResourceLoaderSingleton.skillJSON[dollName];
             else
-                console.error(`${dollName} Doll Name does not exist`);
+                console.error(`${dollName} Doll Name does not exist in skill data`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    getFortData(dollName) {
+        if (ResourceLoaderSingleton) {
+            if (ResourceLoaderSingleton.fortJson.hasOwnProperty(dollName))
+                return ResourceLoaderSingleton.fortJson[dollName];
+            else
+                console.error(`${dollName} Doll Name does not exist in fortification data`);
         }
         else
             console.error("Singleton not yet initialized");
