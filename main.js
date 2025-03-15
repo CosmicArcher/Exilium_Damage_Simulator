@@ -3,8 +3,11 @@ import Doll from "./Doll.js";
 import ResourceLoader from "./ResourceLoader.js";
 import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
+import EventManager from "./EventManager.js";
+import TurnManager from "./TurnManager.js";
+import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
-import {Elements, AmmoTypes, SkillNames, CalculationTypes, SkillJSONKeys} from "./Enums.js";
+import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys} from "./Enums.js";
 
 var selectedPhases = [];
 var selectedDoll;
@@ -86,7 +89,6 @@ function checkSkillConditional(skillName) {
                 // check if the fortification modifies the skill
                 if (fortification.hasOwnProperty(skillName)) {
                     // check if the modification adds a conditional
-                    console.log(fortification);
                     if (fortification[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL))
                         return true;
                     // if not, continue checking the rest of the fortifications
@@ -147,6 +149,9 @@ ResourceLoader.getInstance();
 ResourceLoader.getInstance().loadBuffJSON();
 ResourceLoader.getInstance().loadSkillJSON();
 ResourceLoader.getInstance().loadFortJSON();
+EventManager.getInstance();
+TurnManager.getInstance();
+ActionLog.getInstance();
 }
 
 // target stats dropdowns

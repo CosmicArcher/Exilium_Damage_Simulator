@@ -1,6 +1,7 @@
 import Doll from "./Doll.js";
 import Target from "./Target.js";
 import GameStateManager from "./GameStateManager.js";
+import EventManager from "./EventManager.js";
 import {AttackTypes, Elements, AmmoTypes} from "./Enums.js";
 
 let DamageManagerSingleton;
@@ -75,7 +76,7 @@ class DamageManager {
             target.reduceStability(totalStabDamage);
         // inform the target that it has been "hit" and reduce the counters of any buffs that last for a number of hits rather than turns
         target.takeDamage();
-        console.log(damage);
+        EventManager.getInstance().broadcastEvent("damageDealt", [attacker, target, damage]);
         return damage;
     }
     // will pass the damage to an event observer manager later

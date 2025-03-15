@@ -253,7 +253,6 @@ class Doll extends Unit {
             conditionalOverrides.forEach(d => {
                 skill[d] = conditionalData[d];
             })
-            console.log(skill)
         }
 
         if (skill[SkillJSONKeys.TYPE] == "Attack") {
@@ -360,7 +359,8 @@ class Doll extends Unit {
             skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore);
 
         damage += fixedDamage;
-        target.takeDamage();
+        if (fixedDamage > 0)
+            target.takeDamage();
 
         return damage;
     }
@@ -426,9 +426,8 @@ class Doll extends Unit {
             // each skill key has an object value
             newJSON[skill] = this.copyNestedObject(this.skillData[skill]);
         });
-        console.log(this.skillData);
+
         this.skillData = newJSON;
-        console.log(this.skillData);
     }
     // buffs are made as arrays of objects
     copyBuffArray(arr) {

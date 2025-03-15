@@ -1,5 +1,6 @@
 import ResourceLoader from "./ResourceLoader.js";
 import DamageManager from "./DamageManager.js";
+import EventManager from "./EventManager.js";
 // root class for dolls (attackers) and targets (defenders)
 class Unit {
     constructor(name, defense) { // some dolls use their defense stats for damage
@@ -29,6 +30,7 @@ class Unit {
     addBuff(buffName, duration, source) {
         let buffData = ResourceLoader.getInstance().getBuffData(buffName);
         if (buffData && this.buffsEnabled) {
+            EventManager.getInstance().broadcastEvent("statusApplied", [source, this, buffName]);
             this.currentBuffs.push([buffName, buffData, duration, buffData["Turn_Based"], buffData["Defense_Consumed"], source]);
             if (buffName == "Overburn") {
                 DamageManager.getInstance().applyFixedDamage(source.getAttack() * 0.1);
