@@ -23,7 +23,8 @@ class ActionLog {
     // [attacker, target, damage, element, remaining stability]
     displayDamage(param) {
         if (ActionLogSingleton) {
-            console.log(`${param[0].getName()} did ${param[2]} ${param[3]} damage to ${param[1].getName()}. Remaining Stability: ${param[4]}`);
+            d3.select("#ActionLog").insert("p", "p").text(`${param[0].getName()} did ${param[2]} ${param[3]} damage to ${param[1].getName()}. 
+                                                        Remaining Stability: ${param[4]}`);
         }
         else
             console.error("Singleton not yet initialized");
@@ -33,10 +34,10 @@ class ActionLog {
         if (ActionLogSingleton) {
             if (param[1].constructor == Array)
                 param[1].forEach(d => {
-                    console.log(`${param[0].getName()} applied ${param[2]} to ${d.getName()}`);
+                    d3.select("#ActionLog").insert("p", "p").text(`${param[0].getName()} applied ${param[2]} to ${d.getName()}`);
                 });
             else
-                console.log(`${param[0].getName()} applied ${param[2]} to ${param[1].getName()}`);
+                d3.select("#ActionLog").insert("p", "p").text(`${param[0].getName()} applied ${param[2]} to ${param[1].getName()}`);
         }
         else
             console.error("Singleton not yet initialized");

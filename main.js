@@ -12,7 +12,7 @@ import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys} from "./Enums.js";
 var selectedPhases = [];
 var selectedDoll;
 var selectedFortification = 0;
-var selectedSkill;
+var selectedSkill = "";
 
 var skillOptions;
 
@@ -139,7 +139,28 @@ function createSkillDropdown() {
 function updateSelectedDoll() {
     d3.select("#DollSelected").text("Doll: V" + selectedFortification + " " + selectedDoll);
 }
-
+// change weakness text based on selected list, write none if empty
+function updatePhaseText() {
+    let newText = "Phase Weaknesses:";
+    if (selectedPhases.length == 0)
+        newText += " None";
+    else 
+        selectedPhases.forEach(d => newText += " " + d);
+    d3.select("#PhasesSelected").text(newText);
+}
+function selectPhase(phaseAttribute) {
+    // check if phase is already in the list, if yes remove, otherwise add to the list
+    let removedPhase = false;
+    selectedPhases.forEach((d, i, a) => {
+        if (d == phaseAttribute) {
+            a.splice(i, 1);
+            removedPhase = true;
+        }
+    });
+    if (!removedPhase)
+        selectedPhases.push(phaseAttribute);
+    updatePhaseText();
+}
 // initialize the singletons
 {
 DamageManager.getInstance();
@@ -158,29 +179,6 @@ ActionLog.getInstance();
 {
     var elementOptions;
     var ammoOptions;
-
-    // change weakness text based on selected list, write none if empty
-    function updatePhaseText() {
-        let newText = "Phase Weaknesses:";
-        if (selectedPhases.length == 0)
-            newText += " None";
-        else 
-            selectedPhases.forEach(d => newText += " " + d);
-        d3.select("#PhasesSelected").text(newText);
-    }
-    function selectPhase(phaseAttribute) {
-        // check if phase is already in the list, if yes remove, otherwise add to the list
-        let removedPhase = false;
-        selectedPhases.forEach((d, i, a) => {
-            if (d == phaseAttribute) {
-                a.splice(i, 1);
-                removedPhase = true;
-            }
-        });
-        if (!removedPhase)
-            selectedPhases.push(phaseAttribute);
-        updatePhaseText();
-    }
 
     elementOptions = d3.select("#ElementWeakness").append("div").attr("class", "dropdownBox").style("display", "none");
     Object.values(Elements).forEach(d => {
@@ -258,6 +256,16 @@ ActionLog.getInstance();
                             .on("click", () => {
                                 selectedFortification = i;
                                 updateSelectedDoll();
+                                // if a skill is already selected and gains a conditional because of the fortification, 
+                                // show the override tickbox, otherwise hide and deselect it
+                                if (selectedSkill != "")
+                                    if (checkSkillConditional(selectedSkill)) {
+                                        d3.select("#ConditionalHolder").style("display", "block");
+                                    }
+                                    else {
+                                        d3.select("#ConditionalHolder").style("display", "none");
+                                        d3.select("#ConditionalOverride").node().checked = false;
+                                    }
                             });
             }
         }
@@ -328,13 +336,10 @@ d3.select("#calculateButton").on("click", () => {
     let newDoll3 = newDoll.cloneUnit();
 
     let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
-    /*let damage = newDoll.getSkillDamage(dollStats[1], newTarget, CalculationTypes.EXPECTED, conditionalOverride);
-    d3.select("#DPSDealt").text(`Expected Damage: ${damage}`);
-    damage = newDoll2.getSkillDamage(dollStats[1], newTarget2, CalculationTypes.NOCRIT, conditionalOverride);
-    d3.select("#NoCrit").text(`No Crit Damage: ${damage}`);
-    damage = newDoll3.getSkillDamage(dollStats[1], newTarget3, CalculationTypes.CRIT, conditionalOverride);
-    d3.select("#CritDealt").text(`Crit Damage: ${damage}`);*/
     TurnManager.getInstance().useDollSkill(newDoll, newTarget, dollStats[1], CalculationTypes.EXPECTED, conditionalOverride);
+    d3.select("#ActionLog").insert("p","p").text("Expected Damage");
     TurnManager.getInstance().useDollSkill(newDoll2, newTarget2, dollStats[1], CalculationTypes.NOCRIT, conditionalOverride);
+    d3.select("#ActionLog").insert("p","p").text("No Crit Damage");
     TurnManager.getInstance().useDollSkill(newDoll3, newTarget3, dollStats[1], CalculationTypes.CRIT, conditionalOverride);
+    d3.select("#ActionLog").insert("p","p").text("All Crit Damage");
 })
