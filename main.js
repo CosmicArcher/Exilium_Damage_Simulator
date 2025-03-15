@@ -129,7 +129,7 @@ function createSkillDropdown() {
                             d3.select("#ConditionalHolder").style("display", "block");
                         }
                         else {
-                            d3.select("#ConditionalHolder").style("display", "none");
+                            hideDropdowns();
                             d3.select("#ConditionalOverride").node().checked = false;
                         }
                     });
@@ -161,6 +161,19 @@ function selectPhase(phaseAttribute) {
         selectedPhases.push(phaseAttribute);
     updatePhaseText();
 }
+// when any button is pressed, hide all currently displayed dropdowns
+function hideDropdowns() {
+    elementOptions.style("display", "none");
+    ammoOptions.style("display", "none");
+    if (dollOptions)
+        dollOptions.style("display", "none");
+    if (fortOptions)
+        fortOptions.style("display", "none");
+    phaseDiv.style("display", "none");
+    if (skillOptions)
+        skillOptions.style("display", "none");
+}
+
 // initialize the singletons
 {
 DamageManager.getInstance();
@@ -200,17 +213,21 @@ ActionLog.getInstance();
     });
     // if element button is clicked, show a dropdown of the 6 elements
     d3.select("#ElementWeakness").on("click", () => {
-        if (elementOptions.style("display") == "none")
-        elementOptions.style("display", "block");
+        if (elementOptions.style("display") == "none") {
+            hideDropdowns();
+            elementOptions.style("display", "block");
+        }
         else
-        elementOptions.style("display", "none");
+            hideDropdowns();
     });
     // if ammo button is clicked, show a dropdown of the 5 elements
     d3.select("#AmmoWeakness").on("click", () => {
-        if (ammoOptions.style("display") == "none")
+        if (ammoOptions.style("display") == "none") {
+            hideDropdowns();
             ammoOptions.style("display", "block");
+        }
         else
-            ammoOptions.style("display", "none");
+            hideDropdowns();
     });
 }
 // doll stats dropdowns
@@ -240,10 +257,12 @@ ActionLog.getInstance();
             });
         }
         // toggle the dropdown list
-        if (dollOptions.style("display") == "none") 
+        if (dollOptions.style("display") == "none") {
+            hideDropdowns();
             dollOptions.style("display", "block");
+        }
         else
-            dollOptions.style("display", "none");
+            hideDropdowns();
     });
     // if fortification button is selected, show a list from V0-V6 to set the fortification of the doll
     d3.select("#Fortification").on("click", () => {
@@ -263,39 +282,45 @@ ActionLog.getInstance();
                                         d3.select("#ConditionalHolder").style("display", "block");
                                     }
                                     else {
-                                        d3.select("#ConditionalHolder").style("display", "none");
+                                        hideDropdowns();
                                         d3.select("#ConditionalOverride").node().checked = false;
                                     }
                             });
             }
         }
         // toggle the dropdown list
-        if (fortOptions.style("display") == "none") 
+        if (fortOptions.style("display") == "none") { 
+            hideDropdowns();
             fortOptions.style("display", "block");
+        }
         else
-            fortOptions.style("display", "none");
+            hideDropdowns();
     });
     
     // elemental damage show/hide toggle, construct the dropdown here so that it does not affect the size of the button
     phaseDiv = d3.select("#PhaseInput");
     d3.select("#PhaseDamage").on("click", () => {
         if (phaseDiv.style("display") == "block") {
-            phaseDiv.style("display", "none");
+            hideDropdowns();
         }
         else {
+            hideDropdowns();
             phaseDiv.style("display", "block");
         }
     });
     // if skill button is clicked, show a dropdown of the possible actions of a doll
     d3.select("#Skill").on("click", () => {
-        if (skillOptions.style("display") == "none")
+        if (skillOptions.style("display") == "none") {
+            hideDropdowns();
             skillOptions.style("display", "block");
+        }
         else
-            skillOptions.style("display", "none");
+            hideDropdowns();
     });
 }
 
 d3.select("#calculateButton").on("click", () => {
+    hideDropdowns();
     // get input values
     let targetStats = getTargetStats();
     let dollStats = getDollStats();
