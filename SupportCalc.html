@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>Exilium Damage Sim</title>
+    <title>Exilium Damage Sim With Supports</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="jquery-3.6.0.min.js"></script>
     <style id="jsbin-css">
@@ -39,7 +39,7 @@
             box-sizing: border-box;
             float: left;
             width: 33%;
-            height: 700px;
+            height: 1000px;
             padding-left: 10px;
         }
         .pageTab {
@@ -54,8 +54,8 @@
 </head>
 <body style="white-space: pre-line; background-color: beige;">
     <div style="width: 100%; display: table;">
-        <a href="./SupportCalc.html" class="pageTab">Support Sim</a>
-        <h1 style="text-align: center;">Simple Damage Sim</h1>
+        <a href="./index.html" class="pageTab">Simple Sim</a>
+        <h1 style="text-align: center;">Damage Sim With Supports</h1>
         <div class="column" style="background-color: lightgray;">
             <h2>Target Stats</h2>
             <label for = "targetDef">Defense:</label>
@@ -67,7 +67,7 @@
             <input type = "text" id = "targetCover"><br>
             <label for = "targetStability">Stability:</label>
             <input type = "text" id = "targetStability"><br>
-            <div style="overflow-y: auto; height: 340px; border-top: 1px solid black;">
+            <div style="overflow-y: auto; height: 640px; border-top: 1px solid black;">
                 <label for = "targetDefBuffs">Defense Buffs/Debuffs Sum (+- 0.0x):</label>
                 <input type = "text" id = "targetDefBuffs"><br>
                 <label for = "targetDamageTaken">Damage Taken Sum (+- 0.0x):</label>
@@ -84,23 +84,23 @@
                 <input type = "text" id = "targetDRWithStab"><br>
             </div>
         </div>
-        <div class= "column" style="background-color: lightslategray;">
-            <h2>Doll Stats</h2>
-            <label for = "Doll" id = "DollSelected">Doll:</label>
-            <button id = "Doll">Select Doll</button>
-            <button id = "Fortification" disabled>Fortification</button><br>
-            <label for = "Skill" id = "SkillSelected">Skill:</label>
-            <button id = "Skill" disabled>Select Skill</button>
-            <div style="display: none;" id = "ConditionalHolder">
-                <input type="checkbox" id = "ConditionalOverride" >Skill Conditional Triggered<br>
-            </div>
-            <label for = "dollAttack">Attack:</label>
-            <input type = "text" id = "dollAttack"><br>
-            <label for = "CritRate">Crit Rate (0.0x):</label>
-            <input type = "text" id = "CritRate"><br>
-            <label for = "CritDamage">Crit Damage (1.0x):</label>
-            <input type = "text" id = "CritDamage"><br>
-            <div style="overflow-y: auto; height: 280px; border-top: 1px solid black;">
+        <div class= "column" id = "Dolls" style="background-color: lightslategray;">
+            <h2>Dolls</h2>
+            <div id = "Doll_1">
+                <label for = "Doll" id = "DollSelected">Doll:</label>
+                <button id = "Doll">Select Doll</button>
+                <button id = "Fortification" disabled>Fortification</button><br>
+                <label for = "Skill" id = "SkillSelected">Skill:</label>
+                <button id = "Skill" disabled>Select Skill</button>
+                <div style="display: none;" id = "ConditionalHolder">
+                    <input type="checkbox" id = "ConditionalOverride" >Skill Conditional Triggered<br>
+                </div>
+                <label for = "dollAttack">Attack:</label>
+                <input type = "text" id = "dollAttack"><br>
+                <label for = "CritRate">Crit Rate (0.0x):</label>
+                <input type = "text" id = "CritRate"><br>
+                <label for = "CritDamage">Crit Damage (1.0x):</label>
+                <input type = "text" id = "CritDamage"><br>
                 <label for = "DefIgnore">Defense Ignore (0.0x):</label>
                 <input type = "text" id = "DefIgnore"><br>
                 <label for = "DamageDealt">Damage Dealt (+- 0.0x):</label>
@@ -145,7 +145,7 @@
         </div>
     </div>
 
-    <script type="module" src="main.js">
+    <script type="module" src="SupportCalc.js">
     </script>
 </body>
 </html>
