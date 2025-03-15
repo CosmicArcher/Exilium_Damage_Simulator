@@ -155,7 +155,8 @@
             }
         },
         "Ultimate" : {
-            "Type" : "Attack",
+            "Type" : "Buff",
+            "Target" : "All",
             "Fixed_Damage" : {
                 "Scaling" : 0.5,
                 "Stat" : "Defense"

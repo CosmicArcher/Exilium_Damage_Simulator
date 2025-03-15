@@ -22,11 +22,11 @@ class EventManager {
     addListener(eventName, func) {
         if (EventManagerSingleton) {
             if (EventManagerSingleton.listeners.hasOwnProperty(eventName))
-                EventManagerSingleton.listeners[eventName].add(func);
+                EventManagerSingleton.listeners[eventName].push(func);
             else {
-                // initialize jquery callback
-                EventManagerSingleton.listeners[eventName] = $.Callbacks();
-                EventManagerSingleton.listeners[eventName].add(func);
+                // initialize array belonging to event name
+                EventManagerSingleton.listeners[eventName] = [];
+                EventManagerSingleton.listeners[eventName].push(func);
             }
         }
         else
@@ -36,7 +36,10 @@ class EventManager {
     broadcastEvent(eventName, param) {
         if (EventManagerSingleton) {
             if (EventManagerSingleton.listeners.hasOwnProperty(eventName))
-                EventManagerSingleton.listeners[eventName].fire(param);
+                EventManagerSingleton.listeners[eventName].forEach(d => {
+                    // for any events that require multiple parameters, pass an array as param and process it in the function as a single array parameter
+                    d(param);
+                });
             else {
                 console.error(`${eventName} listeners do not exist`);
             }

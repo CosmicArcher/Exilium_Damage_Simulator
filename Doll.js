@@ -194,7 +194,12 @@ class Doll extends Unit {
             }
         }
     }
-
+    // get the attack type of the skill 
+    getSkillAttackType(skillName) {
+        if (this.skillData.hasOwnProperty(skillName)) 
+            return this.skillData[skillName][SkillJSONKeys.DAMAGE_TYPE];
+        console.error(`${skillName} is not in ${this.name}'s skill names`);
+    }
     // process buffs using json data
     applyBuffEffects(buffData) {
         super.applyBuffEffects(buffData);
@@ -210,7 +215,7 @@ class Doll extends Unit {
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
     // conditionals in skills are set automatically by the respective doll class or by an override checkbox in the menu
-    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = 0) {
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = false) {
         // in the case of support attacks, target has 2 entries, the target and the supported unit
         let enemyTarget = target;
         let supportTarget;
@@ -221,31 +226,10 @@ class Doll extends Unit {
 
         let skill;
         // get the data of the chosen skill
-        switch (skillName) {
-            case SkillNames.BASIC:
-                skill = this.copyNestedObject(this.skillData[SkillNames.BASIC]);
-                break;
-            case SkillNames.SKILL2:
-                skill = this.copyNestedObject(this.skillData[SkillNames.SKILL2]);
-                break;
-            case SkillNames.SKILL3:
-                skill = this.copyNestedObject(this.skillData[SkillNames.SKILL3]);
-                break;
-            case SkillNames.ULT:
-                skill = this.copyNestedObject(this.skillData[SkillNames.ULT]);
-                break;
-            case SkillNames.SUPPORT:
-                skill = this.copyNestedObject(this.skillData[SkillNames.SUPPORT]);
-                break;
-            case SkillNames.INTERCEPT:
-                skill = this.copyNestedObject(this.skillData[SkillNames.INTERCEPT]);
-                break;
-            case SkillNames.COUNTERATTACK:
-                skill = this.copyNestedObject(this.skillData[SkillNames.COUNTERATTACK]);
-                break;
-            default:
-                console.error(`${skillName} is not in the skill names enum`);
-        }
+        if (this.skillData.hasOwnProperty(skillName))
+            skill = this.copyNestedObject(this.skillData[skillName]);
+        else
+            console.error(`${skillName} is not in ${this.name}'s skill names`);
         // if conditional is triggered, overwrite the parts of the object that correspond to the keys in the conditional value
         if (conditionalTriggered && skill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
             let conditionalData = skill[SkillJSONKeys.CONDITIONAL];
@@ -280,6 +264,27 @@ class Doll extends Unit {
         }
         // if a buffing skill rather than attack, return 0 damage after processing buff data
         else {
+            // Suomi ult both buffs all units and damages and applies avalanche on the target
+            if (skillName == SkillNames.ULT && this.name == "Suomi") {
+                this.processPrePostBuffs(skill, target, supportTarget, 0);
+                let fixedDamage = 0;
+                if (skill.hasOwnProperty(SkillJSONKeys.FIXED_DAMAGE)) {
+                    let data = skill[SkillJSONKeys.FIXED_DAMAGE];
+                    switch (data[SkillJSONKeys.FIXED_DAMAGE_STAT]) {
+                        case "Defense":
+                            fixedDamage = this.defense;
+                            break;
+                        case "Attack":
+                            fixedDamage = this.attack;
+                            break;
+                        default:
+                            console.error([`${data[SkillJSONKeys.FIXED_DAMAGE_STAT]} fixed damage scaling for is not covered`, this]);
+                    }
+                    fixedDamage *= data[SkillJSONKeys.FIXED_DAMAGE_SCALING];
+                }
+                target.takeDamage();
+                return fixedDamage;
+            }
             this.processPrePostBuffs(skill, null, supportTarget, 0);
             console.log(this.currentBuffs);
             return 0;

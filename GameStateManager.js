@@ -8,7 +8,7 @@ class GameStateManager {
             console.error("Singleton already exists");
         }
         else {
-            console.log("Game Manager Instantiated");
+            console.log("Game State Manager Instantiated");
             GameStateManagerSingleton = this;
             // track total damage dealt and end turn on every unit
             GameStateManagerSingleton.resetSimulation();
