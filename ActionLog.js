@@ -20,15 +20,15 @@ class ActionLog {
             new ActionLog();
         return ActionLogSingleton;
     }
-    // [attacker, target, damage]
+    // [attacker, target, damage, element, remaining stability]
     displayDamage(param) {
         if (ActionLogSingleton) {
-            console.log(`${param[0].getName()} did ${param[2]} damage to ${param[1].getName()}`);
+            console.log(`${param[0].getName()} did ${param[2]} ${param[3]} damage to ${param[1].getName()}. Remaining Stability: ${param[4]}`);
         }
         else
             console.error("Singleton not yet initialized");
     }
-    // [source, target, damage]
+    // [source, target, buffName]
     displayStatus(param) {
         if (ActionLogSingleton) {
             if (param[1].constructor == Array)

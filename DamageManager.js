@@ -24,16 +24,17 @@ class DamageManager {
     }
 
     calculateDamage(attacker, target, baseDamage, element, ammoType, damageType, isCrit, critDamage, stabilityDamage, coverIgnore = 0) {
-        let weaknessModifier = 1;
+        let weaknesses = 0;
         target.getPhaseWeaknesses().forEach(d => {
             if (d == element || d == ammoType)
-                weaknessModifier += 0.1;
+                weaknesses++;
         });
-        // stability damage is increased by 2 per phase weakness, this is done after stability modifier buffs on the target or doll
+        // stability modifier buffs on the target or doll, minimum of 0 before phase weakness adds 2 per weakness
         let totalStabDamage = Math.max(0, stabilityDamage + target.getStabilityDamageModifier() + attacker.getStabilityDamageModifier());
-        totalStabDamage += parseInt(20 * (weaknessModifier - 1)); // instead of recounting the number of phase weaknesses, just get the decimal and multiply by 20
+        totalStabDamage += weaknesses * 2;
+        let weaknessModifier = 1 + weaknesses * 0.1;
         // if any phase weakness is exploited, stability damage happens before the attack rather than after
-        if (weaknessModifier > 1)
+        if (weaknesses > 0)
             target.reduceStability(totalStabDamage);
         let defenseBuffs = Math.max(0, 1 + target.getDefenseBuffs() - attacker.getDefenseIgnore());
         let defModifier = attacker.getAttack() / (attacker.getAttack() + target.getDefense() * defenseBuffs);
@@ -76,7 +77,7 @@ class DamageManager {
             target.reduceStability(totalStabDamage);
         // inform the target that it has been "hit" and reduce the counters of any buffs that last for a number of hits rather than turns
         target.takeDamage();
-        EventManager.getInstance().broadcastEvent("damageDealt", [attacker, target, damage]);
+        EventManager.getInstance().broadcastEvent("damageDealt", [attacker, target, damage, element, target.getStability()]);
         return damage;
     }
     // will pass the damage to an event observer manager later
