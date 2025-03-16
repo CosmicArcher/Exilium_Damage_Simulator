@@ -22,34 +22,75 @@ var dollOptions;
 var phaseDiv = [];
 var fortOptions;
 // for use when dynamically adding and removing doll slots
-var slotColors = ["olive", "violet", "red", "orange", "dodgerblue", "aquamarine"];
+var slotColors = ["olive", "violet", "deeppink", "orange", "dodgerblue", "aquamarine"];
 
 // an error gets thrown when putting resourceloader.getinstance() directly in the .on(click) functions
 function getDolls() {
     return ResourceLoader.getInstance().getAllDolls();
 }
-
+// for cloning a whole column and removing select html elements
 function spliceNodeList(nodeList, startIndex, numElements) {
     for (let i = 0; i < numElements; i++)
         nodeList[startIndex].remove();
 }
-
+// to track whether more supports are allowed to be added or not
 function updateSupportCounter() {
-    d3.select("#AddSupport").text(`Add Support ${numDolls-1}/4`);
+    d3.select("#AddSupport").text(`Add Support ${numDolls-1-numSummons}/4`);
 }
-
+// adds a new removable slot
 function addDoll() {
     numDolls++;
     updateSupportCounter();
     let newNode = d3.select("#Doll_1").node().cloneNode(true);
     newNode.id = "Doll_" + numDolls;
+    newNode.children[0].innerHTML = "Doll: ";
     d3.select(newNode).style("background-color", slotColors[numDolls-1]);
     spliceNodeList(newNode.childNodes, 7, 5);
-    phaseDiv.push(null);
+
+    let removeButton = d3.select(newNode).insert("button", "label");
+    removeButton.text("Remove Doll")
+                .style("float", "right")
+                .style("margin-right", "50px");
+    removeButton.on("click", event => {
+        let dollIndex = +event.target.parentNode.id.slice(5) - 1;
+        removeDoll(dollIndex);
+    });
+
+
+    phaseDiv.push(newNode.lastElementChild);
     selectedFortifications.push(0);
     selectedDolls.push();
     d3.select("#Dolls").node().appendChild(newNode);
     initializeDollButtons(numDolls - 1);
+}
+// remove index from all arrays and shift the ids and colors of later slots
+function removeDoll(index) {
+    // remove data at index from arrays
+    selectedFortifications.splice(index, 1);
+    d3.select(phaseDiv[index]).remove();
+    phaseDiv.splice(index, 1);
+    // if summon is deleted, do not reduce the support counter
+    let doll = selectedDolls[index];
+    if (doll == "Papasha Summon")
+        numSummons--;
+    selectedDolls.splice(index, 1);
+    numDolls--;
+    updateSupportCounter();
+    // change the colors of the slots after the deleted one
+    for (let i = index; i < numDolls; i++) {
+        let shiftedSlot = document.getElementById("Doll_" + (i + 2));
+        shiftedSlot.id = "Doll_" + (i + 1);
+        d3.select(shiftedSlot).style("background-color", slotColors[i]);
+    }
+    // delete the html element
+    d3.select("#Doll_" + (index + 1)).remove();
+    // if papasha is deleted, remove her summon as well if it is not on the first slot
+    if (doll == "Papasha") {
+        for (let i = 1; i < numDolls; i++) {
+            if (selectedDolls[i] == "Papasha Summon")
+                removeDoll(i);
+        }
+    }
 }
 
 function getValuefromInput(fieldID) {
@@ -180,7 +221,7 @@ function createSkillDropdown() {
 }
 
 function updateSelectedDoll(index) {
-    d3.select(document.getElementById("Doll_" + (index + 1)).children[0]).text("Doll: V" + selectedFortifications[index] + " " + selectedDolls[index]);
+    d3.select(document.getElementById("Doll_" + (index + 1)).children[+(index != 0)]).text("Doll: V" + selectedFortifications[index] + " " + selectedDolls[index]);
 }
 // change weakness text based on selected list, write none if empty
 function updatePhaseText() {
@@ -223,7 +264,7 @@ function initializeDollButtons(index) {
     let dollNum = index + 1;
     let dollStats = document.getElementById("Doll_" + dollNum).children
     // if doll selection button is clicked, show a dropdown of all dolls in the skill json excluding currently selected dolls
-    d3.select(dollStats[1]).on("click", () => {
+    d3.select(dollStats[index == 0 ? 1 : 2]).on("click", () => {
         // if onclick is triggered by selecting from the dropdown, delete the dropdown
         if (dollOptions) {
             dollOptions.remove();
@@ -234,22 +275,31 @@ function initializeDollButtons(index) {
             // hide any other active dropdowns
             hideDropdowns();
             // create the dropdown list 
-            dollOptions = d3.select(dollStats[1]).append("div").attr("class", "dropdownBox");
-            // get all dolls excluding any already selected dolls
+            dollOptions = d3.select(dollStats[index == 0 ? 1 : 2]).append("div").attr("class", "dropdownBox");
+            // get all dolls excluding any already selected dolls, and Papasha summon if support slot
             let dollList = getDolls().filter(doll => {
-                return !selectedDolls.includes(doll);
+                if (index == 0)
+                    return !selectedDolls.includes(doll);
+                return !selectedDolls.includes(doll) && doll != "Papasha Summon";
             });
             dollList.forEach(d => {
                 dollOptions.append("a")
                             .text(d)
                             .on("click", (event) => {
                                 let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
+                                // if papasha was originally in this slot, remove her summon if it is not in slot 1
+                                if (selectedDolls[dollIndex] == "Papasha") {
+                                    for (let i = 1; i < numDolls; i++) {
+                                        if (selectedDolls[i] == "Papasha Summon")
+                                            removeDoll(i);
+                                    }
+                                }
                                 selectedDolls[dollIndex] = d;
                                 updateSelectedDoll(dollIndex);
                                 // enable the skill and fortification dropdown buttons since a doll is now selected
                                 if (dollIndex == 0)
                                     d3.select(dollStats[5]).node().disabled = false;
-                                d3.select(dollStats[2]).node().disabled = false;
+                                d3.select(dollStats[index == 0 ? 2 : 3]).node().disabled = false;
                                 // disable the calculate damage button because a skill for the new doll 1 has not yet been selected
                                 if (dollIndex == 0) {
                                     d3.select("#calculateButton").node().disabled = true;
@@ -270,8 +320,8 @@ function initializeDollButtons(index) {
                                 // if papasha was selected, automatically create a new slot and lock it to her summon            
                                 if (d == "Papasha" && !selectedDolls.includes("Papasha Summon")) {
                                     dollOptions.style("display", "none");
-                                    addDoll();
                                     numSummons++;
+                                    addDoll();
                                     selectedDolls[numDolls-1] = "Papasha Summon";
                                     selectedFortifications[numDolls-1] = selectedFortifications[dollIndex];
                                     updateSelectedDoll(numDolls-1);
@@ -282,10 +332,10 @@ function initializeDollButtons(index) {
         }
     });
     // if fortification button is selected, show a list from V0-V6 to set the fortification of the doll
-    d3.select(dollStats[2]).on("click", () => {
+    d3.select(dollStats[index == 0 ? 2 : 3]).on("click", () => {
         // if dropdown list has not yet been created
         if (!fortOptions) {
-            fortOptions = d3.select(dollStats[2]).append("div").attr("class", "dropdownBox").style("display", "none");
+            fortOptions = d3.select(dollStats[index == 0 ? 2 : 3]).append("div").attr("class", "dropdownBox").style("display", "none");
             for (let i = 0; i < 7; i++) {
                 fortOptions.append("a")
                             .text("V" + i)
@@ -332,7 +382,7 @@ function initializeDollButtons(index) {
             }
         } // if dropdown has already been created, reuse it by transferring it as a child of a new fortification button
         else {
-            dollStats[2].appendChild(fortOptions.node());
+            dollStats[index == 0 ? 2 : 3].appendChild(fortOptions.node());
         }
         // toggle the dropdown list
         if (fortOptions.style("display") == "none") { 
