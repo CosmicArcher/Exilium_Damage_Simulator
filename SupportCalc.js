@@ -5,6 +5,7 @@ import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
 import EventManager from "./EventManager.js";
 import TurnManager from "./TurnManager.js";
+import DollFactory from "./DollFactory.js";
 import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
 import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames} from "./Enums.js";
@@ -85,7 +86,7 @@ function addDoll() {
 
     phaseDiv.push(null);
     selectedFortifications.push(0);
-    selectedDolls.push();
+    selectedDolls.push("");
     d3.select("#Dolls").node().appendChild(newNode);
     initializeDollButtons(numDolls - 1);
 }
@@ -127,6 +128,15 @@ function getValuefromInput(fieldID) {
     return res;
 }
 
+function getNestedInput(arr, htmlElement) {
+    htmlElement.childNodes.forEach(d => {
+        if (d.type == "text")
+            arr.push(+d.value);
+        else if (d.childNodes.length > 0)
+            getNestedInput(arr, d);
+    });
+}
+
 function getTargetStats() {
     // def, weaknesses, cover, stability, def buffs, damage taken, targeted, aoe, stab damage modifier, dr per stab, dr with stab 
     let targetStats = [0,[],0,  0,           0,          0,          0,       0,      0,                    0,           0];
@@ -147,16 +157,8 @@ function getTargetStats() {
 
 function getDollStats(index) {
     let dollStats = [];
-    d3.select("#Doll_" + (index + 1)).node().childNodes.forEach(d => {
-        if (d.type == "text")
-        dollStats.push(+d.value);
-        if (d.childNodes.length > 0) {
-            d.childNodes.forEach(datum => {
-                if (datum.type == "text")
-                dollStats.push(+datum.value);
-            });
-        }
-    });
+    getNestedInput(dollStats, document.getElementById("Doll_" + (index + 1)));
+
     return dollStats;
 }
 
@@ -192,7 +194,6 @@ function getDollSkills(index) {
 
 function createSkillDropdown() {
     let skills = getDollSkills(0);
-    console.log(selectedDolls);
     // clear the selected skill text because of the new doll chosen
     if (skillOptions)
         skillOptions.remove();
@@ -299,7 +300,7 @@ function initializeDollButtons(index) {
                                 selectedDolls[dollIndex] = d;
                                 updateSelectedDoll(dollIndex);
                                 // enable the skill and fortification dropdown buttons since a doll is now selected
-                                if (dollIndex == 0)
+                                if (dollIndex == 0) // only slot 1 can choose a skill, all others can only use support attacks
                                     d3.select(dollStats[6]).node().disabled = false;
                                 d3.select(dollStats[index == 0 ? 3 : 4]).node().disabled = false;
                                 // disable the calculate damage button because a skill for the new doll 1 has not yet been selected
@@ -308,14 +309,15 @@ function initializeDollButtons(index) {
                                     createSkillDropdown();
                                 }
                                 else {
-                                    let conditionalDiv = document.getElementById("Doll_" + (dollIndex + 1)).children[4];
+                                    // check if the support skills have conditionals
+                                    let conditionalDiv = document.getElementById("Doll_" + (dollIndex + 1)).children[5];
                                     if (getDollSkills(dollIndex).hasOwnProperty(SkillNames.SUPPORT)) {
                                         if (checkSkillConditional(SkillNames.SUPPORT, dollIndex)) {
                                             d3.select(conditionalDiv).style("display", "block");
                                         }
                                         else {
                                             d3.select(conditionalDiv).style("display", "none");
-                                            d3.select(conditionalDiv.firstElementChild).node().checked = false;
+                                            conditionalDiv.firstElementChild.checked = false;
                                         }
                                     }
                                 }
@@ -323,13 +325,16 @@ function initializeDollButtons(index) {
                                 if (d == "Papasha" && !selectedDolls.includes("Papasha Summon")) {
                                     dollOptions.style("display", "none");
                                     numSummons++;
-                                    // create papasha doll slot but minimize it and keep the papasha slot maximized
+                                    // create papasha summon doll slot but minimize it and keep the papasha slot maximized
                                     addDoll();
                                     minimizeSlots();
                                     maximizeSlot(dollIndex + 1);
+                                    // create papasha summon on the last doll slot
                                     selectedDolls[numDolls-1] = "Papasha Summon";
                                     selectedFortifications[numDolls-1] = selectedFortifications[dollIndex];
+                                    // update the text to show the summon name and fortification matching papasha
                                     updateSelectedDoll(numDolls-1);
+                                    // delete the doll and fortification buttons of the summon to prevent changing it
                                     spliceNodeList(document.getElementById("Doll_" + numDolls).childNodes,5,4);
                                 }
                             });
@@ -372,14 +377,15 @@ function initializeDollButtons(index) {
                                     }
                                 }
                                 else {
-                                    let conditionalDiv = document.getElementById("Doll_" + (dollIndex + 1)).children[4];
+                                    // if not in slot 1, only check if support with current fortification has conditional
+                                    let conditionalDiv = document.getElementById("Doll_" + (dollIndex + 1)).children[5];
                                     if (getDollSkills(dollIndex).hasOwnProperty(SkillNames.SUPPORT)) {
                                         if (checkSkillConditional(SkillNames.SUPPORT, dollIndex)) {
                                             d3.select(conditionalDiv).style("display", "block");
                                         }
                                         else {
                                             d3.select(conditionalDiv).style("display", "none");
-                                            d3.select(conditionalDiv.firstElementChild).node().checked = false;
+                                            conditionalDiv.firstElementChild.checked = false;
                                         }
                                     }
                                 }
@@ -399,7 +405,6 @@ function initializeDollButtons(index) {
     });
     // elemental damage show/hide toggle, construct the dropdown here so that it does not affect the size of the button
     phaseDiv[index] = d3.select(dollStats[dollStats.length-1].lastElementChild);
-    console.log(dollStats[dollStats.length-1].lastElementChild)
     d3.select(dollStats[dollStats.length-1].lastElementChild.previousElementSibling).on("click", () => {
         if (phaseDiv[index].style("display") == "block") {
             hideDropdowns();
@@ -434,6 +439,7 @@ ResourceLoader.getInstance().loadFortJSON();
 EventManager.getInstance();
 TurnManager.getInstance();
 ActionLog.getInstance();
+DollFactory.getInstance();
 }
 
 // target stats dropdowns
@@ -492,7 +498,7 @@ d3.select("#calculateButton").on("click", () => {
     hideDropdowns();
     // get input values
     let targetStats = getTargetStats();
-    let dollStats = getDollStats();
+    let dollStats = getDollStats(0);
     GameStateManager.getInstance().registerTarget(new Target("6p62", targetStats[0], targetStats[3], 2, targetStats[1]));
     let newTarget = GameStateManager.getInstance().getTarget();
     // this webpage has all buffs manually input rather than automatic
@@ -506,26 +512,28 @@ d3.select("#calculateButton").on("click", () => {
     newTarget.applyDRPerStab(targetStats[9]);
     newTarget.applyDRWithStab(targetStats[10]);
 
-    let newDoll = new Doll(dollStats[0], dollStats[13], dollStats[2], dollStats[3], dollStats[4], selectedFortification);
+    let newDoll = DollFactory.getInstance().createDoll(selectedDolls[0], dollStats[11], dollStats[0], dollStats[1], dollStats[2], selectedFortifications[0]);
     newDoll.disableBuffs();
-    newDoll.setDamageDealt(dollStats[6]);
-    newDoll.setDefenseIgnore(dollStats[5]);
-    newDoll.setTargetedDamage(dollStats[7]);
-    newDoll.setAoEDamage(dollStats[8]);
-    newDoll.setExposedDamage(dollStats[9]);
-    newDoll.setSupportDamage(dollStats[10]);
-    newDoll.setCoverIgnore(dollStats[11]);
-    newDoll.setStabilityDamageModifier(dollStats[12]);
-    newDoll.setPhaseDamage(dollStats[14]);
-    newDoll.setElementDamage(Elements.PHYSICAL, dollStats[15]);
-    newDoll.setElementDamage(Elements.FREEZE, dollStats[16]);
-    newDoll.setElementDamage(Elements.BURN, dollStats[17]);
-    newDoll.setElementDamage(Elements.CORROSION, dollStats[18]);
-    newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
-    newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
+    newDoll.setDamageDealt(dollStats[4]);
+    newDoll.setDefenseIgnore(dollStats[3]);
+    newDoll.setTargetedDamage(dollStats[5]);
+    newDoll.setAoEDamage(dollStats[6]);
+    newDoll.setExposedDamage(dollStats[7]);
+    newDoll.setSupportDamage(dollStats[8]);
+    newDoll.setCoverIgnore(dollStats[9]);
+    newDoll.setStabilityDamageModifier(dollStats[10]);
+    newDoll.setPhaseDamage(dollStats[12]);
+    newDoll.setElementDamage(Elements.PHYSICAL, dollStats[13]);
+    newDoll.setElementDamage(Elements.FREEZE, dollStats[14]);
+    newDoll.setElementDamage(Elements.BURN, dollStats[15]);
+    newDoll.setElementDamage(Elements.CORROSION, dollStats[16]);
+    newDoll.setElementDamage(Elements.HYDRO, dollStats[17]);
+    newDoll.setElementDamage(Elements.ELECTRIC, dollStats[18]);
 
-    let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
-    TurnManager.getInstance().useDollSkill(newDoll, newTarget, dollStats[1], CalculationTypes.EXPECTED, conditionalOverride);
+    //let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
+    let conditionalDiv = document.getElementById("Doll_1").children[7];
+    let conditionalOverride = conditionalDiv.firstElementChild.checked;
+    TurnManager.getInstance().useDollSkill(newDoll, newTarget, selectedSkill, CalculationTypes.EXPECTED, conditionalOverride);
     d3.select("#ActionLog").insert("p","p").text("Expected Damage");
 })
 
