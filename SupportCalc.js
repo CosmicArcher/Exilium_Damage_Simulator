@@ -7,15 +7,18 @@ import EventManager from "./EventManager.js";
 import TurnManager from "./TurnManager.js";
 import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
-import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys} from "./Enums.js";
+import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames} from "./Enums.js";
 
 var selectedPhases = [];
 var selectedDolls = [];
-var selectedFortifications = [];
+var selectedFortifications = [0];
 var selectedSkill = "";
 var numDolls = 1;
 
 var skillOptions;
+var dollOptions;
+var phaseDiv = [];
+var fortOptions;
 
 // an error gets thrown when putting resourceloader.getinstance() directly in the .on(click) functions
 function getDolls() {
@@ -46,6 +49,9 @@ function addDoll() {
             })
         }
     });
+    phaseDiv.push(null);
+    selectedFortifications.push(0);
+    selectedDolls.push();
     d3.select("#Dolls").node().appendChild(newNode);
 }
 
@@ -114,14 +120,14 @@ function getDollStats(index) {
     return dollStats;
 }
 
-function checkSkillConditional(skillName) {
+function checkSkillConditional(skillName, index) {
     // check if the doll's skill has a conditional inherently
-    if (ResourceLoader.getInstance().getSkillData(selectedDoll)[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL))
+    if (ResourceLoader.getInstance().getSkillData(selectedDolls[index])[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL))
         return true;
     else {
         // check if the fortifications add a conditional to the skill
-        let fortificationData = ResourceLoader.getInstance().getFortData(selectedDoll);
-        for (let i = 1; i <= selectedFortification; i++) {
+        let fortificationData = ResourceLoader.getInstance().getFortData(selectedDolls[index]);
+        for (let i = 1; i <= selectedFortifications[index]; i++) {
             // check each fortification
             if (fortificationData.hasOwnProperty("V"+i)) {
                 let fortification = fortificationData["V"+i];
@@ -139,20 +145,21 @@ function checkSkillConditional(skillName) {
     return false;
 }
 
-function getDollSkills() {
-    let dollSkills = ResourceLoader.getInstance().getSkillData(selectedDoll);
+function getDollSkills(index) {
+    let dollSkills = ResourceLoader.getInstance().getSkillData(selectedDolls[index]);
     return Object.keys(dollSkills);
 }
 
 function createSkillDropdown() {
-    let skills = getDollSkills();
+    let skills = getDollSkills(0);
     // clear the selected skill text because of the new doll chosen
     if (skillOptions)
         skillOptions.remove();
     selectedSkill = "";
     d3.select("#SkillSelected").text("Skill: ");
-    d3.select("#ConditionalHolder").style("display", "none");
-    d3.select("#ConditionalOverride").node().checked = false;
+    let conditionalDiv = d3.select("#Skill").node().nextElementSibling;
+    d3.select(conditionalDiv).style("display", "none");
+    d3.select(conditionalDiv.firstElementChild).node().checked = false;
     // change selected skill text when dropdown option is clicked
     skillOptions = d3.select("#Skill").append("div").attr("class", "dropdownBox").style("display", "none");
     skills.forEach(d => {
@@ -164,19 +171,18 @@ function createSkillDropdown() {
                         // activate the damage calculation button once a skill has been selected
                         d3.select("#calculateButton").node().disabled = false;
                         // if the skill has a conditional, show the override tickbox, otherwise hide and deselect it
-                        if (checkSkillConditional(d)) {
-                            d3.select("#ConditionalHolder").style("display", "block");
-                        }
+                        if (checkSkillConditional(d, 0)) 
+                            d3.select(conditionalDiv).style("display", "block");                       
                         else {
-                            hideDropdowns();
-                            d3.select("#ConditionalOverride").node().checked = false;
+                            d3.select(conditionalDiv).style("display", "none");    
+                            d3.select(conditionalDiv.firstElementChild).node().checked = false;
                         }
                     });
     });
 }
 
-function updateSelectedDoll() {
-    d3.select("#DollSelected").text("Doll: V" + selectedFortification + " " + selectedDoll);
+function updateSelectedDoll(index) {
+    d3.select(document.getElementById("Doll_" + (index + 1)).children[0]).text("Doll: V" + selectedFortifications[index] + " " + selectedDolls[index]);
 }
 // change weakness text based on selected list, write none if empty
 function updatePhaseText() {
@@ -187,6 +193,7 @@ function updatePhaseText() {
         selectedPhases.forEach(d => newText += " " + d);
     d3.select("#PhasesSelected").text(newText);
 }
+
 function selectPhase(phaseAttribute) {
     // check if phase is already in the list, if yes remove, otherwise add to the list
     let removedPhase = false;
@@ -206,9 +213,144 @@ function hideDropdowns() {
     ammoOptions.style("display", "none");
     if (fortOptions)
         fortOptions.style("display", "none");
-    phaseDiv.style("display", "none");
+    phaseDiv.forEach(d => {
+        if (d)
+            d.style("display", "none");
+    });
     if (skillOptions)
         skillOptions.style("display", "none");
+}
+// because initializing doll buttons will be repeated each time a new doll is added
+function initializeDollButtons(index) {
+    let dollNum = index + 1;
+    let dollStats = document.getElementById("Doll_" + dollNum).children
+    // if doll selection button is clicked, show a dropdown of all dolls in the skill json excluding currently selected dolls
+    d3.select(dollStats[1]).on("click", () => {
+        // if onclick is triggered by selecting from the dropdown, delete the dropdown
+        if (dollOptions) {
+            dollOptions.remove();
+            dollOptions = null;
+        }
+        // otherwise create a new drop down since one was not displayed yet when the button was pressed
+        else {
+            // hide any other active dropdowns
+            hideDropdowns();
+            // create the dropdown list 
+            dollOptions = d3.select(dollStats[1]).append("div").attr("class", "dropdownBox");
+            // get all dolls excluding any already selected dolls
+            let dollList = getDolls().filter(doll => {
+                for (let i = 0; i < selectedDolls.length; i++) {
+                    if (selectedDolls[i] == doll) 
+                        return false;
+                }
+                return true;
+            });
+            dollList.forEach(d => {
+                dollOptions.append("a")
+                            .text(d)
+                            .on("click", (event) => {
+                                let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
+                                selectedDolls[dollIndex] = d;
+                                updateSelectedDoll(dollIndex);
+                                // enable the skill and fortification dropdown buttons since a doll is now selected
+                                if (dollIndex == 0)
+                                    d3.select(dollStats[5]).node().disabled = false;
+                                d3.select(dollStats[2]).node().disabled = false;
+                                // disable the calculate damage button because a skill for the new doll 1 has not yet been selected
+                                if (dollIndex == 0) {
+                                    d3.select("#calculateButton").node().disabled = true;
+                                    createSkillDropdown();
+                                }
+                                else {
+                                    let conditionalDiv = document.getElementById("Doll_" + (dollIndex + 1)).children[4];
+                                    if (getDollSkills(dollIndex).hasOwnProperty(SkillNames.SUPPORT)) {
+                                        if (checkSkillConditional(SkillNames.SUPPORT, dollIndex)) {
+                                            d3.select(conditionalDiv).style("display", "block");
+                                        }
+                                        else {
+                                            d3.select(conditionalDiv).style("display", "none");
+                                            d3.select(conditionalDiv.firstElementChild).node().checked = false;
+                                        }
+                                    }
+                                }
+                            });
+            });
+        }
+    });
+    // if fortification button is selected, show a list from V0-V6 to set the fortification of the doll
+    d3.select(dollStats[2]).on("click", () => {
+        // if dropdown list has not yet been created
+        if (!fortOptions) {
+            fortOptions = d3.select(dollStats[2]).append("div").attr("class", "dropdownBox").style("display", "none");
+            for (let i = 0; i < 7; i++) {
+                fortOptions.append("a")
+                            .text("V" + i)
+                            .on("click", (event) => {
+                                let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
+                                selectedFortifications[dollIndex] = i;
+                                updateSelectedDoll(dollIndex);
+                                // if a skill is already selected and gains a conditional because of the fortification, 
+                                // show the override tickbox, otherwise hide and deselect it
+                                if (dollIndex == 0) {
+                                    if (selectedSkill != "") {
+                                        let conditionalDiv = d3.select("#Skill").node().nextElementSibling;
+                                        if (checkSkillConditional(selectedSkill, 0)) {
+                                            d3.select(conditionalDiv).style("display", "block");
+                                        }
+                                        else {
+                                            d3.select(conditionalDiv).style("display", "none");
+                                            d3.select(conditionalDiv.firstElementChild).node().checked = false;
+                                        }
+                                    }
+                                }
+                                else {
+                                    let conditionalDiv = document.getElementById("Doll_" + (dollIndex + 1)).children[4];
+                                    if (getDollSkills(dollIndex).hasOwnProperty(SkillNames.SUPPORT)) {
+                                        if (checkSkillConditional(SkillNames.SUPPORT, dollIndex)) {
+                                            d3.select(conditionalDiv).style("display", "block");
+                                        }
+                                        else {
+                                            d3.select(conditionalDiv).style("display", "none");
+                                            d3.select(conditionalDiv.firstElementChild).node().checked = false;
+                                        }
+                                    }
+                                }
+                            });
+            }
+        } // if dropdown has already been created, reuse it by transferring it as a child of a new fortification button
+        else {
+            dollStats[2].appendChild(fortOptions.node());
+        }
+        // toggle the dropdown list
+        if (fortOptions.style("display") == "none") { 
+            hideDropdowns();
+            fortOptions.style("display", "block");
+        }
+        else
+            hideDropdowns();
+    });
+    // elemental damage show/hide toggle, construct the dropdown here so that it does not affect the size of the button
+    phaseDiv[index] = d3.select(dollStats[dollStats.length-1]);
+    d3.select(dollStats[dollStats.length - 2]).on("click", () => {
+        if (phaseDiv[index].style("display") == "block") {
+            hideDropdowns();
+        }
+        else {
+            hideDropdowns();
+            phaseDiv[index].style("display", "block");
+        }
+    });
+    // if skill button is clicked, show a dropdown of the possible actions of doll 1
+    if (index == 0) {
+        d3.select(dollStats[5]).on("click", () => {
+            if (skillOptions.style("display") == "none") {
+                hideDropdowns();
+                skillOptions.style("display", "block");
+            }
+            else
+                hideDropdowns();
+        });
+    }
 }
 
 // initialize the singletons
@@ -267,103 +409,8 @@ ActionLog.getInstance();
             hideDropdowns();
     });
 }
-// doll stats dropdowns
-{
-    var dollOptions;
-    var phaseDiv;
-    var fortOptions;
-    // if doll selection button is clicked, show a dropdown of all dolls in the skill json excluding currently selected dolls
-    d3.select("#Doll").on("click", () => {
-        // if onclick is triggered by selecting from the dropdown, delete the dropdown
-        if (dollOptions) {
-            dollOptions.remove();
-            dollOptions = null;
-        }
-        // otherwise create a new drop down since one was not displayed yet when the button was pressed
-        else {
-            // hide any other active dropdowns
-            hideDropdowns();
-            // create the dropdown list 
-            dollOptions = d3.select("#Doll").append("div").attr("class", "dropdownBox");
-            // get all dolls excluding any already selected dolls
-            let dollList = getDolls().filter(doll => {
-                for (let i = 0; i < selectedDolls.length; i++) {
-                    if (selectedDolls[i] == doll) 
-                        return false;
-                }
-                return true;
-            });
-            dollList.forEach(d => {
-                dollOptions.append("a")
-                            .text(d)
-                            .on("click", () => {
-                                selectedDolls = [d];
-                                getDollStats(0);
-                                /*updateSelectedDoll();
-                                // enable the skill and fortification dropdown buttons since a doll is now selected
-                                d3.select("#Skill").node().disabled = false;
-                                d3.select("#Fortification").node().disabled = false;
-                                // disable the calculate damage button because a skill for the new doll has not yet been selected
-                                d3.select("#calculateButton").node().disabled = true;
-                                createSkillDropdown();*/
-                            })
-            });
-        }
-    });
-    // if fortification button is selected, show a list from V0-V6 to set the fortification of the doll
-    d3.select("#Fortification").on("click", () => {
-        // if dropdown list has not yet been created
-        if (!fortOptions) {
-            fortOptions = d3.select("#Fortification").append("div").attr("class", "dropdownBox").style("display", "none");
-            for (let i = 0; i < 7; i++) {
-                fortOptions.append("a")
-                            .text("V" + i)
-                            .on("click", () => {
-                                selectedFortification = i;
-                                updateSelectedDoll();
-                                // if a skill is already selected and gains a conditional because of the fortification, 
-                                // show the override tickbox, otherwise hide and deselect it
-                                if (selectedSkill != "")
-                                    if (checkSkillConditional(selectedSkill)) {
-                                        d3.select("#ConditionalHolder").style("display", "block");
-                                    }
-                                    else {
-                                        hideDropdowns();
-                                        d3.select("#ConditionalOverride").node().checked = false;
-                                    }
-                            });
-            }
-        }
-        // toggle the dropdown list
-        if (fortOptions.style("display") == "none") { 
-            hideDropdowns();
-            fortOptions.style("display", "block");
-        }
-        else
-            hideDropdowns();
-    });
-    
-    // elemental damage show/hide toggle, construct the dropdown here so that it does not affect the size of the button
-    phaseDiv = d3.select("#PhaseInput");
-    d3.select("#PhaseDamage").on("click", () => {
-        if (phaseDiv.style("display") == "block") {
-            hideDropdowns();
-        }
-        else {
-            hideDropdowns();
-            phaseDiv.style("display", "block");
-        }
-    });
-    // if skill button is clicked, show a dropdown of the possible actions of a doll
-    d3.select("#Skill").on("click", () => {
-        if (skillOptions.style("display") == "none") {
-            hideDropdowns();
-            skillOptions.style("display", "block");
-        }
-        else
-            hideDropdowns();
-    });
-}
+
+initializeDollButtons(0);
 
 d3.select("#calculateButton").on("click", () => {
     hideDropdowns();
@@ -408,3 +455,6 @@ d3.select("#calculateButton").on("click", () => {
 
 addDoll();
 addDoll();
+
+initializeDollButtons(1);
+initializeDollButtons(2);

@@ -129,7 +129,7 @@ function createSkillDropdown() {
                             d3.select("#ConditionalHolder").style("display", "block");
                         }
                         else {
-                            hideDropdowns();
+                            d3.select("#ConditionalHolder").style("display", "none");
                             d3.select("#ConditionalOverride").node().checked = false;
                         }
                     });
@@ -282,7 +282,7 @@ ActionLog.getInstance();
                                         d3.select("#ConditionalHolder").style("display", "block");
                                     }
                                     else {
-                                        hideDropdowns();
+                                        d3.select("#ConditionalHolder").style("display", "none");
                                         d3.select("#ConditionalOverride").node().checked = false;
                                     }
                             });
