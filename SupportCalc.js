@@ -37,27 +37,53 @@ function spliceNodeList(nodeList, startIndex, numElements) {
 function updateSupportCounter() {
     d3.select("#AddSupport").text(`Add Support ${numDolls-1-numSummons}/4`);
 }
+
+function toggleSlotSize(dollNum) {
+    if (document.getElementById("Doll_" + dollNum).className == "slotMaximized")
+        minimizeSlots();
+    else {
+        minimizeSlots();
+        maximizeSlot(dollNum);
+    }
+}
+
+function maximizeSlot(dollNum) {
+    let slot = document.getElementById("Doll_" + dollNum);
+    slot.className = "slotMaximized";
+    slot.firstElementChild.textContent = "-";
+}
+
+function minimizeSlots() {
+    for (let i = 1; i <= numDolls; i++) {
+        let slot = document.getElementById("Doll_" + i);
+        slot.className = "slotMinimized";
+        slot.firstElementChild.textContent = "+";
+    }
+}
 // adds a new removable slot
 function addDoll() {
     numDolls++;
     updateSupportCounter();
     let newNode = d3.select("#Doll_1").node().cloneNode(true);
+    newNode.className = "slotMaximized";
+    newNode.firstElementChild.textContent = "-";
     newNode.id = "Doll_" + numDolls;
-    newNode.children[0].innerHTML = "Doll: ";
+    newNode.children[1].innerHTML = "Doll: ";
     d3.select(newNode).style("background-color", slotColors[numDolls-1]);
-    spliceNodeList(newNode.childNodes, 7, 5);
+    spliceNodeList(newNode.childNodes, 8, 5);
 
     let removeButton = d3.select(newNode).insert("button", "label");
     removeButton.text("Remove Doll")
                 .style("float", "right")
-                .style("margin-right", "50px");
+                .style("margin-right", "20px");
     removeButton.on("click", event => {
         let dollIndex = +event.target.parentNode.id.slice(5) - 1;
         removeDoll(dollIndex);
     });
+    // if the phase buffs are open in the original div, close it
+    d3.select(newNode.lastElementChild.lastElementChild).style("display", "none");
 
-
-    phaseDiv.push(newNode.lastElementChild);
+    phaseDiv.push(null);
     selectedFortifications.push(0);
     selectedDolls.push();
     d3.select("#Dolls").node().appendChild(newNode);
@@ -120,30 +146,6 @@ function getTargetStats() {
 }
 
 function getDollStats(index) {
-    // doll, skill, atk, crit, critdmg, defignore, dmg, targeted, aoe, exposed, support, cover, stability, def, phase, physical, freeze, burn, corrosion, hydro, electric
-    /*let dollStats = ["","", 0, 0, 1,        0,      0,      0,      0,  0,          0,      0,      0,      0,      0,  0,          0,      0,      0,      0,      0];
-    dollStats[0] = selectedDolls[index];
-    dollStats[1] = selectedSkill;
-    dollStats[2] = getValuefromInput("#dollAttack");
-    dollStats[3] = getValuefromInput("#CritRate");
-    dollStats[4] = getValuefromInput("#CritDamage");
-    dollStats[5] = getValuefromInput("#DefIgnore");
-    dollStats[6] = getValuefromInput("#DamageDealt");
-    dollStats[7] = getValuefromInput("#TargetedDamageDealt");
-    dollStats[8] = getValuefromInput("#AoEDamageDealt");
-    dollStats[9] = getValuefromInput("#ExposedDamageDealt");
-    dollStats[10] = getValuefromInput("#SupportDamageDealt");
-    dollStats[11] = getValuefromInput("#CoverIgnore");
-    dollStats[12] = getValuefromInput("#StabilityDamage");
-    dollStats[13] = getValuefromInput("#dollDefense");
-    dollStats[14] = getValuefromInput("#AllDamage");
-    dollStats[15] = getValuefromInput("#PhysicalDamage");
-    dollStats[16] = getValuefromInput("#FreezeDamage");
-    dollStats[17] = getValuefromInput("#BurnDamage");
-    dollStats[18] = getValuefromInput("#CorrosionDamage");
-    dollStats[19] = getValuefromInput("#HydroDamage");
-    dollStats[20] = getValuefromInput("#ElectricDamage");*/
-
     let dollStats = [];
     d3.select("#Doll_" + (index + 1)).node().childNodes.forEach(d => {
         if (d.type == "text")
@@ -221,7 +223,7 @@ function createSkillDropdown() {
 }
 
 function updateSelectedDoll(index) {
-    d3.select(document.getElementById("Doll_" + (index + 1)).children[+(index != 0)]).text("Doll: V" + selectedFortifications[index] + " " + selectedDolls[index]);
+    d3.select(document.getElementById("Doll_" + (index + 1)).children[index == 0 ? 1 : 2]).text("Doll: V" + selectedFortifications[index] + " " + selectedDolls[index]);
 }
 // change weakness text based on selected list, write none if empty
 function updatePhaseText() {
@@ -252,10 +254,6 @@ function hideDropdowns() {
     ammoOptions.style("display", "none");
     if (fortOptions)
         fortOptions.style("display", "none");
-    phaseDiv.forEach(d => {
-        if (d)
-            d.style("display", "none");
-    });
     if (skillOptions)
         skillOptions.style("display", "none");
 }
@@ -263,8 +261,12 @@ function hideDropdowns() {
 function initializeDollButtons(index) {
     let dollNum = index + 1;
     let dollStats = document.getElementById("Doll_" + dollNum).children
+    // if the minimize/maximize button is clicked, maximize the slot and minimize all other slots or minimize the slot.
+    d3.select(dollStats[0]).on("click", () => {
+        toggleSlotSize(dollNum);
+    });
     // if doll selection button is clicked, show a dropdown of all dolls in the skill json excluding currently selected dolls
-    d3.select(dollStats[index == 0 ? 1 : 2]).on("click", () => {
+    d3.select(dollStats[index == 0 ? 2 : 3]).on("click", () => {
         // if onclick is triggered by selecting from the dropdown, delete the dropdown
         if (dollOptions) {
             dollOptions.remove();
@@ -275,7 +277,7 @@ function initializeDollButtons(index) {
             // hide any other active dropdowns
             hideDropdowns();
             // create the dropdown list 
-            dollOptions = d3.select(dollStats[index == 0 ? 1 : 2]).append("div").attr("class", "dropdownBox");
+            dollOptions = d3.select(dollStats[index == 0 ? 2 : 3]).append("div").attr("class", "dropdownBox");
             // get all dolls excluding any already selected dolls, and Papasha summon if support slot
             let dollList = getDolls().filter(doll => {
                 if (index == 0)
@@ -298,8 +300,8 @@ function initializeDollButtons(index) {
                                 updateSelectedDoll(dollIndex);
                                 // enable the skill and fortification dropdown buttons since a doll is now selected
                                 if (dollIndex == 0)
-                                    d3.select(dollStats[5]).node().disabled = false;
-                                d3.select(dollStats[index == 0 ? 2 : 3]).node().disabled = false;
+                                    d3.select(dollStats[6]).node().disabled = false;
+                                d3.select(dollStats[index == 0 ? 3 : 4]).node().disabled = false;
                                 // disable the calculate damage button because a skill for the new doll 1 has not yet been selected
                                 if (dollIndex == 0) {
                                     d3.select("#calculateButton").node().disabled = true;
@@ -321,21 +323,24 @@ function initializeDollButtons(index) {
                                 if (d == "Papasha" && !selectedDolls.includes("Papasha Summon")) {
                                     dollOptions.style("display", "none");
                                     numSummons++;
+                                    // create papasha doll slot but minimize it and keep the papasha slot maximized
                                     addDoll();
+                                    minimizeSlots();
+                                    maximizeSlot(dollIndex + 1);
                                     selectedDolls[numDolls-1] = "Papasha Summon";
                                     selectedFortifications[numDolls-1] = selectedFortifications[dollIndex];
                                     updateSelectedDoll(numDolls-1);
-                                    spliceNodeList(document.getElementById("Doll_" + numDolls).childNodes,3,3);
+                                    spliceNodeList(document.getElementById("Doll_" + numDolls).childNodes,5,4);
                                 }
                             });
             });
         }
     });
     // if fortification button is selected, show a list from V0-V6 to set the fortification of the doll
-    d3.select(dollStats[index == 0 ? 2 : 3]).on("click", () => {
+    d3.select(dollStats[index == 0 ? 3 : 4]).on("click", () => {
         // if dropdown list has not yet been created
         if (!fortOptions) {
-            fortOptions = d3.select(dollStats[index == 0 ? 2 : 3]).append("div").attr("class", "dropdownBox").style("display", "none");
+            fortOptions = d3.select(dollStats[index == 0 ? 3 : 4]).append("div").attr("class", "dropdownBox").style("display", "none");
             for (let i = 0; i < 7; i++) {
                 fortOptions.append("a")
                             .text("V" + i)
@@ -382,7 +387,7 @@ function initializeDollButtons(index) {
             }
         } // if dropdown has already been created, reuse it by transferring it as a child of a new fortification button
         else {
-            dollStats[index == 0 ? 2 : 3].appendChild(fortOptions.node());
+            dollStats[index == 0 ? 3 : 4].appendChild(fortOptions.node());
         }
         // toggle the dropdown list
         if (fortOptions.style("display") == "none") { 
@@ -393,8 +398,9 @@ function initializeDollButtons(index) {
             hideDropdowns();
     });
     // elemental damage show/hide toggle, construct the dropdown here so that it does not affect the size of the button
-    phaseDiv[index] = d3.select(dollStats[dollStats.length-1]);
-    d3.select(dollStats[dollStats.length - 2]).on("click", () => {
+    phaseDiv[index] = d3.select(dollStats[dollStats.length-1].lastElementChild);
+    console.log(dollStats[dollStats.length-1].lastElementChild)
+    d3.select(dollStats[dollStats.length-1].lastElementChild.previousElementSibling).on("click", () => {
         if (phaseDiv[index].style("display") == "block") {
             hideDropdowns();
         }
@@ -405,7 +411,7 @@ function initializeDollButtons(index) {
     });
     // if skill button is clicked, show a dropdown of the possible actions of doll 1
     if (index == 0) {
-        d3.select(dollStats[5]).on("click", () => {
+        d3.select(dollStats[6]).on("click", () => {
             if (skillOptions.style("display") == "none") {
                 hideDropdowns();
                 skillOptions.style("display", "block");
@@ -474,6 +480,8 @@ ActionLog.getInstance();
 }
 // add extra support slot, up to 4 non-summons
 d3.select("#AddSupport").on("click", () => {
+    hideDropdowns();
+    minimizeSlots();
     if (numDolls - numSummons < 5)
         addDoll();
 });

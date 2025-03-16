@@ -39,7 +39,7 @@
             box-sizing: border-box;
             float: left;
             width: 33%;
-            height: 1500px;
+            height: 1000px;
             padding-left: 10px;
         }
         .pageTab {
@@ -49,6 +49,13 @@
             color: black;
             text-decoration: none;
             box-shadow: -1px -1px 1px inset;
+        }
+        .slotMaximized {
+            height: auto;
+        }
+        .slotMinimized {
+            height: 100px;
+            overflow-y: hidden;
         }
     </style>
 </head>
@@ -84,12 +91,13 @@
                 <input type = "text" id = "targetDRWithStab"><br>
             </div>
         </div>
-        <div class= "column" id = "Dolls" style="background-color: lightslategray; white-space: normal;">
+        <div class= "column" id = "Dolls" style="background-color: lightslategray; white-space: normal; height: auto;">
             <div style="height: 50px;">
                 <h2 style="float: left;">Dolls</h2>
                 <button style="float: right; margin-right: 50px; margin-top: 20px;" id = "AddSupport">Add Support 0/4</button>
             </div><br>
-            <div id = "Doll_1" style="white-space: pre-line; margin-left: -10px; padding-left: 10px;">
+            <div id = "Doll_1" style="white-space: pre-line; margin-left: -10px; padding-left: 10px;" class="slotMaximized">
+                <button style="float: right; margin-right: 10px;">-</button>
                 <label>Doll:</label>
                 <button>Select Doll</button>
                 <button disabled>Fortification</button><br>
@@ -104,41 +112,43 @@
                 <input type = "text"><br>
                 <label >Crit Damage (1.0x):</label>
                 <input type = "text"><br>
-                <label >Defense Ignore (0.0x):</label>
-                <input type = "text"><br>
-                <label >Damage Dealt (+- 0.0x):</label>
-                <input type = "text"><br>
-                <label >Targeted Damage Dealt (+- 0.0x):</label>
-                <input type = "text"><br>
-                <label >AoE Damage Dealt (+- 0.0x):</label>
-                <input type = "text"><br>
-                <label >Exposed Damage Dealt (+- 0.0x):</label>
-                <input type = "text"><br>
-                <label >Support Damage Dealt (+- 0.0x):</label>
-                <input type = "text"><br>
-                <label >Cover Ignore (0.0x):</label>
-                <input type = "text"><br>
-                <label >Stability Damage (+- x):</label>
-                <input type = "text"><br>
-                <label >Defense:</label>
-                <input type = "text"><br>
-                <button>Element Damage (0.0x):
-                </button>
-                <div style="display: none;">
-                    <label >(All) Phase Damage:</label>
+                <div style="overflow-y: auto; height: 280px; border-top: 1px solid black;">
+                    <label >Defense Ignore (0.0x):</label>
                     <input type = "text"><br>
-                    <label >Physical Damage:</label>
-                    <input type = "text" ><br>
-                    <label >Freeze Damage:</label>
-                    <input type = "text" ><br>
-                    <label >Burn Damage:</label>
-                    <input type = "text" ><br>
-                    <label >Corrosion Damage:</label>
-                    <input type = "text" ><br>
-                    <label >Hydro Damage:</label>
-                    <input type = "text" ><br>
-                    <label >Electric Damage:</label>
-                    <input type = "text" >
+                    <label >Damage Dealt (+- 0.0x):</label>
+                    <input type = "text"><br>
+                    <label >Targeted Damage Dealt (+- 0.0x):</label>
+                    <input type = "text"><br>
+                    <label >AoE Damage Dealt (+- 0.0x):</label>
+                    <input type = "text"><br>
+                    <label >Exposed Damage Dealt (+- 0.0x):</label>
+                    <input type = "text"><br>
+                    <label >Support Damage Dealt (+- 0.0x):</label>
+                    <input type = "text"><br>
+                    <label >Cover Ignore (0.0x):</label>
+                    <input type = "text"><br>
+                    <label >Stability Damage (+- x):</label>
+                    <input type = "text"><br>
+                    <label >Defense:</label>
+                    <input type = "text"><br>
+                    <button>Element Damage (0.0x):
+                    </button>
+                    <div style="display: none;">
+                        <label >(All) Phase Damage:</label>
+                        <input type = "text"><br>
+                        <label >Physical Damage:</label>
+                        <input type = "text" ><br>
+                        <label >Freeze Damage:</label>
+                        <input type = "text" ><br>
+                        <label >Burn Damage:</label>
+                        <input type = "text" ><br>
+                        <label >Corrosion Damage:</label>
+                        <input type = "text" ><br>
+                        <label >Hydro Damage:</label>
+                        <input type = "text" ><br>
+                        <label >Electric Damage:</label>
+                        <input type = "text" >
+                    </div>
                 </div>
             </div>
         </div>
