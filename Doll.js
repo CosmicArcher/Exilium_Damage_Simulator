@@ -244,7 +244,7 @@ class Doll extends Unit {
             // if support attack, temporarily increase damage dealt stat then undo once damage has been calculated
             if (skillName == SkillNames.SUPPORT)
                 this.damageDealt += this.supportDamageDealt;
-            let damage = this.processAttack(skill, calculationType, target);
+            let damage = this.processAttack(skill, calculationType, enemyTarget);
             if (skillName == SkillNames.SUPPORT)
                 this.damageDealt -= this.supportDamageDealt;
 
@@ -255,7 +255,7 @@ class Doll extends Unit {
 
                 this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 1);
 
-                damage += this.processAttack(extraAttack, calculationType, target);
+                damage += this.processAttack(extraAttack, calculationType, enemyTarget);
 
                 this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 0);
             }
@@ -266,7 +266,7 @@ class Doll extends Unit {
         else {
             // Suomi ult both buffs all units and damages and applies avalanche on the target
             if (skillName == SkillNames.ULT && this.name == "Suomi") {
-                this.processPrePostBuffs(skill, target, supportTarget, 0);
+                this.processPrePostBuffs(skill, enemyTarget, supportTarget, 0);
                 let fixedDamage = 0;
                 if (skill.hasOwnProperty(SkillJSONKeys.FIXED_DAMAGE)) {
                     let data = skill[SkillJSONKeys.FIXED_DAMAGE];
@@ -282,7 +282,7 @@ class Doll extends Unit {
                     }
                     fixedDamage *= data[SkillJSONKeys.FIXED_DAMAGE_SCALING];
                 }
-                target.takeDamage();
+                enemyTarget.takeDamage();
                 return fixedDamage;
             }
             this.processPrePostBuffs(skill, null, supportTarget, 0);

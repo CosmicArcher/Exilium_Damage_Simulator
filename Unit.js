@@ -19,12 +19,12 @@ class Unit {
     getName() {return this.name;}
     // process buffs using json data
     applyBuffEffects(buffData) {
-        if(buffData.hasOwnProperty("Defense%"))
-            this.defenseBuffs += buffData["Defense%"];
+        if(buffData.hasOwnProperty("DefensePerc"))
+            this.defenseBuffs += buffData["DefensePerc"];
     }
     removeBuffEffects(buffData) {
-        if(buffData.hasOwnProperty("Defense%"))
-            this.defenseBuffs -= buffData["Defense%"];
+        if(buffData.hasOwnProperty("DefensePerc"))
+            this.defenseBuffs -= buffData["DefensePerc"];
     }
     // these are called when buffs are added/removed
     addBuff(buffName, duration, source) {

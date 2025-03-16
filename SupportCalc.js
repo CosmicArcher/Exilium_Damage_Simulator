@@ -427,6 +427,32 @@ function initializeDollButtons(index) {
     }
 }
 
+function createDollsFromInput() {
+    let dolls = [];
+    for (let i = 0; i < numDolls; i++) {
+        let dollStats = getDollStats(i)
+        let newDoll = DollFactory.getInstance().createDoll(selectedDolls[i], dollStats[11], dollStats[0], dollStats[1], dollStats[2], selectedFortifications[i]);
+        newDoll.disableBuffs();
+        newDoll.setDamageDealt(dollStats[4]);
+        newDoll.setDefenseIgnore(dollStats[3]);
+        newDoll.setTargetedDamage(dollStats[5]);
+        newDoll.setAoEDamage(dollStats[6]);
+        newDoll.setExposedDamage(dollStats[7]);
+        newDoll.setSupportDamage(dollStats[8]);
+        newDoll.setCoverIgnore(dollStats[9]);
+        newDoll.setStabilityDamageModifier(dollStats[10]);
+        newDoll.setPhaseDamage(dollStats[12]);
+        newDoll.setElementDamage(Elements.PHYSICAL, dollStats[13]);
+        newDoll.setElementDamage(Elements.FREEZE, dollStats[14]);
+        newDoll.setElementDamage(Elements.BURN, dollStats[15]);
+        newDoll.setElementDamage(Elements.CORROSION, dollStats[16]);
+        newDoll.setElementDamage(Elements.HYDRO, dollStats[17]);
+        newDoll.setElementDamage(Elements.ELECTRIC, dollStats[18]);
+        dolls.push(newDoll);
+    }
+    return dolls;
+}
+
 // initialize the singletons
 {
 DamageManager.getInstance();
@@ -502,7 +528,7 @@ d3.select("#calculateButton").on("click", () => {
     GameStateManager.getInstance().registerTarget(new Target("6p62", targetStats[0], targetStats[3], 2, targetStats[1]));
     let newTarget = GameStateManager.getInstance().getTarget();
     // this webpage has all buffs manually input rather than automatic
-    newTarget.disableBuffs();
+    //newTarget.disableBuffs();
     GameStateManager.getInstance().addCover(targetStats[2]);
     newTarget.setDefenseBuffs(targetStats[4]);
     newTarget.setDamageTaken(targetStats[5]);
@@ -512,7 +538,7 @@ d3.select("#calculateButton").on("click", () => {
     newTarget.applyDRPerStab(targetStats[9]);
     newTarget.applyDRWithStab(targetStats[10]);
 
-    let newDoll = DollFactory.getInstance().createDoll(selectedDolls[0], dollStats[11], dollStats[0], dollStats[1], dollStats[2], selectedFortifications[0]);
+    /*let newDoll = DollFactory.getInstance().createDoll(selectedDolls[0], dollStats[11], dollStats[0], dollStats[1], dollStats[2], selectedFortifications[0]);
     newDoll.disableBuffs();
     newDoll.setDamageDealt(dollStats[4]);
     newDoll.setDefenseIgnore(dollStats[3]);
@@ -528,12 +554,14 @@ d3.select("#calculateButton").on("click", () => {
     newDoll.setElementDamage(Elements.BURN, dollStats[15]);
     newDoll.setElementDamage(Elements.CORROSION, dollStats[16]);
     newDoll.setElementDamage(Elements.HYDRO, dollStats[17]);
-    newDoll.setElementDamage(Elements.ELECTRIC, dollStats[18]);
+    newDoll.setElementDamage(Elements.ELECTRIC, dollStats[18]);*/
+    let newDolls = createDollsFromInput();
 
     //let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
     let conditionalDiv = document.getElementById("Doll_1").children[7];
     let conditionalOverride = conditionalDiv.firstElementChild.checked;
-    TurnManager.getInstance().useDollSkill(newDoll, newTarget, selectedSkill, CalculationTypes.EXPECTED, conditionalOverride);
+    // the first doll is the primary attacker, all others support if applicable
+    TurnManager.getInstance().useDollSkill(newDolls[0], newTarget, selectedSkill, CalculationTypes.EXPECTED, conditionalOverride);
     d3.select("#ActionLog").insert("p","p").text("Expected Damage");
 })
 

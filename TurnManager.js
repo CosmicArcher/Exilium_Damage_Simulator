@@ -75,7 +75,10 @@ class TurnManager {
             while (TurnManagerSingleton.actionSequence.length > 0) {
                 let currentAction = TurnManagerSingleton.actionSequence.pop();
                 // actions are an array consisting of [doll, target/[target, supported doll], skillName, calculationType, conditionalOverride]
-                currentAction[0].getSkillDamage(currentAction[2], currentAction[1], currentAction[3], currentAction[4]);
+                if (currentAction[1] != SkillNames.SUPPORT)
+                    currentAction[0].getSkillDamage(currentAction[2], currentAction[1], currentAction[3], currentAction[4]);
+                else
+                    currentAction[0].useSupportSkill(currentAction[2], currentAction[3], currentAction[4]);
 
                 console.log("Actions left: " + TurnManagerSingleton.actionSequence.length);
             }
