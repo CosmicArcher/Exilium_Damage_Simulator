@@ -14,11 +14,15 @@ var selectedDolls = [];
 var selectedFortifications = [0];
 var selectedSkill = "";
 var numDolls = 1;
+// papasha summon does not count towards the limit of 4 supports
+var numSummons = 0;
 
 var skillOptions;
 var dollOptions;
 var phaseDiv = [];
 var fortOptions;
+// for use when dynamically adding and removing doll slots
+var slotColors = ["olive", "violet", "red", "orange", "dodgerblue", "aquamarine"];
 
 // an error gets thrown when putting resourceloader.getinstance() directly in the .on(click) functions
 function getDolls() {
@@ -30,29 +34,22 @@ function spliceNodeList(nodeList, startIndex, numElements) {
         nodeList[startIndex].remove();
 }
 
+function updateSupportCounter() {
+    d3.select("#AddSupport").text(`Add Support ${numDolls-1}/4`);
+}
+
 function addDoll() {
     numDolls++;
+    updateSupportCounter();
     let newNode = d3.select("#Doll_1").node().cloneNode(true);
     newNode.id = "Doll_" + numDolls;
+    d3.select(newNode).style("background-color", slotColors[numDolls-1]);
     spliceNodeList(newNode.childNodes, 7, 5);
-    newNode.childNodes.forEach(d => {
-        if (d.htmlFor)
-            d.htmlFor += numDolls;
-        if (d.id)
-            d.id += numDolls;
-        if (d.childNodes.length > 0) {
-            d.childNodes.forEach(datum => {
-                if (datum.htmlFor)
-                    datum.htmlFor += numDolls;
-                if (datum.id)
-                    datum.id += numDolls;
-            })
-        }
-    });
     phaseDiv.push(null);
     selectedFortifications.push(0);
     selectedDolls.push();
     d3.select("#Dolls").node().appendChild(newNode);
+    initializeDollButtons(numDolls - 1);
 }
 
 function getValuefromInput(fieldID) {
@@ -152,6 +149,7 @@ function getDollSkills(index) {
 
 function createSkillDropdown() {
     let skills = getDollSkills(0);
+    console.log(selectedDolls);
     // clear the selected skill text because of the new doll chosen
     if (skillOptions)
         skillOptions.remove();
@@ -239,11 +237,7 @@ function initializeDollButtons(index) {
             dollOptions = d3.select(dollStats[1]).append("div").attr("class", "dropdownBox");
             // get all dolls excluding any already selected dolls
             let dollList = getDolls().filter(doll => {
-                for (let i = 0; i < selectedDolls.length; i++) {
-                    if (selectedDolls[i] == doll) 
-                        return false;
-                }
-                return true;
+                return !selectedDolls.includes(doll);
             });
             dollList.forEach(d => {
                 dollOptions.append("a")
@@ -273,6 +267,16 @@ function initializeDollButtons(index) {
                                         }
                                     }
                                 }
+                                // if papasha was selected, automatically create a new slot and lock it to her summon            
+                                if (d == "Papasha" && !selectedDolls.includes("Papasha Summon")) {
+                                    dollOptions.style("display", "none");
+                                    addDoll();
+                                    numSummons++;
+                                    selectedDolls[numDolls-1] = "Papasha Summon";
+                                    selectedFortifications[numDolls-1] = selectedFortifications[dollIndex];
+                                    updateSelectedDoll(numDolls-1);
+                                    spliceNodeList(document.getElementById("Doll_" + numDolls).childNodes,3,3);
+                                }
                             });
             });
         }
@@ -289,6 +293,15 @@ function initializeDollButtons(index) {
                                 let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
                                 selectedFortifications[dollIndex] = i;
                                 updateSelectedDoll(dollIndex);
+                                // if the doll is papasha, also update her summon's fortification
+                                if (selectedDolls[dollIndex] == "Papasha") {
+                                    selectedDolls.forEach((d, index) => {
+                                        if (d == "Papasha Summon") {
+                                            selectedFortifications[index] = i;
+                                            updateSelectedDoll(index);
+                                        }
+                                    });
+                                }
                                 // if a skill is already selected and gains a conditional because of the fortification, 
                                 // show the override tickbox, otherwise hide and deselect it
                                 if (dollIndex == 0) {
@@ -409,6 +422,11 @@ ActionLog.getInstance();
             hideDropdowns();
     });
 }
+// add extra support slot, up to 4 non-summons
+d3.select("#AddSupport").on("click", () => {
+    if (numDolls - numSummons < 5)
+        addDoll();
+});
 
 initializeDollButtons(0);
 
@@ -453,8 +471,4 @@ d3.select("#calculateButton").on("click", () => {
     d3.select("#ActionLog").insert("p","p").text("Expected Damage");
 })
 
-addDoll();
-addDoll();
-
-initializeDollButtons(1);
-initializeDollButtons(2);
+d3.select("#Doll_1").style("background-color", slotColors[0]);
