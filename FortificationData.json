@@ -44,11 +44,7 @@
         },
         "V5" : {
             "Support" : {
-                "Pre_Support_Buff" : [{
-                    "Name" : "Damage Up 2",
-                    "Duration" : 1
-                }],
-                "Pre_Target_Buff" : [{
+                "Pre_Self_Buff" : [{
                     "Name" : "Damage Up 2",
                     "Duration" : 1
                 }]

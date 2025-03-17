@@ -58,7 +58,7 @@ class TurnManager {
                 // priority debuffs are  called immediately since only debuffs will be applied and nothing else
                 TurnManagerSingleton.priorityDebuffers.forEach(d => {
                     if (d.getName() != doll.getName()) // a doll cannot support themself
-                        d.usePriorityDebuff(target);
+                        d.usePriorityDebuff(target, doll);
                 });
                 // if anything triggers a wise support, it will be added to the top of the stack
                 // start the action sequence if it is not currently running
