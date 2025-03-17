@@ -41,7 +41,8 @@ class TurnManager {
 
     useDollSkill(doll, target, skillName, calculationType = calculationType.EXPECTED, conditionalOverride = false) {
         if (TurnManagerSingleton) {
-            if (doll.getSkillAttackType(skillName) == AttackTypes.TARGETED) {
+            // targeted non-support skills are the most common type of triggers to get supported
+            if (doll.getSkillAttackType(skillName) == AttackTypes.TARGETED && skillName != SkillNames.SUPPORT) {
                 // regular support should be at the bottom of the sequence stack
                 TurnManagerSingleton.targetedSupporters.forEach(d => {
                     if (d.getName() != doll.getName()) // a doll cannot support themself

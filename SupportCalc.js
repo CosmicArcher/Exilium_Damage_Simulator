@@ -522,6 +522,7 @@ initializeDollButtons(0);
 
 d3.select("#calculateButton").on("click", () => {
     hideDropdowns();
+    TurnManager.getInstance().resetLists();
     // get input values
     let targetStats = getTargetStats();
     let dollStats = getDollStats(0);
