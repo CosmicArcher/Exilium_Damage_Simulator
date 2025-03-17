@@ -20,6 +20,7 @@ class Doll extends Unit {
         this.aoeDamageDealt = 0;
         this.targetedDamageDealt = 0;
         this.exposedDamageDealt = 0;
+        this.slowedDamageDealt = 0;
         this.supportDamageDealt = 0;
         this.phaseDamageDealt = 0;
         this.elementDamageDealt = {
@@ -38,6 +39,7 @@ class Doll extends Unit {
         this.baseAoEDamageDealt = 0;
         this.baseTargetedDamageDealt = 0;
         this.baseExposedDamageDealt = 0;
+        this.baseSlowedDamageDealt = 0;
         this.baseSupportDamageDealt = 0;
         this.basePhaseDamageDealt = 0;
         this.baseElementDamageDealt = {
@@ -50,9 +52,13 @@ class Doll extends Unit {
         };
         this.baseCoverIgnore = 0;
         this.baseStabilityDamageModifier = 0;
+        // keys will be arranged numerically
+        this.keysEnabled = [0,0,0,0,0,0];
 
         this.initializeSkillData();
+        // merge the skill json with the fortification and key modifications of skills
         this.applyFortificationData();
+        this.initializeKeyData();
     }
 
     getAttack() {return this.attack;}
@@ -64,11 +70,24 @@ class Doll extends Unit {
     getTargetedDamage() {return this.targetedDamageDealt;}
     getAoEDamage() {return this.aoeDamageDealt;}
     getExposedDamage() {return this.exposedDamageDealt;}
+    getSlowedDamage() {return this.slowedDamageDealt;}
     getSupportDamage() {return this.supportDamageDealt;}
     getPhaseDamage() {return this.phaseDamageDealt;}
     getElementDamage(elementName) {return this.elementDamageDealt[elementName];}
     getCoverIgnore() {return this.coverIgnore;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
+    // get the base stats for display mid-simulation
+    getBaseDefenseIgnore() {return this.baseDefenseIgnore;}
+    getBaseDamageDealt() {return this.baseDamageDealt;}
+    getBaseTargetedDamage() {return this.baseTargetedDamageDealt;}
+    getBaseAoEDamage() {return this.baseAoEDamageDealt;}
+    getBaseExposedDamage() {return this.baseExposedDamageDealt;}
+    getBaseSlowedDamage() {return this.baseSlowedDamageDealt;}
+    getBaseSupportDamage() {return this.baseSupportDamageDealt;}
+    getBasePhaseDamage() {return this.basePhaseDamageDealt;}
+    getBaseElementDamage(elementName) {return this.baseElementDamageDealt[elementName];}
+    getBaseCoverIgnore() {return this.baseCoverIgnore;}
+    getBaseStabilityDamageModifier() {return this.baseStabilityDamageModifier;}
     // for direct buff input
     setDefenseIgnore(x) {
         this.resetDefenseIgnore();
@@ -94,6 +113,11 @@ class Doll extends Unit {
         this.resetExposedDamage();
         this.baseExposedDamageDealt = x;
         this.exposedDamageDealt += x;
+    }
+    setSlowedDamage(x) {
+        this.resetSlowedDamage();
+        this.baseSlowedDamageDealt = x;
+        this.slowedDamageDealt += x;
     }
     setSupportDamage(x) {
         this.resetSupportDamage();
@@ -140,6 +164,10 @@ class Doll extends Unit {
     resetExposedDamage() {
         this.exposedDamageDealt -= this.baseExposedDamageDealt;
         this.baseExposedDamageDealt = 0;
+    }
+    resetSlowedDamage() {
+        this.slowedDamageDealt -= this.baseSlowedDamageDealt;
+        this.baseSlowedDamageDealt = 0;
     }
     resetSupportDamage() {
         this.supportDamageDealt -= this.baseSupportDamageDealt;
@@ -194,6 +222,14 @@ class Doll extends Unit {
             }
         }
     }
+    // 
+    applyKey(index) {
+        keys[index] = 1;
+    }
+    //
+    initializeKeyData() {
+
+    }
     // get the attack type of the skill 
     getSkillAttackType(skillName) {
         if (this.skillData.hasOwnProperty(skillName)) 
@@ -203,8 +239,8 @@ class Doll extends Unit {
     // process buffs using json data
     applyBuffEffects(buffData) {
         super.applyBuffEffects(buffData);
-        if(buffData.hasOwnProperty("DamageTaken%"))
-            this.damageTaken += buffData["DamageTaken%"];
+        if(buffData.hasOwnProperty("DamagePerc"))
+            this.damageDealt += buffData["DamagePerc"];
         if(buffData.hasOwnProperty("AoEDamageTaken%"))
             this.aoeDamageTaken += buffData["AoEDamageTaken%"];
         if(buffData.hasOwnProperty("TargetedDamageTaken%"))
@@ -212,6 +248,8 @@ class Doll extends Unit {
     }
     removeBuffEffects(buffData) {
         super.removeBuffEffects(buffData);
+        if(buffData.hasOwnProperty("DamagePerc"))
+            this.damageDealt -= buffData["DamagePerc"];
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
     // conditionals in skills are set automatically by the respective doll class or by an override checkbox in the menu
@@ -458,13 +496,20 @@ class Doll extends Unit {
         });
         return newObj;
     }
-
-    cloneUnit() {
-        let newDoll = new Doll(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification);
+    // to enable turn rewinding, each move uses clones of the previous state and rewind just returns to that set of clones
+    cloneUnit(newDoll) {
+        if (!newDoll)
+            newDoll = new Doll(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification);
+        this.keysEnabled.forEach((key, i) => {
+            if (key)
+                newDoll.applyKey(i);
+        });
+        newDoll.CIndex = this.CIndex;
         newDoll.setDefenseIgnore(this.baseDefenseIgnore);
         newDoll.setDamageDealt(this.baseDamageDealt); 
         newDoll.setAoEDamage(this.baseAoEDamageDealt); 
         newDoll.setTargetedDamage(this.baseTargetedDamageDealt); 
+        newDoll.setSlowedDamage(this.baseSlowedDamageDealt);
         newDoll.setExposedDamage(this.baseExposedDamageDealt);
         newDoll.setSupportDamage(this.baseSupportDamageDealt); 
         newDoll.setPhaseDamage(this.basePhaseDamageDealt); 

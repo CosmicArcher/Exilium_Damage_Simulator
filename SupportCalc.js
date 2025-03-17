@@ -432,12 +432,13 @@ function createDollsFromInput() {
     for (let i = 0; i < numDolls; i++) {
         let dollStats = getDollStats(i)
         let newDoll = DollFactory.getInstance().createDoll(selectedDolls[i], dollStats[11], dollStats[0], dollStats[1], dollStats[2], selectedFortifications[i]);
-        newDoll.disableBuffs();
+        //newDoll.disableBuffs();
+        newDoll.finishCloning();
         newDoll.setDamageDealt(dollStats[4]);
         newDoll.setDefenseIgnore(dollStats[3]);
         newDoll.setTargetedDamage(dollStats[5]);
         newDoll.setAoEDamage(dollStats[6]);
-        newDoll.setExposedDamage(dollStats[7]);
+        newDoll.setSlowedDamage(dollStats[7]);
         newDoll.setSupportDamage(dollStats[8]);
         newDoll.setCoverIgnore(dollStats[9]);
         newDoll.setStabilityDamageModifier(dollStats[10]);
@@ -528,6 +529,7 @@ d3.select("#calculateButton").on("click", () => {
     let dollStats = getDollStats(0);
     GameStateManager.getInstance().registerTarget(new Target("6p62", targetStats[0], targetStats[3], 2, targetStats[1]));
     let newTarget = GameStateManager.getInstance().getTarget();
+    newTarget.finishCloning();
     // this webpage has all buffs manually input rather than automatic
     //newTarget.disableBuffs();
     GameStateManager.getInstance().addCover(targetStats[2]);
