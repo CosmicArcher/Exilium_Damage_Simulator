@@ -526,6 +526,7 @@ class Doll extends Unit {
                 newDoll.addBuff(d[0], d[2], d[5]);
             });
 
+        newDoll.finishCloning();
         return newDoll;
     }
 }

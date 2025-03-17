@@ -141,7 +141,8 @@ class Target extends Unit {
             this.currentBuffs.forEach(d => {
                 targetClone.addBuff(d[0], d[2], d[5]);
             });
-
+        
+        targetClone.finishCloning();
         return targetClone;
     }
 }
