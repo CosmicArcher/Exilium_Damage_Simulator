@@ -592,7 +592,7 @@
             "Element" : "Burn",
             "Post_Target_Buff" : [{
                 "Name" : "Overburn",
-                "Duration" : 2
+                "Duration" : 1
             }]
         },
         "Skill3" : {
@@ -602,15 +602,15 @@
             "StabilityDamage" : 3,
             "Ammo_Type" : "Medium",
             "Element" : "Physical",
+            "Post_Self_Buff" : [{
+                "Name" : "Zoom In",
+                "Stacks" : 1
+            }],
             "Conditional" : {
                 "Element" : "Burn",
                 "Post_Target_Buff" : [{
                     "Name" : "Flammable",
                     "Stacks" : 2
-                }],
-                "Post_Self_Buff" : [{
-                    "Name" : "Zoom In",
-                    "Stacks" : 1
                 }]
             }
         },
@@ -646,7 +646,11 @@
             "Type" : "Buff",
             "Target" : "Ally",
             "Post_Target_Buff" : [{
-
+                "Name" : "Continuous Healing 2",
+                "Duration" : 1
+            }, {
+                "Name" : "Continuous Stability Regen 1",
+                "Duration" : 1
             }]
         },
         "Skill3" : {
@@ -689,7 +693,11 @@
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 4,
             "Ammo_Type" : "Light",
-            "Element" : "Burn"
+            "Element" : "Burn",
+            "Conditional" : [{
+                "Condition_Text" : "Has Blazing Assault",
+                "Damage_Boost" : 0.2
+            }]
         },
         "Skill3" : {
             "Type" : "Attack",
@@ -738,7 +746,7 @@
             "Element" : "Physical",
             "Post_Target_Buff" : [{
                 "Name" : "Movement Down 2",
-                "Duration" : 2
+                "Duration" : 1
             }]
         },
         "Skill3" : {
@@ -747,6 +755,9 @@
             "Post_Target_Buff" : [{
                 "Name" : "Defense Up 2",
                 "Duration" : 2
+            }, {
+                "Name" : "Shelter",
+                "Stacks" : 2
             }]
         },
         "Ultimate" : {
@@ -758,7 +769,7 @@
             "Element" : "Physical",
             "Post_Target_Buff" : [{
                 "Name" : "Movement Down 2",
-                "Duration" : 2
+                "Duration" : 1
             }]
         },
         "CounterAttack" : {
@@ -793,7 +804,11 @@
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
             "Ammo_Type" : "Melee",
-            "Element" : "Burn"
+            "Element" : "Burn",
+            "Post_Target_Buff" : [{
+                "Name" : "Overburn",
+                "Duration" : 2
+            }]
         },
         "Ultimate" : {
             "Type" : "Attack",
@@ -801,7 +816,11 @@
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
             "Ammo_Type" : "Melee",
-            "Element" : "Burn"
+            "Element" : "Burn",
+            "Conditional" : [{
+                "Condition_Text" : "Has Overburn",
+                "Cover_Ignore" : 1
+            }]
         }
     },
     "Ksenia" : {
@@ -821,13 +840,11 @@
             "Ammo_Type" : "Light",
             "Element" : "Physical",
             "Post_Target_Buff" : [{
-                "Name" : "Overburn",
-                "Duration" : 1
-            }, {
                 "Name" : "Flammable",
                 "Stacks" : 2
             }],
             "Conditional" : {
+                "Condition_Text" : "Has 2+ Burn Buffs",
                 "Extra_Attack" : {
                     "Type" : "Attack",
                     "Multiplier" : 0.75,
@@ -840,10 +857,18 @@
         },
         "Skill3" : {
             "Type" : "Buff",
-            "Target" : "Self",
+            "Target" : "Ally",
             "Post_Target_Buff" : [{
                 "Name" : "Heat Recovery",
                 "Duration" : 2
+            }],
+            "Conditional" : [{
+                "Append" : 1,
+                "Condition_Text" : "Full HP",
+                "Post_Target_Buff" : [{
+                    "Name" : "Blazing Assault 2",
+                    "Duration" : 2
+                }]
             }]
         },
         "Ultimate" : {
@@ -888,8 +913,12 @@
             "Multiplier" : 0.7,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 2,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
+            "Ammo_Type" : "None",
+            "Element" : "Physical",
+            "Post_Target_Buff" : [{
+                "Name" : "Vulnerability 1",
+                "Duration" : 2
+            }]
         },
         "Skill3" : {
             "Type" : "Attack",
@@ -904,8 +933,13 @@
             "Multiplier" : 0.85,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 3,
-            "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
+            "Ammo_Type" : "None",
+            "Element" : "Physical",
+            "Conditional" : [{
+                "Condition_Text" : "Has Defense Debuffs",
+                "Multiplier" : 0.95,
+                "StabilityDamage" : 4
+            }]
         },
         "Support" : {
             "Type" : "Attack",
@@ -934,14 +968,14 @@
             "Element" : "Freeze",
             "Post_Target_Buff" : [{
                 "Name" : "Cold Snap",
-                "Duration" : 2
+                "Duration" : 1
             }]
         },
         "Skill3" : {
             "Type" : "Buff",
             "Target" : "Self",
             "Post_Self_Buff" : [{
-                "Name" : "Attack Up 2",
+                "Name" : "Attack Up 1",
                 "Duration" : 2
             }]
         },
@@ -954,9 +988,9 @@
             "Element" : "Freeze",
             "Cover_Ignore" : 1,
             "Conditional" : {
-                "Post_Target_Buff" : [{
-                    "Name" : "Cold Snap",
-                    "Duration" : 2
+                "Condition_Text" : "2 Targets",
+                "Post_Self_Buff" : [{
+                    "Name" : "Extra Command"
                 }]
             }
         },
@@ -964,7 +998,7 @@
             "Type" : "Attack",
             "Multiplier" : 0.5,
             "Damage_Type" : "AoE",
-            "StabilityDamage" : 2,
+            "StabilityDamage" : 1,
             "Ammo_Type" : "Shotgun",
             "Element" : "Physical"
         }
@@ -995,15 +1029,16 @@
         "Skill3" : {
             "Type" : "Attack",
             "Multiplier" : 0.7,
-            "Damage_Type" : "AoE",
+            "Damage_Type" : "Targeted",
             "StabilityDamage" : 3,
             "Ammo_Type" : "None",
             "Element" : "Physical",
             "Conditional" : {
+                "Condition_Text" : "Distance",
                 "Extra_Attack" : {
                     "Type" : "Attack",
                     "Multiplier" : 0.7,
-                    "Damage_Type" : "AoE",
+                    "Damage_Type" : "Targeted",
                     "StabilityDamage" : 3,
                     "Ammo_Type" : "None",
                     "Element" : "Physical",
@@ -1021,14 +1056,15 @@
             "StabilityDamage" : 6,
             "Ammo_Type" : "Light",
             "Element" : "Corrosion",
-            "Conditional" : {
+            "Conditional" : [{
+                "Condition_Text" : "Has Defense Debuffs",
                 "Post_Target_Buff" : [{
                     "Name" : "Vulnerability 1",
-                    "Duration" : 1
+                    "Duration" : 2
                 }]
-            }
+            }]
         },
-        "Support" : {
+        "CounterAttack" : {
             "Type" : "Attack",
             "Multiplier" : 0.5,
             "Damage_Type" : "Targeted",
@@ -1052,7 +1088,11 @@
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 3,
             "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
+            "Element" : "Physical",
+            "Conditional" : [{
+                "Condition_Text" : "Covered",
+                "Damage_Boost" : 0.2
+            }]
         },
         "Skill3" : {
             "Type" : "Attack",
@@ -1080,7 +1120,11 @@
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
             "Ammo_Type" : "Heavy",
-            "Element" : "Physical"
+            "Element" : "Physical",
+            "Post_Self_Buff" : [{
+                "Name" : "Insight",
+                "Duration" : 1
+            }]
         }
     },
     "Dushevnaya" : {
@@ -1099,11 +1143,14 @@
             "StabilityDamage" : 2,
             "Ammo_Type" : "Heavy",
             "Element" : "Physical",
-            "Conditional" : {
-                "Multiplier" : 1.3,
+            "Conditional" : [{
+                "Condition_Text" : "4 Ice Grace",
                 "Cover_Ignore" : 0.15,
                 "Element" : "Freeze"
-            }
+            }, {
+                "Condition_Text" : "On Ice Tile",
+                "Multiplier" : 1.3
+            }]
         },
         "Skill3" : {
             "Type" : "Attack",
@@ -1112,13 +1159,14 @@
             "StabilityDamage" : 2,
             "Ammo_Type" : "None",
             "Element" : "Freeze",
-            "Conditional" : {
+            "Conditional" : [{
+                "Condition_Text" : "Enhanced",
                 "Multiplier" : 0.7,
                 "Post_Target_Buff" : [{
                     "Name" : "Frigid",
                     "Duration" : 1
                 }]
-            }
+            }]
         },
         "Ultimate" : {
             "Type" : "Buff",
@@ -1163,7 +1211,14 @@
             "Damage_Type" : "AoE",
             "StabilityDamage" : 0,
             "Ammo_Type" : "None",
-            "Element" : "Physical"
+            "Element" : "Physical",
+            "Conditional" : [{
+                "Condition_Text" : "Has Overburn",
+                "Pre_Target_Buff" : [{
+                    "Name" : "Cleanse",
+                    "Stacks" : 2
+                }]
+            }]
         },
         "Ultimate" : {
             "Type" : "Buff",
@@ -1211,6 +1266,7 @@
                 "Element" : "Corrosion"
             },
             "Conditional" : {
+                "Condition_Text" : "No Kill",
                 "Post_Target_Buff" : [{
                     "Name" : "Corrosive Pressure",
                     "Duration" : 2
@@ -1227,6 +1283,10 @@
             "Post_Target_Buff" : [{
                 "Name" : "Toxic Invasion",
                 "Duration" : 2
+            }],
+            "Conditional" : [{
+                "Condition_Text" : "Has Toxic Invasion",
+                "Damage_Boost" : 0.15
             }]
         },
         "Ultimate" : {
@@ -1235,7 +1295,13 @@
             "Damage_Type" : "AoE",
             "StabilityDamage" : 0,
             "Ammo_Type" : "None",
-            "Element" : "Corrosion"
+            "Element" : "Corrosion",
+            "Conditional" : [{
+                "Condition_Text" : "2 Kills",
+                "Pre_Self_Buff" : [{
+                    "Name" : "Extra Command"
+                }]
+            }]
         }
     }
 }

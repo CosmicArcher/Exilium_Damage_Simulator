@@ -235,7 +235,8 @@ class Doll extends Unit {
             let conditionalData = skill[SkillJSONKeys.CONDITIONAL];
             let conditionalOverrides = Object.keys(conditionalData);
             conditionalOverrides.forEach(d => {
-                skill[d] = conditionalData[d];
+                if (d != SkillJSONKeys.CONDITION_TEXT)
+                    skill[d] = conditionalData[d];
             })
         }
 

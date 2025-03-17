@@ -258,6 +258,14 @@
         "Stackable" : 1,
         "StackLimit" : 2
     },
+    "Zoom In V5" : {
+        "Buff_Type" : "Buff",
+        "Defense_Consumed" : 0,
+        "DamagePerc" : 0.2,
+        "StabilityDamage" : 2,
+        "Stackable" : 1,
+        "StackLimit" : 2
+    },
     "Support" : {
         "Buff_Type" : "Neutral",
         "Turn_Based" : 1
@@ -277,12 +285,26 @@
     },
     "Arctic Benediction" : {
         "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
         "Defense_Consumed" : 0,
-        "DamagePerc" : 0.1
+        "DamagePerc" : 0.1,
+        "StackLimit" : 99
+    },
+    "Arctic Benediction V1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0,
+        "DamagePerc" : 0.2,
+        "StackLimit" : 99
     },
     "Glacial Domain" : {
-        "Buff_Type" : "Neutral",
+        "Buff_Type" : "Buff",
         "Turn_Based" : 1
+    },
+    "Glacial Domain V5" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "DefenseIgnore" : 0.3
     },
     "Corrosive Pressure" : {
         "Buff_Type" : "Debuff",
@@ -290,7 +312,19 @@
         "Element" : "Corrosion",
         "StackLimit" : 10
     },
+    "Corrosive Pressure V2" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Element" : "Corrosion",
+        "StackLimit" : 15,
+        "DefensePerc" : -0.01
+    },
     "Toxic Invasion" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Element" : "Corrosion"
+    },
+    "Toxic Invasion V5" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Element" : "Corrosion"
@@ -437,5 +471,8 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "StackLimit" : 99
+    },
+    "Cleanse" : {
+        
     }
 } 

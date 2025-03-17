@@ -45,6 +45,7 @@ const SkillJSONKeys = {
     BUFF_DURATION: "Duration", // int
     BUFF_STACKS: "Stacks", // int
     CONDITIONAL: "Conditional", // {skill keys to override}
+    CONDITION_TEXT: "Condition_Text", // string to display to inform what the condition is
     EXTRA_ATTACK: "Extra_Attack", // object with same keys as other Attack-type objects
     CONDITIONAL_APPEND: "Append", // key exists if appending to buff list rather than overwriting when condition is met
     DAMAGE_BOOST: "Damage_Boost" // float, corresponds to additional doll damage dealt %
