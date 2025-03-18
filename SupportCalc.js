@@ -11,9 +11,9 @@ import Target from "./Target.js";
 import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames} from "./Enums.js";
 
 var selectedPhases = [];
-var selectedDolls = [];
+var selectedDolls = [""];
 var selectedFortifications = [0];
-var selectedKeys = [[0,0,0,0,1,0]];
+var selectedKeys = [[0,0,0,0,0,0]];
 var selectedSkill = "";
 var numDolls = 1;
 // papasha summon does not count towards the limit of 4 supports
@@ -21,6 +21,7 @@ var numSummons = 0;
 
 var skillOptions;
 var dollOptions;
+var keyOptions;
 var phaseDiv = [];
 var fortOptions;
 // for use when dynamically adding and removing doll slots
@@ -72,7 +73,8 @@ function addDoll() {
     newNode.id = "Doll_" + numDolls;
     newNode.children[1].innerHTML = "Doll: ";
     d3.select(newNode).style("background-color", slotColors[numDolls-1]);
-    spliceNodeList(newNode.childNodes, 8, 5);
+    console.log(newNode.children);
+    spliceNodeList(newNode.children, 12, 2);
 
     let removeButton = d3.select(newNode).insert("button", "label");
     removeButton.text("Remove Doll")
@@ -86,7 +88,16 @@ function addDoll() {
     phaseDiv.push(null);
     selectedFortifications.push(0);
     selectedDolls.push("");
+    selectedKeys.push([0,0,0,0,0,0]);
     document.getElementById("Dolls").appendChild(newNode);
+    // deactivate the fortification and key buttons until doll is selected
+    newNode.children[4].disabled = true;
+    newNode.children[6].disabled = true;
+    newNode.children[8].disabled = true;
+    newNode.children[10].disabled = true;
+    newNode.children[7].textContent = "None";
+    newNode.children[9].textContent = "None";
+    newNode.children[11].textContent = "None";
     // if the phase buffs are open in the original div, close it
     d3.select(newNode.lastElementChild.lastElementChild).style("display", "none");
     // if the conditional toggles were open in the original, hide them
@@ -98,6 +109,7 @@ function addDoll() {
 function removeDoll(index) {
     // remove data at index from arrays
     selectedFortifications.splice(index, 1);
+    selectedKeys.splice(index, 1);
     d3.select(phaseDiv[index]).remove();
     phaseDiv.splice(index, 1);
     // if summon is deleted, do not reduce the support counter
@@ -257,6 +269,7 @@ function getSkillConditionals(skillName, index) {
 function updateConditionalToggles(index) {
     let skillConditionals;
     let conditionalDiv;
+    console.log(selectedDolls);
     // get the skill conditionals and 
     if (index == 0) {
         skillConditionals = getSkillConditionals(selectedSkill, index);
@@ -269,8 +282,7 @@ function updateConditionalToggles(index) {
         else
             skillConditionals = [];
         // support units do not have the skill html element so we get them by traversing through the html children array
-        console.log(document.getElementById("Doll_" + (index + 1)).children)
-        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[5];
+        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[13];
     }
     if (skillConditionals.length > 0) {
         d3.select(conditionalDiv).style("display", "block");
@@ -305,7 +317,7 @@ function getDollSkills(index) {
 function getDollKeys(index) {
     return ResourceLoader.getInstance().getKeyData(selectedDolls[index]);
 }
-
+// for doll slot 1, all other slots use support if possible
 function createSkillDropdown() {
     let skills = getDollSkills(0);
     // clear the selected skill text because of the new doll chosen
@@ -328,6 +340,41 @@ function createSkillDropdown() {
                         d3.select("#calculateButton").node().disabled = false;
                         // if the skill has a conditional, show the override tickbox, otherwise hide and deselect it
                         updateConditionalToggles(0);
+                    });
+    });
+}
+// create the dropdown for the keys
+function createKeyDropdown(index, htmlElement) {
+    console.log(index);
+    let keys = Object.keys(getDollKeys(index));
+    // remove key button
+    keys.push("None");
+    // only show keys that have not yet been equipped and "None"
+    let filteredKeys = keys.filter((d, key_index) => {
+        return !selectedKeys[index][key_index];
+    });
+    console.log(filteredKeys);
+    keyOptions = d3.select(htmlElement).append("div").attr("class", "dropdownBox").style("display", "none");
+    filteredKeys.forEach(key_name => {
+        keyOptions.append("a")
+                    .text(key_name)
+                    .on("click", (event) => {
+                        let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
+                        let keyDisplay = event.target.parentNode.parentNode.nextElementSibling;
+                        if (key_name != "None") {
+                            // if a key has already been selected in this slot, deselect it in the selected keys
+                            if (keyDisplay.textContent != "None") 
+                                selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
+                            // add the key in the selected keys of the doll
+                            selectedKeys[dollIndex][keys.indexOf(key_name)] = 1;
+                            keyDisplay.textContent = key_name;
+                        }
+                        else {
+                            // if a key has already been selected in this slot, deselect it in the selected keys
+                            if (keyDisplay.textContent != "None") 
+                                selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
+                            keyDisplay.textContent = "None";
+                        }
                     });
     });
 }
@@ -366,6 +413,8 @@ function hideDropdowns() {
         fortOptions.style("display", "none");
     if (skillOptions)
         skillOptions.style("display", "none");
+    if (keyOptions)
+        keyOptions.style("display", "none");
 }
 // because initializing doll buttons will be repeated each time a new doll is added
 function initializeDollButtons(index) {
@@ -410,8 +459,11 @@ function initializeDollButtons(index) {
                                 updateSelectedDoll(dollIndex);
                                 // enable the skill and fortification dropdown buttons since a doll is now selected
                                 if (dollIndex == 0) // only slot 1 can choose a skill, all others can only use support attacks
-                                    d3.select(dollStats[6]).node().disabled = false;
+                                    d3.select(dollStats[13]).node().disabled = false;
                                 d3.select(dollStats[index == 0 ? 3 : 4]).node().disabled = false;
+                                d3.select(dollStats[index == 0 ? 5 : 6]).node().disabled = false;
+                                d3.select(dollStats[index == 0 ? 7 : 8]).node().disabled = false;
+                                d3.select(dollStats[index == 0 ? 9 : 10]).node().disabled = false;
                                 // disable the calculate damage button because a skill for the new doll 1 has not yet been selected
                                 if (dollIndex == 0) {
                                     d3.select("#calculateButton").node().disabled = true;
@@ -419,7 +471,6 @@ function initializeDollButtons(index) {
                                 }
                                 else {
                                     // check if the support skills have conditionals
-                                    let conditionalDiv = document.getElementById("Doll_" + (dollIndex + 1)).children[5];
                                     if (getDollSkills(dollIndex).hasOwnProperty(SkillNames.SUPPORT)) {
                                         updateConditionalToggles(dollIndex-1);
                                     }
@@ -438,7 +489,7 @@ function initializeDollButtons(index) {
                                     // update the text to show the summon name and fortification matching papasha
                                     updateSelectedDoll(numDolls-1);
                                     // delete the doll and fortification buttons of the summon to prevent changing it
-                                    spliceNodeList(document.getElementById("Doll_" + numDolls).childNodes,5,4);
+                                    spliceNodeList(document.getElementById("Doll_" + numDolls).childNodes,5,17);
                                 }
                             });
             });
@@ -474,7 +525,6 @@ function initializeDollButtons(index) {
                                 }
                                 else {
                                     // if not in slot 1, only check if support with current fortification has conditional
-                                    let conditionalDiv = document.getElementById("Doll_" + (dollIndex + 1)).children[5];
                                     if (getDollSkills(dollIndex).hasOwnProperty(SkillNames.SUPPORT)) {
                                         updateConditionalToggles(dollIndex-1);
                                     }
@@ -493,6 +543,24 @@ function initializeDollButtons(index) {
         else
             hideDropdowns();
     });
+    // if one of the 3 key slots is selected, show the unequipped keys of the doll and "None" to deselect
+    for (let i = 0; i < 3; i++) {
+        d3.select(dollStats[index == 0 ? 5 + i * 2 : 6 + i * 2]).on("click", (event) => {
+            let dollIndex = +event.target.parentNode.id.slice(5) - 1;
+            if (!keyOptions)
+                createKeyDropdown(dollIndex, event.target);
+            // toggle the dropdown list
+            if (keyOptions.style("display") == "none") { 
+                hideDropdowns();
+                keyOptions.style("display", "block");
+            }
+            else {
+                hideDropdowns();
+                keyOptions.remove();
+                keyOptions = null;
+            }
+        });
+    }
     // elemental damage show/hide toggle, construct the dropdown here so that it does not affect the size of the button
     phaseDiv[index] = d3.select(dollStats[dollStats.length-1].lastElementChild);
     d3.select(dollStats[dollStats.length-1].lastElementChild.previousElementSibling).on("click", () => {
@@ -506,7 +574,7 @@ function initializeDollButtons(index) {
     });
     // if skill button is clicked, show a dropdown of the possible actions of doll 1
     if (index == 0) {
-        d3.select(dollStats[6]).on("click", () => {
+        d3.select(dollStats[13]).on("click", () => {
             if (skillOptions.style("display") == "none") {
                 hideDropdowns();
                 skillOptions.style("display", "block");
