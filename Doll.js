@@ -6,7 +6,7 @@ import DamageManager from "./DamageManager.js";
 import RNGManager from "./RNGManager.js";
 
 class Doll extends Unit {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification) {
+    constructor(name, defense, attack, crit_chance, crit_damage, fortification, keys = [0,0,0,0,0,0]) {
         super(name, defense);
         this.attack = attack;
         this.crit_chance = crit_chance;
@@ -21,6 +21,7 @@ class Doll extends Unit {
         this.targetedDamageDealt = 0;
         this.exposedDamageDealt = 0;
         this.slowedDamageDealt = 0;
+        this.defDownDamageDealt = 0;
         this.supportDamageDealt = 0;
         this.phaseDamageDealt = 0;
         this.elementDamageDealt = {
@@ -40,6 +41,7 @@ class Doll extends Unit {
         this.baseTargetedDamageDealt = 0;
         this.baseExposedDamageDealt = 0;
         this.baseSlowedDamageDealt = 0;
+        this.baseDefDownDamageDealt = 0;
         this.baseSupportDamageDealt = 0;
         this.basePhaseDamageDealt = 0;
         this.baseElementDamageDealt = {
@@ -53,11 +55,12 @@ class Doll extends Unit {
         this.baseCoverIgnore = 0;
         this.baseStabilityDamageModifier = 0;
         // keys will be arranged numerically
-        this.keysEnabled = [0,0,0,0,0,0];
+        this.keysEnabled = keys;
 
         this.initializeSkillData();
         // merge the skill json with the fortification and key modifications of skills
         this.applyFortificationData();
+        this.applyKeyData()
     }
 
     getAttack() {return this.attack;}
@@ -70,6 +73,7 @@ class Doll extends Unit {
     getAoEDamage() {return this.aoeDamageDealt;}
     getExposedDamage() {return this.exposedDamageDealt;}
     getSlowedDamage() {return this.slowedDamageDealt;}
+    getDefDownDamage() {return this.defDownDamageDealt;}
     getSupportDamage() {return this.supportDamageDealt;}
     getPhaseDamage() {return this.phaseDamageDealt;}
     getElementDamage(elementName) {return this.elementDamageDealt[elementName];}
@@ -82,6 +86,7 @@ class Doll extends Unit {
     getBaseAoEDamage() {return this.baseAoEDamageDealt;}
     getBaseExposedDamage() {return this.baseExposedDamageDealt;}
     getBaseSlowedDamage() {return this.baseSlowedDamageDealt;}
+    getBaseDefDownDamage() {return this.baseDefDownDamageDealt;}
     getBaseSupportDamage() {return this.baseSupportDamageDealt;}
     getBasePhaseDamage() {return this.basePhaseDamageDealt;}
     getBaseElementDamage(elementName) {return this.baseElementDamageDealt[elementName];}
@@ -117,6 +122,11 @@ class Doll extends Unit {
         this.resetSlowedDamage();
         this.baseSlowedDamageDealt = x;
         this.slowedDamageDealt += x;
+    }
+    setDefDownDamage(x) {
+        this.resetDefDownDamage();
+        this.baseDefDownDamageDealt = x;
+        this.defDownDamageDealt += x;
     }
     setSupportDamage(x) {
         this.resetSupportDamage();
@@ -172,6 +182,10 @@ class Doll extends Unit {
         this.supportDamageDealt -= this.baseSupportDamageDealt;
         this.baseSupportDamageDealt = 0;
     }
+    resetDefDownDamage() {
+        this.defDownDamageDealt -= this.baseDefDownDamageDealt;
+        this.baseDefDownDamageDealt = 0;
+    }
     resetPhaseDamage() {
         this.phaseDamageDealt -= this.basePhaseDamageDealt;
         this.basePhaseDamageDealt = 0;
@@ -215,12 +229,8 @@ class Doll extends Unit {
             }
         }
     }
-    // 
-    applyKey(index) {
-        this.keysEnabled[index] = 1;
-    }
     // merge the modifications from key into skill data after fort data has merged
-    mergeKeyData() {
+    applyKeyData() {
         for (let i = 0; i < 6; i++) {
             // check if the key is equipped
             if (this.keysEnabled[i]) {

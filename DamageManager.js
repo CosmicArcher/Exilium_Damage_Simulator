@@ -56,6 +56,11 @@ class DamageManager {
             totalBuffs += target.getAoEDamageTaken();
             totalBuffs += attacker.getAoEDamage();
         }
+        // damage increases that require a specific type of debuff
+        if (target.hasBuffType("Movement", true))
+            totalBuffs += attacker.getSlowedDamage();
+        if (target.hasBuffType("Defense", true))
+            totalBuffs += attacker.getDefDownDamage();
         if (target.getStability() == 0)
             totalBuffs += attacker.getExposedDamage();
         if (element == Elements.PHYSICAL) {

@@ -51,11 +51,43 @@ class Unit {
             }
         });
     }
-
+    // for checking if a specific buff is on the unit
     hasBuff(buffName) {
         for (let i = 0; i < this.currentBuffs.length; i++) {
-            if (buff[0] == buffName)
+            if (this.currentBuffs[0] == buffName)
                 return true;
+        }
+        return false;
+    }
+    // for checking if any buff/debuff of a certain type is on the unit
+    hasBuffType(type, isDebuff = true) {
+        for (let i = 0; i < this.currentBuffs.length; i++) {
+            if (this.currentBuffs[1].Stat == type) {
+                if (isDebuff) {
+                    if (this.currentBuffs[1].Buff_Type == "Debuff")
+                        return true;
+                }
+                else {
+                    if (this.currentBuffs[1].Buff_Type == "Buff")
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+    // for checking if any buff/debuff of a certain element is on the unit
+    hasBuffElement(element, isDebuff = true) {
+        for (let i = 0; i < this.currentBuffs.length; i++) {
+            if (this.currentBuffs[1].Element == element) {
+                if (isDebuff) {
+                    if (this.currentBuffs[1].Buff_Type == "Debuff")
+                        return true;
+                }
+                else {
+                    if (this.currentBuffs[1].Buff_Type == "Buff")
+                        return true;
+                }
+            }
         }
         return false;
     }

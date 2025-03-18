@@ -25,11 +25,7 @@ class DollFactory {
             let newDoll;
             switch(name) {
                 case "Qiongjiu":
-                    newDoll = new Qiongjiu(name, defense, attack, crit_chance, crit_damage, fortification);
-                    newDoll.applyKey(1);
-                    newDoll.applyKey(4);
-                    newDoll.applyKey(2);
-                    newDoll.mergeKeyData();
+                    newDoll = new Qiongjiu(name, defense, attack, crit_chance, crit_damage, fortification, [0,1,1,0,1,0]);
                     break;
                 case "Makiatto":
                     newDoll = new Makiatto(name, defense, attack, crit_chance, crit_damage, fortification);
