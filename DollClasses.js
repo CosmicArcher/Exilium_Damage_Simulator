@@ -4,8 +4,8 @@ import GameStateManager from "./GameStateManager.js";
 import TurnManager from "./TurnManager.js";
 
 class Supporter extends Doll {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification, supportLimit) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification);
+    constructor(name, defense, attack, crit_chance, crit_damage, fortification, supportLimit, keysEnabled) {
+        super(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
 
         this.supportLimit = supportLimit;
         this.supportsUsed = 0;
@@ -27,8 +27,8 @@ class Supporter extends Doll {
 }
 
 class Interceptor extends Doll {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification, interceptLimit) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification);
+    constructor(name, defense, attack, crit_chance, crit_damage, fortification, interceptLimit, keysEnabled) {
+        super(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
 
         this.interceptLimit = interceptLimit;
         this.interceptsUsed = 0;
@@ -50,8 +50,8 @@ class Interceptor extends Doll {
 }
 
 export class Qiongjiu extends Supporter {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification, 3);
+    constructor(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super(name, defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled);
 
         TurnManager.getInstance().registerTargetedSupporter(this, false);
         TurnManager.getInstance().registerPriorityDebuffer(this);
@@ -142,8 +142,8 @@ export class Qiongjiu extends Supporter {
 }
 
 export class Makiatto extends Interceptor {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification, 2);
+    constructor(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super(name, defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
 
         this.interceptEnabled = true;
         if (this.fortification == 6)

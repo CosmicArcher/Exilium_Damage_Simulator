@@ -3,6 +3,7 @@
         "V1" : {
             "Skill2" : {
                 "Conditional" : [{
+                    "Condition_Text" : "onKill",
                     "Post_Self_Buff" : [{
                         "Name" : "Support Boost 1 V1",
                         "Duration" : -1,
@@ -13,9 +14,10 @@
         },
         "V2" : {
             "Skill3" : {
-                "Conditional" : {
+                "Conditional" : [{
+                    "Condition_Text" : "Has Overburn",
                     "Crit_Modifier" : 1
-                }
+                }]
             }
         },
         "V3" : {

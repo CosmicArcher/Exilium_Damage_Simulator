@@ -235,12 +235,10 @@ class Doll extends Unit {
             // check if the key is equipped
             if (this.keysEnabled[i]) {
                 // check if the key modifies a skill
-                if (this.keyData[i.toString()].hasOwnProperty("Skill")) {
-                    let skill = this.keyData[i.toString()]["Skill"];
+                if (this.keyData[Object.keys(this.keyData)[i]].hasOwnProperty("Skill")) {
+                    let skill = this.keyData[Object.keys(this.keyData)[i]]["Skill"];
                     Object.keys(skill).forEach(skill_name => {
                         // merge the skill json with the skill modified by the key, overwriting and appending where necessary
-                        console.log(this.skillData[skill_name]);
-                        console.log(skill[skill_name]);
                         this.mergeData(this.skillData[skill_name], skill[skill_name]);
                     });
                 }

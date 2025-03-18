@@ -1,10 +1,8 @@
 {
     "Qiongjiu" : {
-        "0" : {
-            "Name" : "Concentration"
+        "Concentration" : {
         },
-        "1" : {
-            "Name" : "Efficient Planning",
+        "Efficient Planning" : {
             "Skill" : {
                 "Support" : {
                     "Pre_Target_Buff" : [{
@@ -13,14 +11,11 @@
                 }
             }
         },
-        "2" : {
-            "Name" : "Targeted Training"
+        "Targeted Training" : {
         },
-        "3" : {
-            "Name" : "Point of Vulnerability"
+        "Point of Vulnerability" : {
         },
-        "4" : {
-            "Name" : "Necessary Adjustments",
+        "Necessary Adjustments" : {
             "Skill" : {
                 "Skill2" : {
                     "Append" : {
@@ -35,8 +30,7 @@
                 }
             }
         },
-        "5" : {
-            "Name" : "Steadiness"
+        "Steadiness" : {
         }
     }
 }

@@ -57,6 +57,11 @@
             height: 100px;
             overflow-y: hidden;
         }
+        .statScroll {
+            overflow-y: auto;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
     </style>
 </head>
 <body style="white-space: pre-line; background-color: beige;">
@@ -74,7 +79,7 @@
             <input type = "text" id = "targetCover"><br>
             <label for = "targetStability">Stability:</label>
             <input type = "text" id = "targetStability"><br>
-            <div style="overflow-y: auto; height: 640px; border-top: 1px solid black;">
+            <div style="height: 640px;" class="statScroll">
                 <label for = "targetDefBuffs">Defense Buffs/Debuffs Sum (+- 0.0x):</label>
                 <input type = "text" id = "targetDefBuffs"><br>
                 <label for = "targetDamageTaken">Damage Taken Sum (+- 0.0x):</label>
@@ -104,7 +109,8 @@
                 <label for = "Skill" id = "SkillSelected">Skill:</label>
                 <button id = "Skill" disabled>Select Skill</button>
                 <div style="display: none;">
-                    <input type="checkbox" >Skill Conditional Triggered<br>
+                    <input type="checkbox" >
+                    <label></label><br>
                 </div>
                 <label >Attack:</label>
                 <input type = "text"><br>
@@ -112,7 +118,7 @@
                 <input type = "text"><br>
                 <label >Crit Damage (1.0x):</label>
                 <input type = "text"><br>
-                <div style="overflow-y: auto; height: 280px; border-top: 1px solid black;">
+                <div style="height: 280px;" class="statScroll">
                     <label >Defense Ignore (0.0x):</label>
                     <input type = "text"><br>
                     <label >Damage Dealt (+- 0.0x):</label>

@@ -41,13 +41,14 @@
                 "Duration" : -1,
                 "Stacks" : 3
             }],
-            "Conditional" : {
+            "Conditional" : [{
+                "Condition_Text" : "Max Index",
                 "Post_Self_Buff" : [{
                     "Name" :"Support Boost 2",
                     "Duration" : -1,
                     "Stacks" : 4
                 }]
-            }
+            }]
         },
         "Support" : {
             "Type" : "Attack",
