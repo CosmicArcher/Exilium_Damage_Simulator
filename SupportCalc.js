@@ -463,6 +463,7 @@ ResourceLoader.getInstance();
 ResourceLoader.getInstance().loadBuffJSON();
 ResourceLoader.getInstance().loadSkillJSON();
 ResourceLoader.getInstance().loadFortJSON();
+ResourceLoader.getInstance().loadKeyJSON();
 EventManager.getInstance();
 TurnManager.getInstance();
 ActionLog.getInstance();
@@ -564,7 +565,7 @@ d3.select("#calculateButton").on("click", () => {
     let conditionalDiv = document.getElementById("Doll_1").children[7];
     let conditionalOverride = conditionalDiv.firstElementChild.checked;
     // the first doll is the primary attacker, all others support if applicable
-    TurnManager.getInstance().useDollSkill(newDolls[0], newTarget, selectedSkill, CalculationTypes.EXPECTED, conditionalOverride);
+    TurnManager.getInstance().useDollSkill(newDolls[0], newTarget, selectedSkill, CalculationTypes.EXPECTED, [conditionalOverride]);
     d3.select("#ActionLog").insert("p","p").text("Expected Damage");
 })
 

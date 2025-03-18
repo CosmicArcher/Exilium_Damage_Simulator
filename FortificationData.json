@@ -2,13 +2,13 @@
     "Qiongjiu" : {
         "V1" : {
             "Skill2" : {
-                "Conditional" : {
+                "Conditional" : [{
                     "Post_Self_Buff" : [{
                         "Name" : "Support Boost 1 V1",
                         "Duration" : -1,
                         "Stacks" : 1
                     }]
-                }
+                }]
             }
         },
         "V2" : {

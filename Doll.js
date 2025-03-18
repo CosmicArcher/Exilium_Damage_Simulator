@@ -58,7 +58,6 @@ class Doll extends Unit {
         this.initializeSkillData();
         // merge the skill json with the fortification and key modifications of skills
         this.applyFortificationData();
-        this.initializeKeyData();
     }
 
     getAttack() {return this.attack;}
@@ -193,6 +192,7 @@ class Doll extends Unit {
     initializeSkillData() {
         this.skillData = ResourceLoader.getInstance().getSkillData(this.name);
         this.fortData = ResourceLoader.getInstance().getFortData(this.name);
+        this.keyData = ResourceLoader.getInstance().getKeyData(this.name);
         // change skilldata from a reference to resource loader's json to directly having its own copy of the values
         this.copySkillJSON();
     }
@@ -205,30 +205,37 @@ class Doll extends Unit {
                 // some fortifications modify multiple skills at once, typically by modifying a unique buff that multiple skills apply
                 let fortificationSkills = Object.keys(fortification);
                 if (fortificationSkills.length > 1) {
-                    fortificationSkills.forEach(d => {
-                        // get the keys that will be modified
-                        Object.keys(d).forEach(skill_key => {
-                            // overwrite skillData since fortification should not change once initialized
-                            this.skillData[d][skill_key] = d[skill_key];
-                        });
+                    fortificationSkills.forEach(skill_name => {
+                        this.mergeData(this.skillData[skill_name], fortification[skill_name]);
                     });
                 }
                 else {
-                    Object.keys(fortification[fortificationSkills]).forEach(skill_key => {
-                        // overwrite skillData since fortification should not change once initialized
-                        this.skillData[fortificationSkills][skill_key] = fortification[fortificationSkills][skill_key];
-                    });
+                    this.mergeData(this.skillData[fortificationSkills[0]], fortification[fortificationSkills[0]]);
                 }
             }
         }
     }
     // 
     applyKey(index) {
-        keys[index] = 1;
+        this.keysEnabled[index] = 1;
     }
-    //
-    initializeKeyData() {
-
+    // merge the modifications from key into skill data after fort data has merged
+    mergeKeyData() {
+        for (let i = 0; i < 6; i++) {
+            // check if the key is equipped
+            if (this.keysEnabled[i]) {
+                // check if the key modifies a skill
+                if (this.keyData[i.toString()].hasOwnProperty("Skill")) {
+                    let skill = this.keyData[i.toString()]["Skill"];
+                    Object.keys(skill).forEach(skill_name => {
+                        // merge the skill json with the skill modified by the key, overwriting and appending where necessary
+                        console.log(this.skillData[skill_name]);
+                        console.log(skill[skill_name]);
+                        this.mergeData(this.skillData[skill_name], skill[skill_name]);
+                    });
+                }
+            }
+        }
     }
     // get the attack type of the skill 
     getSkillAttackType(skillName) {
@@ -253,7 +260,7 @@ class Doll extends Unit {
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
     // conditionals in skills are set automatically by the respective doll class or by an override checkbox in the menu
-    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = false) {
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
         // in the case of support attacks, target has 2 entries, the target and the supported unit
         let enemyTarget = target;
         let supportTarget;
@@ -268,14 +275,14 @@ class Doll extends Unit {
             skill = this.copyNestedObject(this.skillData[skillName]);
         else
             console.error(`${skillName} is not in ${this.name}'s skill names`);
-        // if conditional is triggered, overwrite the parts of the object that correspond to the keys in the conditional value
-        if (conditionalTriggered && skill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
-            let conditionalData = skill[SkillJSONKeys.CONDITIONAL];
-            let conditionalOverrides = Object.keys(conditionalData);
-            conditionalOverrides.forEach(d => {
-                if (d != SkillJSONKeys.CONDITION_TEXT)
-                    skill[d] = conditionalData[d];
-            })
+        // if conditional is triggered, overwrite the parts of the object that correspond to the keys in the conditional value or append to arrays if flagged
+        if (skill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+            conditionalTriggered.forEach((flag, index) => {
+                if (flag) {
+                    let conditionalData = skill[SkillJSONKeys.CONDITIONAL][index];
+                    this.mergeData(skill, conditionalData);
+                }
+            });
         }
 
         if (skill[SkillJSONKeys.TYPE] == "Attack") {
@@ -495,6 +502,37 @@ class Doll extends Unit {
                 newObj[d] = obj[d];
         });
         return newObj;
+    }
+    // merges skill data with conditional or key modifications
+    mergeData(skillData, modification) {
+        // check if the modification appends or overwrites, append nests the keys as values with an append key
+        Object.keys(modification).forEach(key => {
+            // skip over condition text since that is not meant to be used outside of display purposes
+            if (key != SkillJSONKeys.CONDITION_TEXT) {
+                // if the key is append, get the nested object to be added into the array belonging to the key rather than overwrite
+                if (key == SkillJSONKeys.APPEND) {
+                    Object.keys(modification[key]).forEach(append_key => {
+                        // check if array at key already exists, in the case of v0 qj there is none but v1 has hence why append is used for her key modification
+                        if (skillData.hasOwnProperty(append_key)) {
+                            // sometimes multiple elements are to be appended in the array
+                            modification[key][append_key].forEach(obj => {
+                                skillData[append_key].push(obj);
+                            });
+                        }
+                        else {
+                            let newArr = [];
+                            modification[key][append_key].forEach(obj => {
+                                newArr.push(obj);
+                            });
+                            skillData[append_key] = newArr;
+                        }
+                    });
+                }
+                else {
+                    skillData[key] = modification[key];
+                }
+            }
+        });
     }
     // to enable turn rewinding, each move uses clones of the previous state and rewind just returns to that set of clones
     cloneUnit(newDoll) {
