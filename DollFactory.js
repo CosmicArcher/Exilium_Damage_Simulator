@@ -26,6 +26,10 @@ class DollFactory {
             switch(name) {
                 case "Qiongjiu":
                     newDoll = new Qiongjiu(name, defense, attack, crit_chance, crit_damage, fortification);
+                    newDoll.applyKey(1);
+                    newDoll.applyKey(4);
+                    newDoll.applyKey(2);
+                    newDoll.mergeKeyData();
                     break;
                 case "Makiatto":
                     newDoll = new Makiatto(name, defense, attack, crit_chance, crit_damage, fortification);

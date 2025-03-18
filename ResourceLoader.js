@@ -26,6 +26,9 @@ class ResourceLoader {
     loadFortJSON() {
         d3.json("FortificationData.json").then(d => ResourceLoaderSingleton.fortJson = d);
     }
+    loadKeyJSON() {
+        d3.json("KeyData.json").then(d => ResourceLoaderSingleton.keyJSON = d);
+    }
     // give the resulting json corresponding to buff or doll
     getBuffData(buffName) {
         if (ResourceLoaderSingleton) {
@@ -53,6 +56,16 @@ class ResourceLoader {
                 return ResourceLoaderSingleton.fortJson[dollName];
             else
                 console.error(`${dollName} Doll Name does not exist in fortification data`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    getKeyData(dollName) {
+        if (ResourceLoaderSingleton) {
+            if (ResourceLoaderSingleton.keyJSON.hasOwnProperty(dollName))
+                return ResourceLoaderSingleton.keyJSON[dollName];
+            else
+                console.error(`${dollName} Doll Name does not exist in key data`);
         }
         else
             console.error("Singleton not yet initialized");

@@ -1,0 +1,42 @@
+{
+    "Qiongjiu" : {
+        "0" : {
+            "Name" : "Concentration"
+        },
+        "1" : {
+            "Name" : "Efficient Planning",
+            "Skill" : {
+                "Support" : {
+                    "Pre_Target_Buff" : [{
+                        "Name" : "Cleanse"
+                    }]
+                }
+            }
+        },
+        "2" : {
+            "Name" : "Targeted Training"
+        },
+        "3" : {
+            "Name" : "Point of Vulnerability"
+        },
+        "4" : {
+            "Name" : "Necessary Adjustments",
+            "Skill" : {
+                "Skill2" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "Phase Exploit",
+                            "Pre_Self_Buff" : [{
+                                "Name" : "Blazing Assault 2",
+                                "Duration" : 2
+                            }]
+                        }]
+                    }
+                }
+            }
+        },
+        "5" : {
+            "Name" : "Steadiness"
+        }
+    }
+}
