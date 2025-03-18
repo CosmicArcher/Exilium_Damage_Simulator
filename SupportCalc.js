@@ -269,10 +269,12 @@ function getSkillConditionals(skillName, index) {
 function updateConditionalToggles(index) {
     let skillConditionals;
     let conditionalDiv;
-    console.log(selectedDolls);
-    // get the skill conditionals and 
+    // get the skill conditionals and the html element holding the toggles
     if (index == 0) {
-        skillConditionals = getSkillConditionals(selectedSkill, index);
+        if (selectedSkill != "") 
+            skillConditionals = getSkillConditionals(selectedSkill, index);
+        else
+            skillConditionals = [];
         conditionalDiv = document.getElementById("Skill").nextElementSibling;
     }
     else {
@@ -375,6 +377,8 @@ function createKeyDropdown(index, htmlElement) {
                                 selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
                             keyDisplay.textContent = "None";
                         }
+                        // sometimes keys add conditionals so changing a key might add or remove some
+                        updateConditionalToggles(dollIndex);
                     });
     });
 }
@@ -459,11 +463,16 @@ function initializeDollButtons(index) {
                                 updateSelectedDoll(dollIndex);
                                 // enable the skill and fortification dropdown buttons since a doll is now selected
                                 if (dollIndex == 0) // only slot 1 can choose a skill, all others can only use support attacks
-                                    d3.select(dollStats[13]).node().disabled = false;
-                                d3.select(dollStats[index == 0 ? 3 : 4]).node().disabled = false;
-                                d3.select(dollStats[index == 0 ? 5 : 6]).node().disabled = false;
-                                d3.select(dollStats[index == 0 ? 7 : 8]).node().disabled = false;
-                                d3.select(dollStats[index == 0 ? 9 : 10]).node().disabled = false;
+                                    dollStats[13].disabled = false;
+                                dollStats[index == 0 ? 3 : 4].disabled = false;
+                                dollStats[index == 0 ? 5 : 6].disabled = false;
+                                dollStats[index == 0 ? 7 : 8].disabled = false;
+                                dollStats[index == 0 ? 9 : 10].disabled = false;
+                                // clear the displayed keys from the previous doll
+                                dollStats[index == 0 ? 6 : 7].textContent = "None";
+                                dollStats[index == 0 ? 8 : 9].textContent = "None";
+                                dollStats[index == 0 ? 10 : 11].textContent = "None";
+                                selectedKeys[dollIndex] = [0,0,0,0,0,0];
                                 // disable the calculate damage button because a skill for the new doll 1 has not yet been selected
                                 if (dollIndex == 0) {
                                     d3.select("#calculateButton").node().disabled = true;
