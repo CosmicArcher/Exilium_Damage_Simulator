@@ -34,6 +34,7 @@ class Doll extends Unit {
         };
         this.coverIgnore = 0;
         this.stabilityDamageModifier = 0;
+        this.stabilityIgnore = 0;
         // base values changed by direct input rather than automatic from buff applications
         this.baseDefenseIgnore = 0;
         this.baseDamageDealt = 0;
@@ -54,8 +55,11 @@ class Doll extends Unit {
         };
         this.baseCoverIgnore = 0;
         this.baseStabilityDamageModifier = 0;
+        this.baseStabilityIgnore = 0;
         // keys will be arranged numerically
         this.keysEnabled = keys;
+
+        this.turnAvailable = true;
 
         this.initializeSkillData();
         // merge the skill json with the fortification and key modifications of skills
@@ -79,6 +83,7 @@ class Doll extends Unit {
     getElementDamage(elementName) {return this.elementDamageDealt[elementName];}
     getCoverIgnore() {return this.coverIgnore;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
+    getStabilityIgnore() {return this.stabilityIgnore;}
     // get the base stats for display mid-simulation
     getBaseDefenseIgnore() {return this.baseDefenseIgnore;}
     getBaseDamageDealt() {return this.baseDamageDealt;}
@@ -92,6 +97,7 @@ class Doll extends Unit {
     getBaseElementDamage(elementName) {return this.baseElementDamageDealt[elementName];}
     getBaseCoverIgnore() {return this.baseCoverIgnore;}
     getBaseStabilityDamageModifier() {return this.baseStabilityDamageModifier;}
+    getBaseStabilityIgnore() {return this.baseStabilityIgnore;}
     // for direct buff input
     setDefenseIgnore(x) {
         this.resetDefenseIgnore();
@@ -153,6 +159,11 @@ class Doll extends Unit {
         this.baseStabilityDamageModifier = x;
         this.stabilityDamageModifier += x;
     }
+    setStabilityIgnore(x) {
+        this.resetStabilityIgnore();
+        this.baseStabilityIgnore = x;
+        this.stabilityIgnore += x;
+    }
     // when using the setters, undo the addition of the previous base multipliers
     resetDefenseIgnore() {
         this.defenseIgnore -= this.baseDefenseIgnore;
@@ -201,6 +212,10 @@ class Doll extends Unit {
     resetStabilityDamageModifier() {
         this.stabilityDamageModifier -= this.baseStabilityDamageModifier;
         this.baseStabilityDamageModifier = 0;
+    }
+    resetStabilityIgnore() {
+        this.stabilityIgnore -= this.baseStabilityIgnore;
+        this.baseStabilityIgnore = 0;
     }
     // get the data belonging to the doll from the loaded jsons
     initializeSkillData() {
@@ -295,11 +310,11 @@ class Doll extends Unit {
 
         if (skill[SkillJSONKeys.TYPE] == "Attack") {
             this.processPrePostBuffs(skill, enemyTarget, supportTarget, 1);
-            // if support attack, temporarily increase damage dealt stat then undo once damage has been calculated
-            if (skillName == SkillNames.SUPPORT)
+            // if out of turn attack, temporarily increase damage dealt stat then undo once damage has been calculated
+            if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
                 this.damageDealt += this.supportDamageDealt;
             let damage = this.processAttack(skill, calculationType, enemyTarget);
-            if (skillName == SkillNames.SUPPORT)
+            if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
                 this.damageDealt -= this.supportDamageDealt;
 
             this.processPrePostBuffs(skill, enemyTarget, supportTarget, 0);
@@ -313,33 +328,27 @@ class Doll extends Unit {
 
                 this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 0);
             }
+            // end turn and decrease counters on buffs if extra command or movement is not triggered
+            if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
+                this.endTurn();
+            // extra action counts down on buff duration but enables another turn
+            if (this.hasBuff("Extra Action"))
+                this.turnAvailable = true;
 
             return damage;
         }
         // if a buffing skill rather than attack, return 0 damage after processing buff data
         else {
-            // Suomi ult both buffs all units and damages and applies avalanche on the target
-            if (skillName == SkillNames.ULT && this.name == "Suomi") {
-                this.processPrePostBuffs(skill, enemyTarget, supportTarget, 0);
-                let fixedDamage = 0;
-                if (skill.hasOwnProperty(SkillJSONKeys.FIXED_DAMAGE)) {
-                    let data = skill[SkillJSONKeys.FIXED_DAMAGE];
-                    switch (data[SkillJSONKeys.FIXED_DAMAGE_STAT]) {
-                        case "Defense":
-                            fixedDamage = this.defense;
-                            break;
-                        case "Attack":
-                            fixedDamage = this.attack;
-                            break;
-                        default:
-                            console.error([`${data[SkillJSONKeys.FIXED_DAMAGE_STAT]} fixed damage scaling for is not covered`, this]);
-                    }
-                    fixedDamage *= data[SkillJSONKeys.FIXED_DAMAGE_SCALING];
-                }
-                enemyTarget.takeDamage();
-                return fixedDamage;
-            }
+            this.processPrePostBuffs(skill, null, supportTarget, 1);
+            // end turn and decrease counters on buffs if extra command or movement is not triggered
+            if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
+                this.endTurn();
+            // extra action counts down on buff duration but enables another turn
+            if (this.hasBuff("Extra Action"))
+                this.turnAvailable = true;
+
             this.processPrePostBuffs(skill, null, supportTarget, 0);
+
             console.log(this.currentBuffs);
             return 0;
         }
@@ -347,6 +356,7 @@ class Doll extends Unit {
 
     endTurn() {
         super.endTurn();
+        this.turnAvailable = false;
     }
 
     processAttack(skill, calculationType, target) {
@@ -545,17 +555,14 @@ class Doll extends Unit {
     // to enable turn rewinding, each move uses clones of the previous state and rewind just returns to that set of clones
     cloneUnit(newDoll) {
         if (!newDoll)
-            newDoll = new Doll(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification);
-        this.keysEnabled.forEach((key, i) => {
-            if (key)
-                newDoll.applyKey(i);
-        });
+            newDoll = new Doll(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled);
         newDoll.CIndex = this.CIndex;
         newDoll.setDefenseIgnore(this.baseDefenseIgnore);
         newDoll.setDamageDealt(this.baseDamageDealt); 
         newDoll.setAoEDamage(this.baseAoEDamageDealt); 
         newDoll.setTargetedDamage(this.baseTargetedDamageDealt); 
         newDoll.setSlowedDamage(this.baseSlowedDamageDealt);
+        newDoll.setDefDownDamage(this.baseDefDownDamageDealt);
         newDoll.setExposedDamage(this.baseExposedDamageDealt);
         newDoll.setSupportDamage(this.baseSupportDamageDealt); 
         newDoll.setPhaseDamage(this.basePhaseDamageDealt); 
@@ -564,6 +571,7 @@ class Doll extends Unit {
         });
         newDoll.setCoverIgnore(this.baseCoverIgnore); 
         newDoll.setStabilityDamageModifier(this.baseStabilityDamageModifier);
+        newDoll.setStabilityIgnore(this.baseStabilityIgnore);
 
         if (!this.buffsEnabled)
             newDoll.disableBuffs();

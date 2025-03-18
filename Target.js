@@ -27,7 +27,9 @@ class Target extends Unit {
     getStability() {return this.stability;} // for skills that check if stability is broken or not
     getPhaseWeaknesses() {return this.phaseWeaknesses;}
     // assemble total damage reduction with stability
-    getDamageTaken() {return this.damageTaken - this.drPerStab * this.stability - (this.stability>0 ? this.drWithStab : 0);}
+    getDRPerStab() {return this.drPerStab;}
+    getDRWithStab() {return this.drWithStab;}
+    getDamageTaken() {return this.damageTaken;}
     getAoEDamageTaken() {return this.aoeDamageTaken;}
     getTargetedDamageTaken() {return this.targetedDamageTaken;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}

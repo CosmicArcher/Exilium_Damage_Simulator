@@ -20,10 +20,11 @@ class ActionLog {
             new ActionLog();
         return ActionLogSingleton;
     }
-    // [attacker, target, damage, element, remaining stability]
+    // [attacker, target, damage, element, remaining stability, isCrit]
     displayDamage(param) {
         if (ActionLogSingleton) {
-            d3.select("#ActionLog").insert("p", "p").text(`${param[0].getName()} did ${param[2]} ${param[3]} damage to ${param[1].getName()}. 
+            d3.select("#ActionLog").insert("p", "p")
+                                    .text(`${param[0].getName()} did ${param[2]} ${param[5] ? "Crit": "Non-Crit"} ${param[3]} damage to ${param[1].getName()}. 
                                                         Remaining Stability: ${param[4]}`);
         }
         else

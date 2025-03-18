@@ -36,16 +36,24 @@ class DamageManager {
         // if any phase weakness is exploited, stability damage happens before the attack rather than after
         if (weaknesses > 0)
             target.reduceStability(totalStabDamage);
+        // some dolls ignore a set amount of stability
+        let effectiveStability = Math.max(target.getStability() - attacker.getStabilityIgnore(),0);
+
         let defenseBuffs = Math.max(0, 1 + target.getDefenseBuffs() - attacker.getDefenseIgnore());
         let defModifier = attacker.getAttack() / (attacker.getAttack() + target.getDefense() * defenseBuffs);
 
         let coverValue = GameStateManager.getInstance().getCover();
-        let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - (target.getStability() > 0 && 
+        let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - (effectiveStability > 0 && 
                                                                             !(damageType == AttackTypes.AOE || ammoType == AmmoTypes.MELEE) ? 0.6 : 0);
 
         let critModifier = isCrit ? critDamage : 1;
         // there are a lot of damage dealt/taken effects that are specific to certain conditions
         let totalBuffs = 1;
+        // check if there is remaining stability, apply stability based damage reduction
+        if (effectiveStability > 0) {
+            totalBuffs -= target.getDRPerStab() * effectiveStability;
+            totalBuffs -= target.getDRWithStab();
+        }
         totalBuffs += target.getDamageTaken();
         totalBuffs += attacker.getDamageDealt();
         if (damageType == AttackTypes.TARGETED) {
@@ -61,7 +69,7 @@ class DamageManager {
             totalBuffs += attacker.getSlowedDamage();
         if (target.hasBuffType("Defense", true))
             totalBuffs += attacker.getDefDownDamage();
-        if (target.getStability() == 0)
+        if (effectiveStability == 0)
             totalBuffs += attacker.getExposedDamage();
         if (element == Elements.PHYSICAL) {
             totalBuffs += attacker.getElementDamage(Elements.PHYSICAL);
@@ -82,7 +90,7 @@ class DamageManager {
             target.reduceStability(totalStabDamage);
         // inform the target that it has been "hit" and reduce the counters of any buffs that last for a number of hits rather than turns
         target.takeDamage();
-        EventManager.getInstance().broadcastEvent("damageDealt", [attacker, target, damage, element, target.getStability()]);
+        EventManager.getInstance().broadcastEvent("damageDealt", [attacker, target, damage, element, target.getStability(), isCrit]);
         return damage;
     }
     // will pass the damage to an event observer manager later
