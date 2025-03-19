@@ -348,7 +348,6 @@ function createSkillDropdown() {
 }
 // create the dropdown for the keys
 function createKeyDropdown(index, htmlElement) {
-    console.log(index);
     let keys = Object.keys(getDollKeys(index));
     // remove key button
     keys.push("None");
@@ -599,7 +598,8 @@ function createDollsFromInput() {
     let dolls = [];
     for (let i = 0; i < numDolls; i++) {
         let dollStats = getDollStats(i)
-        let newDoll = DollFactory.getInstance().createDoll(selectedDolls[i], dollStats[11], dollStats[0], dollStats[1], dollStats[2], selectedFortifications[i]);
+        let newDoll = DollFactory.getInstance().createDoll(selectedDolls[i], dollStats[11], dollStats[0], dollStats[1], dollStats[2], 
+            selectedFortifications[i], selectedKeys[i]);
         //newDoll.disableBuffs();
         newDoll.finishCloning();
         newDoll.setDamageDealt(dollStats[4]);
@@ -693,11 +693,12 @@ initializeDollButtons(0);
 d3.select("#calculateButton").on("click", () => {
     hideDropdowns();
     TurnManager.getInstance().resetLists();
+    GameStateManager.getInstance().resetSimulation();
     // get input values
     let targetStats = getTargetStats();
     let dollStats = getDollStats(0);
-    GameStateManager.getInstance().registerTarget(new Target("6p62", targetStats[0], targetStats[3], 2, targetStats[1]));
-    let newTarget = GameStateManager.getInstance().getTarget();
+    let newTarget = new Target("6p62", targetStats[0], targetStats[3], 2, targetStats[1]);
+    GameStateManager.getInstance().registerTarget(newTarget);
     newTarget.finishCloning();
     // this webpage has all buffs manually input rather than automatic
     //newTarget.disableBuffs();
@@ -728,11 +729,11 @@ d3.select("#calculateButton").on("click", () => {
     newDoll.setElementDamage(Elements.HYDRO, dollStats[17]);
     newDoll.setElementDamage(Elements.ELECTRIC, dollStats[18]);*/
     let newDolls = createDollsFromInput();
-
+    GameStateManager.getInstance().startSimulation();
     //let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
     let conditionalOverride = getConditionalOverrides();
     // the first doll is the primary attacker, all others support if applicable
-    TurnManager.getInstance().useDollSkill(newDolls[0], newTarget, selectedSkill, CalculationTypes.EXPECTED, conditionalOverride[0]);
+    TurnManager.getInstance().useDollSkill(newDolls[0].getName(), selectedSkill, CalculationTypes.EXPECTED, conditionalOverride[0]);
     d3.select("#ActionLog").insert("p","p").text("Expected Damage");
 })
 

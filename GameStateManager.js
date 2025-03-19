@@ -45,6 +45,24 @@ class GameStateManager {
         else
             console.error("Singleton not yet initialized");
     }
+    startSimulation() {
+        if (GameStateManagerSingleton) {
+            // clone the latest version of the units
+            let target = GameStateManagerSingleton.target[0];
+            let dolls = GameStateManagerSingleton.dolls[0];
+            let newTarget = target.cloneUnit();
+            let newDolls = [];
+            dolls.forEach(doll => {
+                newDolls.push(doll.cloneUnit());
+            });
+            // put the latest units as the ones in the get functions
+            GameStateManagerSingleton.target.push(newTarget);
+            GameStateManagerSingleton.dolls.push(newDolls);
+            GameStateManagerSingleton.totalDamage.push(0);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
     // game state manager holds reference to the target
     registerTarget(target) {
         if (GameStateManagerSingleton) {
@@ -80,6 +98,18 @@ class GameStateManager {
         else
             console.error("Singleton not yet initialized");
     }
+    // return whether the doll exists in the team
+    hasDoll(dollName) {
+        if (GameStateManagerSingleton) {
+            for (let i = 0; i < GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1].length; i++) {
+                if (GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1][i].getName() == dollName)
+                    return true;
+            }
+            return false;
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
     // return the latest copies of all the dolls
     getAllDolls() {
         if (GameStateManagerSingleton) 
@@ -101,10 +131,14 @@ class GameStateManager {
         else
             console.error("Singleton not yet initialized");
     }
-    // let the target perform their turn, ticking down any buffs/debuffs
+    // let the target perform their turn, ticking down any buffs/debuffs and refreshing support charges and lock the final state in as another action
     endRound() {
         if (GameStateManagerSingleton) {
             GameStateManagerSingleton.target[GameStateManagerSingleton.actionCount+1].endTurn();
+            GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1].forEach(doll => {
+                doll.refreshSupportUses();
+            });
+            GameStateManagerSingleton.lockAction();
         }
         else
             console.error("Singleton not yet initialized");

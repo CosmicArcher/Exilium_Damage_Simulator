@@ -1,5 +1,6 @@
 import Doll from "./Doll.js";
 import { AmmoTypes, Elements, SkillNames, CalculationTypes } from "./Enums.js";
+import EventManager from "./EventManager.js";
 import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
 import TurnManager from "./TurnManager.js";
@@ -51,16 +52,16 @@ class Interceptor extends Doll {
 }
 
 export class Qiongjiu extends Supporter {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Qiongjiu", defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled);
 
-        TurnManager.getInstance().registerTargetedSupporter(this, false);
-        TurnManager.getInstance().registerPriorityDebuffer(this);
+        TurnManager.getInstance().registerTargetedSupporter(this.name, false);
+        TurnManager.getInstance().registerPriorityDebuffer(this.name);
         this.supportEnabled = true;
 
         if (this.fortification > 2)
             this.supportDamageDealt += 0.1; // V3 10% support damage
-        if (keysEnabled[0]) // first key gives full starting index 
+        if (this.keysEnabled[0]) // first key gives full starting index 
             this.CIndex = 6;
     }
 
@@ -96,6 +97,7 @@ export class Qiongjiu extends Supporter {
             if (this.fortification == 6)
                 this.damageDealt += 0.1;
         }
+        
         let damage = super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
         if (GameStateManager.getInstance().getCover() == 0) {
             this.damageDealt -= 0.1;
@@ -131,13 +133,13 @@ export class Qiongjiu extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Qiongjiu(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Qiongjiu(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }
 
 export class Makiatto extends Interceptor {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Makiatto", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
 
         this.interceptEnabled = true;
         // fortifications increase intercept limit during ult duration
@@ -294,15 +296,16 @@ export class Makiatto extends Interceptor {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Makiatto(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Makiatto(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }
 
 export class Suomi extends Supporter {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Suomi", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
 
-        TurnManager.getInstance().registerTargetedSupporter(this, true);
+        TurnManager.getInstance().registerTargetedSupporter(this.name, true);
+        TurnManager.getInstance().registerActionListener(this.name);
         this.supportEnabled = true;
 
         if (this.fortification > 2)
@@ -366,12 +369,13 @@ export class Suomi extends Supporter {
         }
         return 0;
     }
-
-    applyAvalanche() {
-        GameStateManager.getInstance().getTarget().addBuff("Avalanche", -1, this);
+    // apply 1 avalanche stack each time an ally excluding herself uses a skill
+    alertAllyEnd(unitName) {
+        if (unitName != this.name)
+            GameStateManager.getInstance().getTarget().addBuff("Avalanche", -1, this);
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Suomi(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Suomi(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }

@@ -117,7 +117,7 @@ class Unit {
                     if (buffName == "Overburn") {
                         this.applyDoT(buffName, sourceName);
                     }
-                    EventManager.getInstance().broadcastEvent("statusApplied", [source.getName(), this.name, buffName]);
+                    EventManager.getInstance().broadcastEvent("statusApplied", [sourceName, this.name, buffName]);
                 }
             }
         }

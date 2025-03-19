@@ -1,4 +1,6 @@
 import { AttackTypes, SkillNames } from "./Enums.js";
+import EventManager from "./EventManager.js";
+import GameStateManager from "./GameStateManager.js";
 
 
 let TurnManagerSingleton;
@@ -12,6 +14,7 @@ class TurnManager {
             console.log("Turn Manager Instantiated");
             TurnManagerSingleton = this;
             TurnManagerSingleton.resetLists();
+            EventManager.getInstance().addListener("allyAction", TurnManagerSingleton.activateActionListeners);
         }
     }
 
@@ -34,31 +37,37 @@ class TurnManager {
             TurnManagerSingleton.conditionalSupporters = {};
             // flag to tell if the action sequence is already being processed top to bottom to ensure the function is only called once
             TurnManagerSingleton.actionsRunning = false;
+            // for groza and suomi passives listening for other doll end turn
+            TurnManagerSingleton.actionListener = [];
         }
         else
             console.error("Singleton not yet initialized");
     }
 
-    useDollSkill(doll, target, skillName, calculationType = calculationType.EXPECTED, conditionalOverride = false) {
+    useDollSkill(dollName, skillName, calculationType = calculationType.EXPECTED, conditionalOverride = false) {
         if (TurnManagerSingleton) {
             // targeted non-support skills are the most common type of triggers to get supported
+            let doll = GameStateManager.getInstance().getDoll(dollName);
+            let target = GameStateManager.getInstance().getTarget();
             if (doll.getSkillAttackType(skillName) == AttackTypes.TARGETED && skillName != SkillNames.SUPPORT) {
                 // regular support should be at the bottom of the sequence stack
-                TurnManagerSingleton.targetedSupporters.forEach(d => {
-                    if (d.getName() != doll.getName()) // a doll cannot support themself
-                        TurnManagerSingleton.actionSequence.push([d, [target, doll], SkillNames.SUPPORT, calculationType, false]);
+                TurnManagerSingleton.targetedSupporters.forEach(supportName => {
+                    if (supportName != dollName) // a doll cannot support themself
+                        TurnManagerSingleton.actionSequence.push([supportName, [target, doll], SkillNames.SUPPORT, calculationType, [false]]);
                 });
                 // add in the attacker that triggered it all
-                TurnManagerSingleton.actionSequence.push([doll, target, skillName, calculationType, conditionalOverride]);
+                TurnManagerSingleton.actionSequence.push([dollName, target, skillName, calculationType, conditionalOverride]);
                 // the priority supports added to the top of the stack
-                TurnManagerSingleton.prioritySupporters.forEach(d => {
-                    if (d.getName() != doll.getName()) // a doll cannot support themself
-                        TurnManagerSingleton.actionSequence.push([d, [target, doll], SkillNames.SUPPORT, calculationType, false]);
+                TurnManagerSingleton.prioritySupporters.forEach(supportName => {
+                    if (supportName != dollName) // a doll cannot support themself
+                        TurnManagerSingleton.actionSequence.push([supportName, [target, doll], SkillNames.SUPPORT, calculationType, [false]]);
                 });
                 // priority debuffs are  called immediately since only debuffs will be applied and nothing else
-                TurnManagerSingleton.priorityDebuffers.forEach(d => {
-                    if (d.getName() != doll.getName()) // a doll cannot support themself
-                        d.usePriorityDebuff(target, doll);
+                TurnManagerSingleton.priorityDebuffers.forEach(supportName => {
+                    if (supportName != dollName)  {// a doll cannot support themself
+                        let support = GameStateManager.getInstance().getDoll(supportName);
+                        support.usePriorityDebuff(target, doll);
+                    }
                 });
                 // if anything triggers a wise support, it will be added to the top of the stack
                 // start the action sequence if it is not currently running
@@ -75,52 +84,69 @@ class TurnManager {
             TurnManagerSingleton.actionsRunning = true;
             while (TurnManagerSingleton.actionSequence.length > 0) {
                 let currentAction = TurnManagerSingleton.actionSequence.pop();
-                // actions are an array consisting of [doll, target/[target, supported doll], skillName, calculationType, conditionalOverride]
-                if (currentAction[1] != SkillNames.SUPPORT)
-                    currentAction[0].getSkillDamage(currentAction[2], currentAction[1], currentAction[3], currentAction[4]);
+                let doll = GameStateManager.getInstance().getDoll(currentAction[0]);
+                // actions are an array consisting of [dollName, target/[target, supported doll], skillName, calculationType, conditionalOverride]
+                if (currentAction[1] != SkillNames.SUPPORT) {
+                    doll.getSkillDamage(currentAction[2], currentAction[1], currentAction[3], currentAction[4]);
+                }
                 else
-                    currentAction[0].useSupportSkill(currentAction[2], currentAction[3], currentAction[4]);
+                    doll.useSupportSkill(currentAction[2], currentAction[3], currentAction[4]);
 
                 console.log("Actions left: " + TurnManagerSingleton.actionSequence.length);
             }
-            TurnManagerSingleton.actionsRunning = false;
+            TurnManagerSingleton.actionsRunning = false;  
+            GameStateManager.getInstance().lockAction();
         }
         else
             console.error("Singleton not yet initialized");
     }
 
-    registerTargetedSupporter(doll, isPrioritySupport = false) {
+    registerTargetedSupporter(dollName, isPrioritySupport = false) {
         if (TurnManagerSingleton) {
             if (isPrioritySupport)
-                TurnManagerSingleton.prioritySupporters.push(doll);
+                TurnManagerSingleton.prioritySupporters.push(dollName);
             else
-                TurnManagerSingleton.targetedSupporters.push(doll);
+                TurnManagerSingleton.targetedSupporters.push(dollName);
         }
         else
             console.error("Singleton not yet initialized");
     }
 
-    registerPriorityDebuffer(doll) {
+    registerPriorityDebuffer(dollName) {
         if (TurnManagerSingleton) {
-            TurnManagerSingleton.priorityDebuffers.push(doll);
+            TurnManagerSingleton.priorityDebuffers.push(dollName);
         }
         else
             console.error("Singleton not yet initialized");
     }
 
-    registerConditionalSupporter(doll, condition) {
+    registerConditionalSupporter(dollName, condition) {
         if (TurnManagerSingleton) {
             // check if array for that key already exists
             if (TurnManagerSingleton.conditionalSupporters.hasOwnProperty(condition))
-                TurnManagerSingleton.conditionalSupporters[condition].push(doll);
+                TurnManagerSingleton.conditionalSupporters[condition].push(dollName);
             // initialize array if the key does not exist yet
             else {
                 TurnManagerSingleton.conditionalSupporters[condition] = [];
-                TurnManagerSingleton.conditionalSupporters[condition].push(doll);
+                TurnManagerSingleton.conditionalSupporters[condition].push(dollName);
             }
         }
         else
             console.error("Singleton not yet initialized");
+    }
+
+    registerActionListener(dollName) {
+        if (TurnManagerSingleton) {
+            TurnManagerSingleton.actionListener.push(dollName);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+
+    activateActionListeners(triggeringDollName) {
+        TurnManagerSingleton.actionListener.forEach(doll => {
+            doll.alertAllyEnd(triggeringDollName);
+        });
     }
 }
 
