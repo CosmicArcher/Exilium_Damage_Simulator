@@ -126,17 +126,22 @@
                     "Name" : "Avalanche",
                     "Duration" : -1,
                     "Stacks" : 3
+                }, {
+                    "Name" : "Frost",
+                    "Duration" : 3
                 }],
-                "Conditional" : {
-                    "Append" : 1,
-                    "Post_Self_Buff" : [{
-                        "Name" : "Shelter",
-                        "Duration" : 3
-                    }, {
-                        "Name" : "Continuous Healing 1",
-                        "Duration" : 3
-                    }]
-                }
+                "Conditional" : [{
+                    "Condition_Text" : "FullHP",
+                    "Append" : {
+                        "Post_Self_Buff" : [{
+                            "Name" : "Shelter",
+                            "Duration" : 3
+                        }, {
+                            "Name" : "Continuous Healing 1",
+                            "Duration" : 3
+                        }]
+                    }
+                }]
             }
         },
         "V3" : {
@@ -148,24 +153,27 @@
                     "Name" : "Impact Response 1",
                     "Duration" : 2
                 }],
-                "Conditional" : {
-                    "Append" : 1,
-                    "Post_Target_Buff" : [{
-                        "Name" : "Defensive Support",
-                        "Duration" : 2,
-                        "Stacks" : 2
-                    }]
-                }
+                "Conditional" : [{
+                    "Condition_Text" : "Nearby Large",
+                    "Append" : {
+                        "Post_Target_Buff" : [{
+                            "Name" : "Defensive Support",
+                            "Duration" : 2,
+                            "Stacks" : 2
+                        }]
+                    }
+                }]
             }
         },
         "V4" : {
             "Skill2" : {
-                "Conditional" : {
+                "Conditional" : [{
+                    "Condition_Text" : "Stab Break Hit",
                     "Fixed_Damage" : {
                         "Scaling" : 1.25,
                         "Stat" : "Defense"
                     }
-                }
+                }]
             }
         },
         "V6" : {

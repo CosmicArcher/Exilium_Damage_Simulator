@@ -1,4 +1,5 @@
 import {Makiatto, Qiongjiu, Suomi} from "./DollClasses.js";
+import GameStateManager from "./GameStateManager.js";
 
 let DollFactorySingleton;
 
@@ -24,17 +25,18 @@ class DollFactory {
             let newDoll;
             switch(name) {
                 case "Qiongjiu":
-                    newDoll = new Qiongjiu(name, defense, attack, crit_chance, crit_damage, fortification, keys);
+                    newDoll = new Qiongjiu(defense, attack, crit_chance, crit_damage, fortification, keys);
                     break;
                 case "Makiatto":
-                    newDoll = new Makiatto(name, defense, attack, crit_chance, crit_damage, fortification, keys);
+                    newDoll = new Makiatto(defense, attack, crit_chance, crit_damage, fortification, keys);
                     break;
                 case Suomi:
-                    newDoll = new Suomi(name, defense, attack, crit_chance, crit_damage, fortification, keys);
+                    newDoll = new Suomi(defense, attack, crit_chance, crit_damage, fortification, keys);
                     break;
                 default:
                     console.log(`${name} doll class does not exist`);
             }
+            GameStateManager.getInstance().registerDoll(newDoll);
             return newDoll;
         }
         else

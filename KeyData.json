@@ -68,5 +68,28 @@
         },
         "Absolute Concentration" : {
         }
+    },
+    "Suomi" : {
+        "Unyielding Momentum" : {
+        },
+        "Little Guardian" : {
+        },
+        "Positive Feedback" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "Below 80%"
+                        }]
+                    }
+                }
+            }
+        },
+        "Move Swiftly" : {
+        },
+        "Indomitable Will" : {
+        },
+        "Logistics Support" : {
+        }
     }
 }

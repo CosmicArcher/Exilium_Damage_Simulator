@@ -99,13 +99,12 @@ export class Qiongjiu extends Supporter {
         }
         
         let damage = super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
         if (GameStateManager.getInstance().getCover() == 0) {
             this.damageDealt -= 0.1;
             if (this.fortification == 6)
                 this.damageDealt -= 0.1;
         }
-        if (skillName == SkillNames.ULT)
-            this.CIndex -= 3;
 
         return damage;
     }
@@ -116,7 +115,7 @@ export class Qiongjiu extends Supporter {
             let damage = this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
             // V4 vuln application requires her to have support boost 2 stacks and the target to be out of cover
             if (this.hasBuff("Support Boost 2 V4") && GameStateManager.getInstance().getCover() == 0)
-                target[0].addBuff("Vulnerability 1", 1, this);
+                target[0].addBuff("Vulnerability 1", this.name, 1, 1);
             return damage;
         }
         return 0;
@@ -124,11 +123,11 @@ export class Qiongjiu extends Supporter {
 
     usePriorityDebuff(target, ally) {
         if (this.keysEnabled[2]) {
-            target.addBuff("Defense Down 2", 1, this);
+            target.addBuff("Defense Down 2", this.name, 1, 1);
             console.log("Applying debuff");
         }
         if (this.fortification > 4) {
-            ally.addBuff("Damage Up 2", 1, this);
+            ally.addBuff("Damage Up 2", this.name, 1, 1);
         }
     }
 
@@ -150,14 +149,14 @@ export class Makiatto extends Interceptor {
         if (keysEnabled[1]) // key 2 starts full index
             this.CIndex = 6;
         if (keysEnabled[4]) // key 5 applies murderous intent on the  highest hp enemy, sim is meant for single target
-            GameStateManager.getInstance().getTarget().addBuff("Murderous Intent", -1, this);
+            GameStateManager.getInstance().getTarget().addBuff("Murderous Intent", this.name, -1, 1);
         if (keysEnabled[5])
             this.attackBuff += 0.1;
         // Makiatto passive
         this.crit_chance += 0.4;
         this.crit_damage -= 0.1;
-        this.addBuff("Insight", 2, this);
-        this.addBuff("Steady Progress", 2, this);
+        this.addBuff("Insight", this.name, 2, 1);
+        this.addBuff("Steady Progress", this.name, 2, 1);
     }
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
@@ -259,9 +258,8 @@ export class Makiatto extends Interceptor {
                 }
             }
         }
-        // index costs/recovery of skills
+        // index recovery of skills
         if (skillName == SkillNames.SKILL2) {
-            this.CIndex -= 2;
             // key 1 conditional refunds 1 index on kill
             if (this.keysEnabled[0]) {
                 if (conditionalTriggered[1])
@@ -290,9 +288,9 @@ export class Makiatto extends Interceptor {
     
     endTurn() {
         super.endTurn();
-        // Passive constantly refreshes these buffs as long as 80%+ hp which is assumed
-        this.addBuff("Insight", 2, this);
-        this.addBuff("Steady Progress", 2, this);
+        // Passive constantly refreshes these buffs as long as 80%+ hp which is assumed always true
+        this.addBuff("Insight", this.name, 2, 1);
+        this.addBuff("Steady Progress", this.name, 2, 1);
     }
 
     cloneUnit() {
@@ -306,73 +304,92 @@ export class Suomi extends Supporter {
 
         TurnManager.getInstance().registerTargetedSupporter(this.name, true);
         TurnManager.getInstance().registerActionListener(this.name);
-        this.supportEnabled = true;
 
-        if (this.fortification > 2)
-            this.supportDamageDealt += 0.1; // V3 10% support damage
-        if (keysEnabled[0]) // first key gives full starting index 
+        this.supportEnabled = true;
+        // 2nd key starts with full index
+        if (this.keysEnabled[1]) 
             this.CIndex = 6;
+        // v5+ suomi has 1 additional support limit
+        if (this.fortification > 4)
+            this.supportLimit = 3;
     }
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
-        // qj gets 1 index whenever she attacks
-        if (skillName != SkillNames.ULT && this.CIndex < 6)
-            this.CIndex++;
-        // qj skill2 key condition is at least one phase exploit
-        if (skillName == SkillNames.SKILL2 && this.keysEnabled[4]) {
-            let weaknesses = target.getPhaseWeaknesses();
-            if (weaknesses.includes(Elements.BURN) || weaknesses.includes(AmmoTypes.MEDIUM)) {
-                // v1 qj adds another conditional to the skill
-                if (this.fortification == 0)
+        // handle ult solely within this function
+        if (skillName != SkillNames.ULT) {
+            // v4+ skill2 conditional is if this hit brings positive stability down to 0
+            if (skillName == SkillNames.SKILL2 && this.fortification > 3 && target.getStability() > 0) {
+                let weaknesses = 0;
+                target.getPhaseWeaknesses().forEach(d => {
+                if (d == Elements.FREEZE || d == AmmoTypes.LIGHT)
+                    weaknesses++;
+                });
+                let totalStabDamage = Math.max(0, 4 + target.getStabilityDamageModifier() + this.getStabilityDamageModifier());
+                totalStabDamage += weaknesses * 2;
+                if (totalStabDamage > target.getStability())
                     conditionalTriggered[0] = true;
-                else
-                    conditionalTriggered[1] = true;
+            }
+            // v3+ skill3 grants an extra stack of defensive support if near a large target
+            if (skillName == SkillNames.SKILL3) {
+                if (this.fortification > 2 && target.getIsLarge()) 
+                    conditionalTriggered[0] = true;
+            }
+
+            super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+            // key 3 gives skill3 an index refund if target is below 80% hp
+            if (skillName == SkillNames.SKILL3) {
+                if (this.keysEnabled[2])
+                    if (conditionalTriggered[1]) 
+                        this.CIndex++;
             }
         }
-        // v2+ qj skill3 has a conditional if the target is burning
-        if (skillName == SkillNames.SKILL3) {
-            if (target.hasBuff("Overburn"))
-                conditionalTriggered[0] = true;
-        }
-        // qj ult has a conditional at max index
-        if (skillName == SkillNames.ULT && this.CIndex == 6) {
-            conditionalTriggered[0] = true;
-            // rather than temporarily increasing max support by 1 and tracking that, I would rather just reduce the used counter by 1 even if it goes negative
-            this.supportsUsed--;
-        }
-        // if the target is out of cover, qj deals extra damage, enhanced by v6
-        if (GameStateManager.getInstance().getCover() == 0) {
-            this.damageDealt += 0.1;
-            if (this.fortification == 6)
-                this.damageDealt += 0.1;
-        }
-        let damage = super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
-        if (GameStateManager.getInstance().getCover() == 0) {
-            this.damageDealt -= 0.1;
-            if (this.fortification == 6)
-                this.damageDealt -= 0.1;
-        }
-        if (skillName == SkillNames.ULT)
-            this.CIndex -= 3;
+        else {
+            let skill = this.copyNestedObject(this.skillData[skillName]);
+            // ult condition is full hp before ulting
+            if (skill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+                conditionalTriggered.forEach((flag, index) => {
+                    if (flag) {
+                        let conditionalData = skill[SkillJSONKeys.CONDITIONAL][index];
+                        this.mergeData(skill, conditionalData);
+                    }
+                });
+            }
+            this.processAttack(skill, calculationType, target);
 
-        return damage;
+            this.processPrePostBuffs(skill, target, null, 0);
+
+            this.endTurn();
+            // suomi ult buffs all dolls after dealing damage to the enemy
+            GameStateManager.getInstance().getAllDolls().forEach(doll => {
+                // because ult affects all dolls and deals damage, I placed the ally buff under self_buff instead of target_buff
+                // suomi does end up with 1 extra stack of wintry bastion at v2+ but that is a defensive buff so it doesn't matter
+                let statusEffects = skill[SkillJSONKeys.POST_SELF_BUFF];
+                statusEffects.forEach(buff => {
+                    let stacks = 1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                        stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                    let duration = -1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                        duration = buff[SkillJSONKeys.BUFF_DURATION];
+                    doll.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                });
+            });
+            // suomi applies 1 stack of avalanche for any active skill use by anyone other than herself but groza might still be present in the team
+            EventManager.getInstance().broadcastEvent("allyAction", this.name);
+            // apply the 5 index cost of the ult
+            this.CIndex -= skill[SkillJSONKeys.COST];
+        }
     }
 
-    useSupportSkill(target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = false) {
-        if (this.supportsUsed < this.supportLimit && this.supportEnabled) {
-            this.supportsUsed++;
-            let damage = this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
-            // V4 vuln application requires her to have support boost 2 stacks and the target to be out of cover
-            if (this.hasBuff("Support Boost 2 V4") && GameStateManager.getInstance().getCover() == 0)
-                target[0].addBuff("Vulnerability 1", 1, this);
-            return damage;
-        }
-        return 0;
+    endTurn() {
+        super.endTurn();
+        // passive gives 2 index per end turn
+        this.CIndex = Math.min(this.CIndex + 2, 6);
     }
     // apply 1 avalanche stack each time an ally excluding herself uses a skill
     alertAllyEnd(unitName) {
         if (unitName != this.name)
-            GameStateManager.getInstance().getTarget().addBuff("Avalanche", -1, this);
+            GameStateManager.getInstance().getTarget().addBuff("Avalanche", this.name, -1, 1);
     }
 
     cloneUnit() {

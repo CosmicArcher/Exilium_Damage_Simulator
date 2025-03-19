@@ -10,6 +10,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cooldown" : 1,
             "Multiplier" : 1.5,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 3,
@@ -21,6 +22,7 @@
         },
         "Skill3" : {
             "Type" : "Attack",
+            "Cooldown" : 1,
             "Multiplier" : 1.1,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 3,
@@ -33,6 +35,7 @@
         },
         "Ultimate" : {
             "Type" : "Buff",
+            "Cost" : 3,
             "Target" : "Self",
             "Post_Self_Buff" : [{
                 "Name" : "Support Boost 2",
@@ -66,6 +69,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cost" : 2,
             "Multiplier" : 1.6,
             "Crit_Damage_Modifier" : 0.3,
             "Damage_Type" : "Targeted",
@@ -78,6 +82,7 @@
         },
         "Skill3" : {
             "Type" : "Attack",
+            "Cooldown" : 3,
             "Multiplier" : 1.3,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
@@ -90,6 +95,7 @@
         },
         "Ultimate" : {
             "Type" : "Buff",
+            "Cooldown" : 3,
             "Target" : "Self",
             "Post_Self_Buff" : [{
                 "Name" : "Alert",
@@ -124,6 +130,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cooldown" : 1,
             "Multiplier" : 1,
             "Crit_Modifier" : -1,
             "Damage_Type" : "Targeted",
@@ -137,21 +144,25 @@
         },
         "Skill3" : {
             "Type" : "Buff",
+            "Cost" : 2,
             "Target" : "Ally",
             "Post_Target_Buff" : [{
                 "Name" : "Frost Barrier",
                 "Duration" : 2
             }],
-            "Conditional" : {
-                "Append" : 1,
-                "Post_Target_Buff" : [{
-                    "Name" : "Defensive Support",
-                    "Duration" : 2
-                }]
-            }
+            "Conditional" : [{
+                "Condition_Text" : "Nearby Target",
+                "Append" : {
+                    "Post_Target_Buff" : [{
+                        "Name" : "Defensive Support",
+                        "Duration" : 2
+                    }]
+                }
+            }]
         },
         "Ultimate" : {
             "Type" : "Buff",
+            "Cost" : 5,
             "Target" : "All",
             "Fixed_Damage" : {
                 "Scaling" : 0.5,
@@ -168,6 +179,9 @@
                 "Name" : "Avalanche",
                 "Duration" : -1,
                 "Stacks" : 2
+            }, {
+                "Name" : "Frost",
+                "Duration" : 3
             }]
         },
         "Support" : {
