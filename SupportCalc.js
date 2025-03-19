@@ -22,7 +22,7 @@ var numSummons = 0;
 var skillOptions;
 var dollOptions;
 var keyOptions;
-var phaseDiv = [];
+var phaseDiv = [null];
 var fortOptions;
 // for use when dynamically adding and removing doll slots
 var slotColors = ["olive", "violet", "deeppink", "orange", "dodgerblue", "aquamarine"];
@@ -73,7 +73,6 @@ function addDoll() {
     newNode.id = "Doll_" + numDolls;
     newNode.children[1].innerHTML = "Doll: ";
     d3.select(newNode).style("background-color", slotColors[numDolls-1]);
-    console.log(newNode.children);
     spliceNodeList(newNode.children, 12, 2);
 
     let removeButton = d3.select(newNode).insert("button", "label");
@@ -188,8 +187,7 @@ function getConditionalOverrides() {
     }
 
     for (let i = 1; i < numDolls; i++) {
-        console.log(document.getElementById("Doll_" + (index + 1)).children);
-        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[13];
+        conditionalDiv = document.getElementById("Doll_" + (i + 1)).children[13];
         overrides.push([]);
         for (let j = 0; j < conditionalDiv.children.length / 3; j++) {
             overrides[0].push(conditionalDiv.children[j*3].checked);
@@ -355,7 +353,6 @@ function createKeyDropdown(index, htmlElement) {
     let filteredKeys = keys.filter((d, key_index) => {
         return !selectedKeys[index][key_index];
     });
-    console.log(filteredKeys);
     keyOptions = d3.select(htmlElement).append("div").attr("class", "dropdownBox").style("display", "none");
     filteredKeys.forEach(key_name => {
         keyOptions.append("a")
@@ -419,6 +416,9 @@ function hideDropdowns() {
         skillOptions.style("display", "none");
     if (keyOptions)
         keyOptions.style("display", "none");
+    phaseDiv.forEach(div => {
+        div.style("display", "none");
+    });
 }
 // because initializing doll buttons will be repeated each time a new doll is added
 function initializeDollButtons(index) {
@@ -711,23 +711,6 @@ d3.select("#calculateButton").on("click", () => {
     newTarget.applyDRPerStab(targetStats[9]);
     newTarget.applyDRWithStab(targetStats[10]);
 
-    /*let newDoll = DollFactory.getInstance().createDoll(selectedDolls[0], dollStats[11], dollStats[0], dollStats[1], dollStats[2], selectedFortifications[0]);
-    newDoll.disableBuffs();
-    newDoll.setDamageDealt(dollStats[4]);
-    newDoll.setDefenseIgnore(dollStats[3]);
-    newDoll.setTargetedDamage(dollStats[5]);
-    newDoll.setAoEDamage(dollStats[6]);
-    newDoll.setExposedDamage(dollStats[7]);
-    newDoll.setSupportDamage(dollStats[8]);
-    newDoll.setCoverIgnore(dollStats[9]);
-    newDoll.setStabilityDamageModifier(dollStats[10]);
-    newDoll.setPhaseDamage(dollStats[12]);
-    newDoll.setElementDamage(Elements.PHYSICAL, dollStats[13]);
-    newDoll.setElementDamage(Elements.FREEZE, dollStats[14]);
-    newDoll.setElementDamage(Elements.BURN, dollStats[15]);
-    newDoll.setElementDamage(Elements.CORROSION, dollStats[16]);
-    newDoll.setElementDamage(Elements.HYDRO, dollStats[17]);
-    newDoll.setElementDamage(Elements.ELECTRIC, dollStats[18]);*/
     let newDolls = createDollsFromInput();
     GameStateManager.getInstance().startSimulation();
     //let conditionalOverride = d3.select("#ConditionalOverride").node().checked;

@@ -38,7 +38,7 @@ class TurnManager {
             // flag to tell if the action sequence is already being processed top to bottom to ensure the function is only called once
             TurnManagerSingleton.actionsRunning = false;
             // for groza and suomi passives listening for other doll end turn
-            TurnManagerSingleton.actionListener = [];
+            TurnManagerSingleton.actionListeners = [];
         }
         else
             console.error("Singleton not yet initialized");
@@ -71,6 +71,12 @@ class TurnManager {
                 });
                 // if anything triggers a wise support, it will be added to the top of the stack
                 // start the action sequence if it is not currently running
+                if (!TurnManagerSingleton.actionsRunning)
+                    TurnManagerSingleton.processActionSequence();
+            }
+            else {
+                // if not a targeted non-support attack, only use the skill
+                TurnManagerSingleton.actionSequence.push([dollName, target, skillName, calculationType, conditionalOverride]);
                 if (!TurnManagerSingleton.actionsRunning)
                     TurnManagerSingleton.processActionSequence();
             }
@@ -137,14 +143,15 @@ class TurnManager {
 
     registerActionListener(dollName) {
         if (TurnManagerSingleton) {
-            TurnManagerSingleton.actionListener.push(dollName);
+            TurnManagerSingleton.actionListeners.push(dollName);
         }
         else
             console.error("Singleton not yet initialized");
     }
 
     activateActionListeners(triggeringDollName) {
-        TurnManagerSingleton.actionListener.forEach(doll => {
+        TurnManagerSingleton.actionListeners.forEach(dollName => {
+            let doll = GameStateManager.getInstance().getDoll(dollName)
             doll.alertAllyEnd(triggeringDollName);
         });
     }

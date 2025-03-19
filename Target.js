@@ -203,12 +203,13 @@ class Target extends Unit {
         this.phaseWeaknesses.forEach(weakness => {
             weaknesses.push(weakness);
         });
+        let temporaryWeaknesses = [];
         // because phaseweaknesses is modified by temporary weaknesses, ensure that the clone knows that those are temporary weaknesses rather than inherent 
         this.tempWeakness.forEach(weakness => {
-            targetClone.tempWeakness.push(weakness);
+            temporaryWeaknesses.push(weakness);
         });
         let targetClone = new Target(this.name, this.defense, this.maxStability, this.turnsToRecoverStability, weaknesses);
-        
+        targetClone.tempWeakness = temporaryWeaknesses;
         targetClone.setDamageTaken(this.baseDamageTaken);
         targetClone.setAoEDamageTaken(this.baseAoEDamageTaken);
         targetClone.setTargetedDamageTaken(this.baseTargetedDamageTaken);

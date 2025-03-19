@@ -137,7 +137,7 @@ class Unit {
     // for checking if a specific buff is on the unit
     hasBuff(buffName) {
         for (let i = 0; i < this.currentBuffs.length; i++) {
-            if (this.currentBuffs[0] == buffName)
+            if (this.currentBuffs[i][0] == buffName)
                 return true;
         }
         return false;
@@ -145,14 +145,16 @@ class Unit {
     // for checking if any buff/debuff of a certain type is on the unit
     hasBuffType(type, isDebuff = true) {
         for (let i = 0; i < this.currentBuffs.length; i++) {
-            if (this.currentBuffs[1].Stat == type) {
-                if (isDebuff) {
-                    if (this.currentBuffs[1].Buff_Type == "Debuff")
-                        return true;
-                }
-                else {
-                    if (this.currentBuffs[1].Buff_Type == "Buff")
-                        return true;
+            if (this.currentBuffs[i][1].hasOwnProperty(BuffJSONKeys.STAT)) {
+                if (this.currentBuffs[i][1][BuffJSONKeys.STAT] == type) {
+                    if (isDebuff) {
+                        if (this.currentBuffs[i][1][BuffJSONKeys.BUFF_TYPE] == "Debuff")
+                            return true;
+                    }
+                    else {
+                        if (this.currentBuffs[i][1][BuffJSONKeys.BUFF_TYPE] == "Buff")
+                            return true;
+                    }
                 }
             }
         }
@@ -161,14 +163,16 @@ class Unit {
     // for checking if any buff/debuff of a certain element is on the unit
     hasBuffElement(element, isDebuff = true) {
         for (let i = 0; i < this.currentBuffs.length; i++) {
-            if (this.currentBuffs[1].Element == element) {
-                if (isDebuff) {
-                    if (this.currentBuffs[1].Buff_Type == "Debuff")
-                        return true;
-                }
-                else {
-                    if (this.currentBuffs[1].Buff_Type == "Buff")
-                        return true;
+            if (this.currentBuffs[i][1].hasOwnProperty(BuffJSONKeys.ELEMENT)) {
+                if (this.currentBuffs[i][1].Element == element) {
+                    if (isDebuff) {
+                        if (this.currentBuffs[i][1].Buff_Type == "Debuff")
+                            return true;
+                    }
+                    else {
+                        if (this.currentBuffs[i][1].Buff_Type == "Buff")
+                            return true;
+                    }
                 }
             }
         }

@@ -97,6 +97,7 @@ class DamageManager {
     applyFixedDamage(damage, sourceName) {
         let target = GameStateManager.getInstance().getTarget();
         target.takeDamage();
+        damage = Math.max(damage,1);
         EventManager.getInstance().broadcastEvent("fixedDamage", [sourceName, target, damage, target.getStability()]);
     }
 }
