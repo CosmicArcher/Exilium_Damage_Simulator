@@ -162,6 +162,21 @@
         "Stackable" : 1,
         "StackLimit" : 3
     },
+    "Lone Wolf" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0
+    },
+    "Steady Progress" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Defense_Consumed" : 0
+    },
+    "Murderous Intent" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Defense_Consumed" : 0
+    },
     "Tuning" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,

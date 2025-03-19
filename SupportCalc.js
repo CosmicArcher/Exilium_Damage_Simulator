@@ -188,7 +188,8 @@ function getConditionalOverrides() {
     }
 
     for (let i = 1; i < numDolls; i++) {
-        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[5];
+        console.log(document.getElementById("Doll_" + (index + 1)).children);
+        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[13];
         overrides.push([]);
         for (let j = 0; j < conditionalDiv.children.length / 3; j++) {
             overrides[0].push(conditionalDiv.children[j*3].checked);

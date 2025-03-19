@@ -32,11 +32,13 @@ class Unit {
     addBuff(buffName, duration, source) {
         let buffData = ResourceLoader.getInstance().getBuffData(buffName);
         if (buffData && this.buffsEnabled) {
-            if (!this.cloning)
-                EventManager.getInstance().broadcastEvent("statusApplied", [source, this, buffName]);
             this.currentBuffs.push([buffName, buffData, duration, buffData["Turn_Based"], buffData["Defense_Consumed"], source]);
-            if (buffName == "Overburn") {
-                DamageManager.getInstance().applyFixedDamage(source.getAttack() * 0.1);
+            if (!this.cloning) {
+                // we also do not want overburn application damage to trigger while cloning
+                if (buffName == "Overburn") {
+                    DamageManager.getInstance().applyFixedDamage(source.getAttack() * 0.1);
+                }
+                EventManager.getInstance().broadcastEvent("statusApplied", [source, this, buffName]);
             }
             this.applyBuffEffects(buffData);
         }
