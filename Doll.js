@@ -298,6 +298,18 @@ class Doll extends Unit {
             skill = this.copyNestedObject(this.skillData[skillName]);
         else
             console.error(`${skillName} is not in ${this.name}'s skill names`);
+        // if v1+ makiatto skill2 or v6 intercept condition is triggered, that means that the first hit crit so just change the calculation type to crit
+        if (this.name == "Makiatto") {
+            if ((skillName == SkillNames.SKILL2 && this.fortification > 0) || (skillName == SkillNames.INTERCEPT && this.fortification == 6)) {
+                if (conditionalTriggered[0]) {
+                    calculationType = CalculationTypes.CRIT;
+                }
+                // if conditional is not triggered, check if this is v1+ skill2 or v6 intercept with crit or expected calculation type and get the oncrit buff anyway
+                else if (calculationType == CalculationTypes.CRIT || calculationType == CalculationTypes.EXPECTED)
+                    conditionalTriggered[0] = true;
+            }
+        }
+
         // if conditional is triggered, overwrite the parts of the object that correspond to the keys in the conditional value or append to arrays if flagged
         if (skill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
             conditionalTriggered.forEach((flag, index) => {

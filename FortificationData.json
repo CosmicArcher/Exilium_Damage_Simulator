@@ -5,9 +5,7 @@
                 "Conditional" : [{
                     "Condition_Text" : "onKill",
                     "Post_Self_Buff" : [{
-                        "Name" : "Support Boost 1 V1",
-                        "Duration" : -1,
-                        "Stacks" : 1
+                        "Name" : "Support Boost 1 V1"
                     }]
                 }]
             }
@@ -32,13 +30,11 @@
             "Ultimate" : {
                 "Post_Self_Buff" : [{
                     "Name" : "Support Boost 2 V4",
-                    "Duration" : -1,
                     "Stacks" : 3
                 }],
                 "Conditional" : {
                     "Post_Self_Buff" : [{
                         "Name" :"Support Boost 2 V4",
-                        "Duration" : -1,
                         "Stacks" : 4
                     }]
                 }
@@ -64,8 +60,7 @@
                 "Ammo_Type" : "Heavy",
                 "Element" : "Freeze",
                 "Post_Self_Buff" : [{
-                    "Name" : "Cold Conviction",
-                    "Duration" : -1
+                    "Name" : "Cold Conviction"
                 }],
                 "Extra_Attack" : {
                     "Type" : "Attack",
@@ -75,11 +70,11 @@
                     "Ammo_Type" : "Heavy",
                     "Element" : "Freeze",
                     "Post_Self_Buff" : [{
-                        "Name" : "Cold Conviction",
-                        "Duration" : -1
+                        "Name" : "Cold Conviction"
                     }]
                 },
-                "Conditional" : {
+                "Conditional" : [{
+                    "Condition_Text" : "onCrit",
                     "Extra_Attack" : {
                         "Type" : "Attack",
                         "Multiplier" : 1,
@@ -90,11 +85,10 @@
                         "Ammo_Type" : "Heavy",
                         "Element" : "Freeze",
                         "Post_Self_Buff" : [{
-                            "Name" : "Cold Conviction",
-                            "Duration" : -1
+                            "Name" : "Cold Conviction"
                         }]
                     }
-                }
+                }]
             }
         },
         "V4" : {
@@ -107,12 +101,13 @@
         },
         "V6" : {
             "Intercept" : {
-                "Conditional" : {
+                "Conditional" : [{
+                    "Condition_Text" : "onCrit",
                     "Post_Self_Buff" : [{
                         "Name" : "Rapture",
                         "Duration" : 1
                     }]
-                }
+                }]
             }
         }
     },

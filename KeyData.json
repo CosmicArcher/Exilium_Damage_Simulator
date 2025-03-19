@@ -32,5 +32,41 @@
         },
         "Steadiness" : {
         }
+    },
+    "Makiatto" : {
+        "Additional Intelligence" : {
+            "Skill" : {
+                "Skill2" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "onKill"
+                        }]
+                    }
+                }
+            }
+        },
+        "Iced with Milk Foam" : {
+        },
+        "Indomitable Lone Wolf" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Conditional" : [{
+                        "Condition_Text" : "Isolated",
+                        "Append" : {
+                            "Post_Self_Buff" : [{
+                                "Name" : "Lone Wolf",
+                                "Duration" : 1
+                            }]
+                        }
+                    }]
+                }
+            }
+        },
+        "Break Time" : {
+        },
+        "Heated Caramel" : {
+        },
+        "Absolute Concentration" : {
+        }
     }
 }

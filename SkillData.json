@@ -16,9 +16,7 @@
             "Ammo_Type" : "Medium",
             "Element" : "Burn",
             "Post_Self_Buff" : [{
-                "Name" : "Support Boost 1",
-                "Duration" : -1,
-                "Stacks" : 1
+                "Name" : "Support Boost 1"
             }]
         },
         "Skill3" : {
@@ -38,14 +36,12 @@
             "Target" : "Self",
             "Post_Self_Buff" : [{
                 "Name" : "Support Boost 2",
-                "Duration" : -1,
                 "Stacks" : 3
             }],
             "Conditional" : [{
                 "Condition_Text" : "Max Index",
                 "Post_Self_Buff" : [{
                     "Name" :"Support Boost 2",
-                    "Duration" : -1,
                     "Stacks" : 4
                 }]
             }]
@@ -77,8 +73,7 @@
             "Ammo_Type" : "Heavy",
             "Element" : "Freeze",
             "Post_Self_Buff" : [{
-                "Name" : "Cold Conviction",
-                "Duration" : -1
+                "Name" : "Cold Conviction"
             }]
         },
         "Skill3" : {

@@ -1,5 +1,4 @@
-import { AttackTypes, SkillNames } from "./Enums.js";
-import {Makiatto, Qiongjiu} from "./DollClasses.js";
+import {Makiatto, Qiongjiu, Suomi} from "./DollClasses.js";
 
 let DollFactorySingleton;
 
@@ -20,15 +19,18 @@ class DollFactory {
         return DollFactorySingleton;
     }
 
-    createDoll(name, defense, attack, crit_chance, crit_damage, fortification) {
+    createDoll(name, defense, attack, crit_chance, crit_damage, fortification, keys) {
         if (DollFactorySingleton) {
             let newDoll;
             switch(name) {
                 case "Qiongjiu":
-                    newDoll = new Qiongjiu(name, defense, attack, crit_chance, crit_damage, fortification, [0,1,1,0,1,0]);
+                    newDoll = new Qiongjiu(name, defense, attack, crit_chance, crit_damage, fortification, keys);
                     break;
                 case "Makiatto":
-                    newDoll = new Makiatto(name, defense, attack, crit_chance, crit_damage, fortification);
+                    newDoll = new Makiatto(name, defense, attack, crit_chance, crit_damage, fortification, keys);
+                    break;
+                case Suomi:
+                    newDoll = new Suomi(name, defense, attack, crit_chance, crit_damage, fortification, keys);
                     break;
                 default:
                     console.log(`${name} doll class does not exist`);
