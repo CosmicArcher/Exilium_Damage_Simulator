@@ -61,6 +61,7 @@ class Doll extends Unit {
         this.keysEnabled = keys;
 
         this.turnAvailable = true;
+        this.cooldowns = [0,0,0,0];
 
         this.initializeSkillData();
         // merge the skill json with the fortification and key modifications of skills
@@ -356,9 +357,17 @@ class Doll extends Unit {
             // end turn and decrease counters on buffs if extra command or movement is not triggered
             if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
                 this.endTurn();
+            else {
+                if (this.hasBuff("Extra Command"))
+                    this.removeBuff("Extra Command");
+                if (this.hasBuff("Extra Movement"))
+                    this.removeBuff("Extra Movement");
+            }
             // extra action counts down on buff duration but enables another turn
-            if (this.hasBuff("Extra Action"))
+            if (this.hasBuff("Extra Action")) {
                 this.turnAvailable = true;
+                this.removeBuff("Extra Action");
+            }
 
             if (skill[SkillJSONKeys.BUFF_TARGET] == "All") {
                 GameStateManager.getInstance().getAllDolls().forEach(doll => {
@@ -367,18 +376,42 @@ class Doll extends Unit {
             }
             else
                 this.processPrePostBuffs(skill, supportTarget, null, 0);
-
-            console.log(this.currentBuffs);
         }
         // suomi applies 1 stack of avalanche for any active skill use by anyone other than herself
         if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
             EventManager.getInstance().broadcastEvent("allyAction", this.name);
+            // apply the index cost or cooldown of the skill if present
+            if (skill.hasOwnProperty(SkillJSONKeys.COST))
+                this.CIndex -= skill[SkillJSONKeys.COST];
+            if (skill.hasOwnProperty(SkillJSONKeys.COOLDOWN)) {
+                switch(skillName) {
+                    case SkillNames.BASIC:
+                        this.cooldowns[0] = skill[SkillJSONKeys.COOLDOWN];
+                        break;
+                    case SkillNames.SKILL2:
+                        this.cooldowns[1] = skill[SkillJSONKeys.COOLDOWN];
+                        break;
+                    case SkillNames.SKILL3:
+                        this.cooldowns[2] = skill[SkillJSONKeys.COOLDOWN];
+                        break;
+                    case SkillNames.ULT:
+                        this.cooldowns[3] = skill[SkillJSONKeys.COOLDOWN];
+                        break;
+                    default :
+                        console.error(`How did ${skillName} make it through the include check`);
+                }
+            }
         }
     }
 
     endTurn() {
         super.endTurn();
         this.turnAvailable = false;
+        // tick down the cooldowns
+        for (let i = 0; i < 4; i++) {
+            if (this.cooldowns[i] > 0)
+                this.cooldowns[i]--;
+        }
     }
 
     processAttack(skill, calculationType, target) {
@@ -681,6 +714,12 @@ class Doll extends Unit {
                 newDoll.buffImmunity.push(immunity);
             });
         }
+        // copy the values of the cooldown rather than passing a reference to the array
+        let cds = [];
+        for (let i = 0; i < 4; i++)
+            cds.push(this.cooldowns[i]);
+        newDoll.cooldowns = cds;
+
         newDoll.finishCloning();
         return newDoll;
     }

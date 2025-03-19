@@ -23,6 +23,8 @@ const AmmoTypes = {
 
 const SkillJSONKeys = {
     TYPE: "Type", // Attack, Buff
+    COOLDOWN: "Cooldown", // int, present if skill has a cooldown
+    COST: "Cost", // int, present if the skill costs index
     MULTIPLIER: "Multiplier", // float
     CRIT_MODIFIER: "Crit_Modifier", // float
     CRIT_DAMAGE_MODIFIER: "Crit_Damage_Modifier", // float
