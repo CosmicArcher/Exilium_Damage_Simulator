@@ -210,13 +210,19 @@
         "Crit_Damage" : 0.03
     },
     "Extra Action" : {
-
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Extra Movement" : {
-
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Extra Command" : {
-
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Movement Down 2" : {
         "Buff_Type" : "Debuff",
@@ -488,6 +494,11 @@
         "StackLimit" : 99
     },
     "Cleanse" : {
-        
+    },
+    "Frost" : {
+        "Buff_Type" : "Neutral",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1
     }
 } 

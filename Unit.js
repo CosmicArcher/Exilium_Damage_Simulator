@@ -59,14 +59,14 @@ class Unit {
                 this.addBuff("Avalanche", "Suomi", -1, 1);
         } 
         if (buffData && this.buffsEnabled && !this.buffImmunity.includes(buffName)) {
-            // check if the name is cleanse
+            // check if the name is cleanse, instead of adding to buffs, remove buffs equal to cleanse stacks
             if (buffName == "Cleanse") {
                 // remove the first stackCount buffs that are cleansable
                 let cleanseNames = [];
                 for (let i = 0; i < this.currentBuffs.length && cleanseNames.length < stacks; i++) {
                     // only cleanse buffs
                     if (this.currentBuffs[i][1][BuffJSONKeys.BUFF_TYPE] == "Buff")  {
-                        if (this.currentBuffs[i][1][BuffJSONKeys.CLEANSABLE])
+                        if (this.currentBuffs[i][1][BuffJSONKeys.CLEANSEABLE])
                             cleanseNames.push(this.currentBuffs[i][0]);
                     }
                 }

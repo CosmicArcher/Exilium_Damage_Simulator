@@ -72,7 +72,7 @@ const BuffJSONKeys = {
     BUFF_TYPE : "Buff_Type", // string
     TURN_BASED : "Turn_Based", // bool, whether duration is reduced per endTurn() called
     CONSUMPTION_MODE : "Consumption_Mode", // stack consumption mode, Attack, AllAttack, Defense, None
-    CLEANSABLE : "Cleansable", // bool, whether "cleanse" can remove the buff
+    CLEANSEABLE : "Cleanseable", // bool, whether "cleanse" can remove the buff
     ELEMENT : "Element", // element of the buff for certain interactions
     STAT : "Stat", // which stat the buff is classified as, movement, attack, defense, etc.
     STACKABLE : "Stackable", // whether the buff can stack with itself and compound the effects

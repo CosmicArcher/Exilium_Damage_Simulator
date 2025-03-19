@@ -1,4 +1,4 @@
-import { BuffJSONKeys } from "./Enums.js";
+import { BuffJSONKeys, Elements } from "./Enums.js";
 import EventManager from "./EventManager.js";
 import Unit from "./Unit.js";
 
@@ -27,6 +27,8 @@ class Target extends Unit {
         this.drWithStab = 0;
         // bosses are typically immune to command prohibition statuses
         this.buffImmunity = ["Frigid", "Stun", "Taunt", "Paralysis", "Overheated"];
+        // Track whether a weakness was implanted by a tile or is inherent
+        this.tempWeakness =[];
     }
     getStability() {return this.stability;} // for skills that check if stability is broken or not
     getPhaseWeaknesses() {return this.phaseWeaknesses;}
@@ -121,6 +123,35 @@ class Target extends Unit {
                 }
             }
         }
+        // add temporary freeze weakness if on frost tile
+        else if (buffName == "Frost") {
+            if (!this.phaseWeaknesses.includes(Elements.FREEZE)) {
+                this.phaseWeaknesses.push(Elements.FREEZE);
+                this.tempWeakness.push(Elements.FREEZE);
+            }
+        }
+    }
+    removeBuff(buffName) {
+        super.removeBuff(buffName);
+        // once frost tile expires, remove freeze weakness if it was not inherent to the unit
+        if (buffName == "Frost") {
+            if (this.tempWeakness.includes(Elements.FREEZE)) {
+                let removed = false;
+                for (let i = 0; i < this.phaseWeaknesses.length && !removed; i++) {
+                    if (this.phaseWeaknesses[i] == Elements.FREEZE) {
+                        this.phaseWeaknesses.splice(i,1);
+                        removed = true;
+                    }
+                }
+                removed = false;
+                for (let i = 0; i < this.tempWeakness.length && !removed; i++) {
+                    if (this.tempWeakness[i] == Elements.FREEZE) {
+                        this.tempWeakness.splice(i,1);
+                        removed = true;
+                    }
+                }
+            }
+        }
     }
     // activate certain stability based damage reduction passives
     applyDRPerStab(x) {this.drPerStab = x;}
@@ -147,6 +178,10 @@ class Target extends Unit {
 
     endTurn() {
         super.endTurn();
+        // check if is on frost tile, add frozen stack on turn end before counting stability regen
+        if (this.hasBuff("Frost")) {
+            this.addBuff("Frozen", "Suomi", 1, 1);
+        }
         // check if stability is broken
         if (this.stability == 0) {
             // count how many turns stability was broken, if number reaches the regeneration limit, recover full stability
@@ -159,7 +194,17 @@ class Target extends Unit {
     }
     // will figure out the best way to separate buff effects and their durations from direct set functions some other time
     cloneUnit() {
-        let targetClone = new Target(this.name, this.defense, this.maxStability, this.turnsToRecoverStability, this.phaseWeaknesses);
+        // because phaseweaknesses can be changed at any time, copy the array rather than passing the reference
+        let weaknesses = [];
+        this.phaseWeaknesses.forEach(weakness => {
+            weaknesses.push(weakness);
+        });
+        // because phaseweaknesses is modified by temporary weaknesses, ensure that the clone knows that those are temporary weaknesses rather than inherent 
+        this.tempWeakness.forEach(weakness => {
+            targetClone.tempWeakness.push(weakness);
+        });
+        let targetClone = new Target(this.name, this.defense, this.maxStability, this.turnsToRecoverStability, weaknesses);
+        
         targetClone.setDamageTaken(this.baseDamageTaken);
         targetClone.setAoEDamageTaken(this.baseAoEDamageTaken);
         targetClone.setTargetedDamageTaken(this.baseTargetedDamageTaken);
