@@ -345,11 +345,17 @@ class Doll extends Unit {
             // end turn and decrease counters on buffs if extra command or movement is not triggered
             if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
                 this.endTurn();
+            else {
+                if (this.hasBuff("Extra Command"))
+                    this.removeBuff("Extra Command");
+                if (this.hasBuff("Extra Movement"))
+                    this.removeBuff("Extra Movement");
+            }
             // extra action counts down on buff duration but enables another turn
-            if (this.hasBuff("Extra Action"))
+            if (this.hasBuff("Extra Action")) {
                 this.turnAvailable = true;
-
-            
+                this.removeBuff("Extra Action");
+            }
         }
         // if a buffing skill rather than attack, process buff data with supportTarget in the target parameter
         else {
@@ -492,12 +498,12 @@ class Doll extends Unit {
             skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore);
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt -= skill[SkillJSONKeys.DAMAGE_BOOST];
-            if (GameStateManager.getInstance().hasDoll("Suomi")) {
-                if (GameStateManager.getInstance().getDoll("Suomi").fortification > 1) {
-                    if (this.hasBuff("Frost Barrier"))
-                        this.elementDamageDealt.Freeze -= 0.15;
-                }
+        if (GameStateManager.getInstance().hasDoll("Suomi")) {
+            if (GameStateManager.getInstance().getDoll("Suomi").fortification > 1) {
+                if (this.hasBuff("Frost Barrier"))
+                    this.elementDamageDealt.Freeze -= 0.15;
             }
+        }
         // after doing damage, consume any buffs that are reduced on attack
         this.consumeAttackBuffs();
 
