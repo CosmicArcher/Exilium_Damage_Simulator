@@ -10,10 +10,10 @@ class ActionLog {
         else {
             console.log("Action Log Instantiated");
             ActionLogSingleton = this;
-            EventManager.getInstance().addListener("damageDealt", this.displayDamage);
-            EventManager.getInstance().addListener("fixedDamage", this.displayFixedDamage);
-            EventManager.getInstance().addListener("avalanche", this.displayAvalanche);
-            EventManager.getInstance().addListener("statusApplied", this.displayStatus);
+            EventManager.getInstance().addListener("damageDealt", ActionLogSingleton.displayDamage);
+            EventManager.getInstance().addListener("fixedDamage", ActionLogSingleton.displayFixedDamage);
+            EventManager.getInstance().addListener("avalanche", ActionLogSingleton.displayAvalanche);
+            EventManager.getInstance().addListener("statusApplied", ActionLogSingleton.displayStatus);
         }
     }
 
@@ -51,15 +51,15 @@ class ActionLog {
         else
             console.error("Singleton not yet initialized");
     }
-    // [source, target, buffName]
+    // [source, targets[], buffName]
     displayStatus(param) {
         if (ActionLogSingleton) {
             if (param[1].constructor == Array)
-                param[1].forEach(d => {
-                    d3.select("#ActionLog").insert("p", "p").text(`${param[0].getName()} applied ${param[2]} to ${d.getName()}`);
+                param[1].forEach(target => {
+                    d3.select("#ActionLog").insert("p", "p").text(`${param[0]} applied ${param[2]} to ${target}`);
                 });
             else
-                d3.select("#ActionLog").insert("p", "p").text(`${param[0].getName()} applied ${param[2]} to ${param[1].getName()}`);
+                d3.select("#ActionLog").insert("p", "p").text(`${param[0]} applied ${param[2]} to ${param[1]}`);
         }
         else
             console.error("Singleton not yet initialized");

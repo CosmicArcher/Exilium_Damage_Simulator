@@ -24,6 +24,8 @@ class Target extends Unit {
         // some bosses have damage reduction based on stability
         this.drPerStab = 0;
         this.drWithStab = 0;
+        // bosses are typically immune to command prohibition statuses
+        this.buffImmunity = ["Frigid", "Stun", "Taunt", "Paralysis", "Overheated"];
     }
     getStability() {return this.stability;} // for skills that check if stability is broken or not
     getPhaseWeaknesses() {return this.phaseWeaknesses;}
@@ -98,12 +100,19 @@ class Target extends Unit {
         if(buffData.hasOwnProperty("StabilityDamageTaken"))
             this.stabilityDamageModifier -= buffData["StabilityDamageTaken"];
     }
-    addBuff(buffName, duration, source) {
-        super.addBuff(buffName, duration, source);
+    addBuff(buffName, sourceName, duration = -1, stacks = 1) {
+        super.addBuff(buffName, sourceName, duration, stacks);
         // if avalanche reaches 5 stacks, reduce 8 stability and consume all stacks 
         if (buffName == "Avalanche") {
-            this.reduceStability(8);
-            EventManager.getInstance().broadcastEvent("avalanche", this.stability);
+            for (let i = 0; i < this.currentBuffs.length; i++) {
+                if (this.currentBuffs[i][0] == "Avalanche") {
+                    if (this.currentBuffs[i][3] == 5) {
+                        this.reduceStability(8);
+                        EventManager.getInstance().broadcastEvent("avalanche", this.stability);
+                        this.removeBuff("Avalanche");
+                    }
+                }
+            }
         }
     }
     // activate certain stability based damage reduction passives
@@ -150,11 +159,14 @@ class Target extends Unit {
         // buffs are enabled by default so check if they are disabled when cloning
         if (!this.buffsEnabled)
             targetClone.disableBuffs();
-        else
-            this.currentBuffs.forEach(d => {
-                targetClone.addBuff(d[0], d[2], d[5]);
+        else {
+            this.currentBuffs.forEach(buff => {
+                targetClone.addBuff(buff[0], buff[2], buff[3], buff[6]);
             });
-        
+            this.buffImmunity.forEach(immunity => {
+                targetClone.buffImmunity.push(immunity);
+            });
+        }
         targetClone.finishCloning();
         return targetClone;
     }

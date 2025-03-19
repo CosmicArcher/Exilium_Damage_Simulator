@@ -68,4 +68,15 @@ const CalculationTypes = {
     SIMULATION: "Simulation"
 }
 
-export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes};
+const BuffJSONKeys = {
+    BUFF_TYPE : "Buff_Type", // string
+    TURN_BASED : "Turn_Based", // bool, whether duration is reduced per endTurn() called
+    CONSUMPTION_MODE : "Consumption_Mode", // stack consumption mode, Attack, Defense, None
+    CLEANSABLE : "Cleansable", // bool, whether "cleanse" can remove the buff
+    ELEMENT : "Element", // element of the buff for certain interactions
+    STAT : "Stat", // which stat the buff is classified as, movement, attack, defense, etc.
+    STACKABLE : "Stackable", // whether the buff can stack with itself and compound the effects
+    STACK_LIMIT : "Stack_Limit" // maximum number of stacks the unit can have, is not necessarily used in conjunction with "stackable"
+}
+
+export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes, BuffJSONKeys};

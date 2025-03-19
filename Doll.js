@@ -351,7 +351,7 @@ class Doll extends Unit {
         }
         // if a buffing skill rather than attack, return 0 damage after processing buff data
         else {
-            this.processPrePostBuffs(skill, null, supportTarget, 1);
+            this.processPrePostBuffs(skill, supportTarget, null, 1);
             // end turn and decrease counters on buffs if extra command or movement is not triggered
             if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
                 this.endTurn();
@@ -359,7 +359,13 @@ class Doll extends Unit {
             if (this.hasBuff("Extra Action"))
                 this.turnAvailable = true;
 
-            this.processPrePostBuffs(skill, null, supportTarget, 0);
+            if (skill[SkillJSONKeys.BUFF_TARGET] == "All") {
+                GameStateManager.getInstance().getAllDolls().forEach(doll => {
+                    this.processPrePostBuffs(skill, doll, null, 0);
+                });
+            }
+            else
+                this.processPrePostBuffs(skill, supportTarget, null, 0);
 
             console.log(this.currentBuffs);
             return 0;
@@ -452,21 +458,39 @@ class Doll extends Unit {
             if (skill.hasOwnProperty(SkillJSONKeys.PRE_SELF_BUFF)) {
                 let statusEffects = skill[SkillJSONKeys.PRE_SELF_BUFF];
                 // some skills apply multiple buffs so run a foreach loop to ensure all buffs are applies
-                statusEffects.forEach(d => {
-                    this.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                statusEffects.forEach(buff => {
+                    let stacks = 1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                        stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                    let duration = -1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                        duration = buff[SkillJSONKeys.BUFF_DURATION];
+                    this.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
                 });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.PRE_TARGET_BUFF)) {
                 let statusEffects = skill[SkillJSONKeys.PRE_TARGET_BUFF];
-                statusEffects.forEach(d => {
-                    target.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                statusEffects.forEach(buff => {
+                    let stacks = 1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                        stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                    let duration = -1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                        duration = buff[SkillJSONKeys.BUFF_DURATION];
+                    target.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
                 });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.PRE_SUPPORT_BUFF)) {
                 if (supportTarget) {
                     let statusEffects = skill[SkillJSONKeys.PRE_SUPPORT_BUFF];
-                    statusEffects.forEach(d => {
-                        supportTarget.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                    statusEffects.forEach(buff => {
+                        let stacks = 1;
+                        if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                            stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                        let duration = -1;
+                        if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                            duration = buff[SkillJSONKeys.BUFF_DURATION];
+                        supportTarget.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
                     });
                 }
                 else
@@ -477,21 +501,39 @@ class Doll extends Unit {
             // if the skill applies buffs after the attack
             if (skill.hasOwnProperty(SkillJSONKeys.POST_TARGET_BUFF)) {
                 let statusEffects = skill[SkillJSONKeys.POST_TARGET_BUFF];
-                statusEffects.forEach(d => {
-                    target.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                statusEffects.forEach(buff => {
+                    let stacks = 1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                        stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                    let duration = -1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                        duration = buff[SkillJSONKeys.BUFF_DURATION];
+                    target.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
                 });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.POST_SELF_BUFF)) {
                 let statusEffects = skill[SkillJSONKeys.POST_SELF_BUFF];
-                statusEffects.forEach(d => {
-                    this.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                statusEffects.forEach(buff => {
+                    let stacks = 1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                        stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                    let duration = -1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                        duration = buff[SkillJSONKeys.BUFF_DURATION];
+                    this.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
                 });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.POST_SUPPORT_BUFF)) {
                 if (supportTarget) {
                     let statusEffects = skill[SkillJSONKeys.POST_SUPPORT_BUFF];
-                    statusEffects.forEach(d => {
-                        supportTarget.addBuff(d[SkillJSONKeys.BUFF_NAME], d[SkillJSONKeys.BUFF_DURATION], this);
+                    statusEffects.forEach(buff => {
+                        let stacks = 1;
+                        if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                            stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                        let duration = -1;
+                        if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                            duration = buff[SkillJSONKeys.BUFF_DURATION];
+                        supportTarget.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
                     });
                 }
                 else
@@ -587,11 +629,14 @@ class Doll extends Unit {
 
         if (!this.buffsEnabled)
             newDoll.disableBuffs();
-        else
-            this.currentBuffs.forEach(d => {
-                newDoll.addBuff(d[0], d[2], d[5]);
+        else {
+            this.currentBuffs.forEach(buff => {
+                newDoll.addBuff(buff[0], buff[2], buff[3], buff[6]);
             });
-
+            this.buffImmunity.forEach(immunity => {
+                newDoll.buffImmunity.push(immunity);
+            });
+        }
         newDoll.finishCloning();
         return newDoll;
     }

@@ -1,6 +1,8 @@
 import ResourceLoader from "./ResourceLoader.js";
 import DamageManager from "./DamageManager.js";
 import EventManager from "./EventManager.js";
+import { BuffJSONKeys } from "./Enums.js";
+import GameStateManager from "./GameStateManager.js";
 // root class for dolls (attackers) and targets (defenders)
 class Unit {
     constructor(name, defense) { // some dolls use their defense stats for damage
@@ -8,46 +10,118 @@ class Unit {
         this.defense = defense;
         // stat buffs that are important for both target and attacker
         this.defenseBuffs = 0;
-        // track buff name, buff data, turns/stacks left, isTurnBased, isDefenseConsumed, source (for overburn damage)
+        // track buff name, buff data, turns left, stacks left, isTurnBased, consumption mode, sourceName (for overburn damage)
         this.currentBuffs = [];
         // some modes of the calculator will be purely manual input of buff effects while others will be automatic from the addBuff() function
         this.buffsEnabled = 1;
         // flag to disable event broadcasting of buff applications while copying buffs from original to clone
         this.cloning = true;
+        // bosses are immune to certain buffs
+        this.buffImmunity = [];
     }
 
     setDefense(x) {this.defense = x;}
     getDefense() {return this.defense;}
     getName() {return this.name;}
     // process buffs using json data
-    applyBuffEffects(buffData) {
-        if(buffData.hasOwnProperty("DefensePerc"))
-            this.defenseBuffs += buffData["DefensePerc"];
+    applyBuffEffects(buffData, stacks = 1, stackable = false) {
+        if(buffData.hasOwnProperty("DefensePerc")) {
+            if (stackable)
+                this.defenseBuffs += buffData["DefensePerc"] * stacks;
+            else 
+                this.defenseBuffs += buffData["DefensePerc"];
+        }
     }
-    removeBuffEffects(buffData) {
-        if(buffData.hasOwnProperty("DefensePerc"))
-            this.defenseBuffs -= buffData["DefensePerc"];
+    removeBuffEffects(buffData, stacks = 1, stackable = false) {
+        if(buffData.hasOwnProperty("DefensePerc")){
+            if (stackable)
+                this.defenseBuffs -= buffData["DefensePerc"] * stacks;
+            else 
+                this.defenseBuffs -= buffData["DefensePerc"];
+        }
+    }
+    // for applying overburn and corrosive pressure
+    applyDoT(buffName, sourceName) {
+        let attacker = GameStateManager.getInstance().getDoll(sourceName);
+        if (buffName == "Overburn") {
+            DamageManager.getInstance().applyFixedDamage(attacker.getAttack() * 0.1, sourceName);
+        }
+        else if (buffName == "Corrosive Pressure") {
+
+        }
     }
     // these are called when buffs are added/removed
-    addBuff(buffName, duration, source) {
+    addBuff(buffName, sourceName, duration = -1, stacks = 1) {
         let buffData = ResourceLoader.getInstance().getBuffData(buffName);
-        if (buffData && this.buffsEnabled) {
-            this.currentBuffs.push([buffName, buffData, duration, buffData["Turn_Based"], buffData["Defense_Consumed"], source]);
-            if (!this.cloning) {
-                // we also do not want overburn application damage to trigger while cloning
-                if (buffName == "Overburn") {
-                    DamageManager.getInstance().applyFixedDamage(source.getAttack() * 0.1, source.getName());
+        if (buffData && this.buffsEnabled && !this.buffImmunity.includes(buffName)) {
+            // check if the name is cleanse
+            if (buffName == "Cleanse") {
+                // remove the first stackCount buffs that are cleansable
+                let cleanseNames = [];
+                for (let i = 0; i < this.currentBuffs.length && cleanseNames.length < stacks; i++) {
+                    // only cleanse buffs
+                    if (this.currentBuffs[i][1][BuffJSONKeys.BUFF_TYPE] == "Buff")  {
+                        if (this.currentBuffs[i][1][BuffJSONKeys.CLEANSABLE])
+                            cleanseNames.push(this.currentBuffs[i][0]);
+                    }
                 }
-                EventManager.getInstance().broadcastEvent("statusApplied", [source, this, buffName]);
+                cleanseNames.forEach(buff => {
+                    this.removeBuff(buff);
+                });
             }
-            this.applyBuffEffects(buffData);
+            else {
+                //
+                if (!buffData[BuffJSONKeys.TURN_BASED])
+                    duration = -1;
+                if (!buffData.hasOwnProperty(BuffJSONKeys.STACK_LIMIT))
+                    stacks = 1;
+                // check if the unit already has the buff
+                let index = -1;
+                for (let i = 0; i < this.currentBuffs.length; i++) {
+                    if (this.currentBuffs[i][0] == buffName)
+                        index = i;
+                }
+                // if does not currently have the buff, add to the list
+                if (index == -1) {
+                    this.currentBuffs.push([buffName, buffData, duration, stacks, buffData[BuffJSONKeys.TURN_BASED], buffData[BuffJSONKeys.CONSUMPTION_MODE], sourceName]);
+                    this.applyBuffEffects(buffData, stacks, buffData.hasOwnProperty(BuffJSONKeys.STACKABLE));
+                    if (buffName == "Murderous Intent") {
+                        this.buffImmunity.push("Frozen");
+                        this.buffImmunity.push("Frigid");
+                    }
+                }
+                else {
+                    let buff = this.currentBuffs[index];
+                    // check if the buff is turn-based, refresh the duration to the higher of the application or current duration
+                    if (buff[4]) {
+                        buff[2] = Math.max(buff[2], duration);
+                    }
+                    // if the buff is below its stack limit, increase the stack count based on the stacks parameter
+                    if (buffData.hasOwnProperty(BuffJSONKeys.STACK_LIMIT)) {
+                        if (buff[3] < buffData[BuffJSONKeys.STACK_LIMIT]) {
+                            let stackGain = Math.min(buffData[BuffJSONKeys.STACK_LIMIT] - buff[3], stacks);
+                            buff[3] += stackGain;
+                            if (buffData.hasOwnProperty(BuffJSONKeys.STACKABLE))
+                                this.applyBuffEffects(buffData, stackGain, true);
+                        }
+                    }
+                    
+                }
+                if (!this.cloning) {
+                    // we also do not want overburn application damage to trigger while cloning
+                    if (buffName == "Overburn") {
+                        this.applyDoT(buffName, sourceName);
+                    }
+                    EventManager.getInstance().broadcastEvent("statusApplied", [source.getName(), this.name, buffName]);
+                }
+            }
         }
     }
     removeBuff(buffName) {
         // sanity check by checking if the buff exists in the array first
         this.currentBuffs.forEach((buff,i) => {
             if (buff[0] == buffName) {
-                this.removeBuffEffects(buff[1]);
+                this.removeBuffEffects(buff[1], buff[3], buff[1].hasOwnProperty(BuffJSONKeys.STACKABLE));
                 this.currentBuffs.splice(i, 1);
                 return; // exit loop early once buff has been found
             }
@@ -102,16 +176,23 @@ class Unit {
     setDefenseBuffs(x) {this.defenseBuffs = x;} // only use for quick calcs, direct buff input
     
     endTurn() {
-        this.currentBuffs.forEach(d => {
-            if (d[3]) {
+        this.currentBuffs.forEach(buff => {
+            if (buff[4]) {
                 // apply overburn damage over time effect, damage updates as the source's attack stat changes
-                if (d[0] == "Overburn") {
-                    DamageManager.getInstance().applyFixedDamage(d[5].getAttack() * 0.1, d[5].getName());
+                if (buff[0] == "Overburn" || buff[0] == "Corrosive Pressure") {
+                    this.applyDoT(buff[0], buff[6]);
                 }
-                // tick down all turn-based buffs by 1
-                d[2]--;
-                if (d[2] == 0) {
-                    this.removeBuff(d[0]);
+                // if 2 stacks of frozen and ending turn, turn frozen into frigid
+                if (buff[0] == "Frozen" && buff[3] == 2) {
+                    this.removeBuff(buff[0]);
+                    this.addBuff("Frigid", buff[6], 1, 1);
+                }
+                else {
+                    // tick down all turn-based buffs by 1
+                    buff[2]--;
+                    if (buff[2] == 0) {
+                        this.removeBuff(buff[0]);
+                    }
                 }
             }
         })
