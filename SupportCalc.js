@@ -362,16 +362,42 @@ function createKeyDropdown(index, htmlElement) {
                         let keyDisplay = event.target.parentNode.parentNode.nextElementSibling;
                         if (key_name != "None") {
                             // if a key has already been selected in this slot, deselect it in the selected keys
-                            if (keyDisplay.textContent != "None") 
+                            if (keyDisplay.textContent != "None") {
                                 selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
+                                // if doll is papasha, also change her summon's keys
+                                if (selectedDolls[dollIndex] == "Papasha") {
+                                    selectedDolls.forEach((doll, i) => {
+                                        if (doll == "Papasha Summon") {
+                                            selectedKeys[i][keys.indexOf(keyDisplay.textContent)] = 0;
+                                        }
+                                    });
+                                }
+                            }
                             // add the key in the selected keys of the doll
                             selectedKeys[dollIndex][keys.indexOf(key_name)] = 1;
+                            // if doll is papasha, also change her summon's keys
+                            if (selectedDolls[dollIndex] == "Papasha") {
+                                selectedDolls.forEach((doll, i) => {
+                                    if (doll == "Papasha Summon") {
+                                        selectedKeys[i][keys.indexOf(key_name)] = 1;
+                                    }
+                                });
+                            }
                             keyDisplay.textContent = key_name;
                         }
                         else {
                             // if a key has already been selected in this slot, deselect it in the selected keys
-                            if (keyDisplay.textContent != "None") 
+                            if (keyDisplay.textContent != "None") {
                                 selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
+                                // if doll is papasha, also change her summon's keys
+                                if (selectedDolls[dollIndex] == "Papasha") {
+                                    selectedDolls.forEach((doll, i) => {
+                                        if (doll == "Papasha Summon") {
+                                            selectedKeys[i][keys.indexOf(keyDisplay.textContent)] = 0;
+                                        }
+                                    });
+                                }
+                            }
                             keyDisplay.textContent = "None";
                         }
                         // sometimes keys add conditionals so changing a key might add or remove some

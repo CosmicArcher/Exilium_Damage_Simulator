@@ -91,5 +91,60 @@
         },
         "Logistics Support" : {
         }
+    },
+    "Papasha" : {
+        "Glory with Us" : {
+            "Skill" : {
+                "Skill2" : {
+                    "Conditional" : [{
+                        "Condition_Text" : "Large Target",
+                        "Damage_Boost" : 0.2
+                    }]
+                }
+            }
+        },
+        "Vow to Defend" : {
+        },
+        "Unwavering Conviction" : {
+        },
+        "Final Assault" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "Far Target"
+                        }]
+                    }
+                }
+            }
+        },
+        "I'll Learn it" : {
+        },
+        "Strength in Unity" : {
+        }
+    },
+    "Papasha Summon" : {
+        "Glory with Us" : {
+        },
+        "Vow to Defend" : {
+        },
+        "Unwavering Conviction" : {
+        },
+        "Final Assault" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "Far Target",
+                            "Damage_Boost" : 0.1
+                        }]
+                    }
+                }
+            }
+        },
+        "I'll Learn it" : {
+        },
+        "Strength in Unity" : {
+        }
     }
 }

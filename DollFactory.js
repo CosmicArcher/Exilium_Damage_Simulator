@@ -1,4 +1,4 @@
-import {Makiatto, Qiongjiu, Suomi} from "./DollClasses.js";
+import {Makiatto, Papasha, PapashaSummon, Qiongjiu, Suomi} from "./DollClasses.js";
 import GameStateManager from "./GameStateManager.js";
 import TurnManager from "./TurnManager.js";
 
@@ -37,6 +37,12 @@ class DollFactory {
                     newDoll = new Suomi(defense, attack, crit_chance, crit_damage, fortification, keys);
                     TurnManager.getInstance().registerTargetedSupporter(name, true);
                     TurnManager.getInstance().registerActionListener(name);
+                    break;
+                case "Papasha":
+                    newDoll = new Papasha(defense, attack, crit_chance, crit_damage, fortification, keys);
+                    break;
+                case "Papasha Summon":
+                    newDoll = new PapashaSummon(defense, attack, crit_chance, crit_damage, fortification, keys);
                     break;
                 default:
                     console.log(`${name} doll class does not exist`);

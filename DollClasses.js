@@ -421,3 +421,129 @@ export class Suomi extends Supporter {
         return super.cloneUnit(new Suomi(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }
+
+export class Papasha extends Doll {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Papasha", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+
+        if (fortification > 2)
+            this.addBuff("Power of Unity", this.name, -1, 3);
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        let summon = GameStateManager.getInstance().getDoll("Papasha Summon"); 
+        if (skillName != SkillNames.SKILL3) {
+            // key 1 gives skill 2 damage buff on large targets
+            if (this.keysEnabled[0] && skillName == SkillNames.SKILL2 && target.getIsLarge())
+                conditionalTriggered[0] = true;
+            // ult applies buffs on the summon before papasha attacks but the order does not really matter
+            if (skillName == SkillNames.ULT && this.fortification < 6) {
+                summon.addBuff("Tenacity to Withstand", this.name, 2, 1);
+            }
+            // papasha crit increases summon crit by 20% for the next hit and conversely
+            let newSimType;
+            if (calculationType == CalculationTypes.SIMULATION) {
+                if (RNGManager.getInstance().getRNG() <= this.crit_chance) {
+                    newSimType = CalculationTypes.CRIT;
+                    summon.crit_chance += 0.2;
+                }
+                else
+                    newSimType = CalculationTypes.NOCRIT;
+            }
+            
+            super.getSkillDamage(skillName, target, calculationType == CalculationTypes.SIMULATION ? newSimType : calculationType, conditionalTriggered);
+            // skill2 adds courage to endure on the summon if v1 or the target has stability after the nade, does not matter if the following support attack breaks it
+            if (skillName == SkillNames.SKILL2) {
+                if (this.fortification > 0 || target.getStability() > 0)
+                    summon.addBuff("Courage to Endure", this.name, 3, 1);
+            }
+            // after papasha attack, use summon support, if she used skill2 with key 1, temporarily increase stability damage by 2 regardless of target size
+            if (this.keysEnabled[0] && skillName == SkillNames.SKILL2)
+                summon.setStabilityDamageModifier(summon.getBaseStabilityDamageModifier() + 2);
+
+            summon.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
+
+            if (this.keysEnabled[0] && skillName == SkillNames.SKILL2)
+                summon.setStabilityDamageModifier(summon.getBaseStabilityDamageModifier() - 2);
+            // undo the temporary crit chance too
+            if (calculationType == CalculationTypes.SIMULATION)
+                summon.crit_chance -= 0.2;
+        }
+        else {
+            summon.getSkillDamage(SkillNames.SKILL3, target, calculationType, conditionalTriggered);
+        }
+        // summon buff durations are timed with papasha end turn
+        summon.endTurn();
+    }
+
+    refreshSupportUses() {
+        super.refreshSupportUses();
+        if (this.keysEnabled[5]) {
+            let summon = GameStateManager.getInstance().getDoll("Papasha Summon");
+            if (this.getAttack() > summon.getAttack())
+                summon.addBuff("Accolades Brilliance", this.name, 1, 1);
+            else
+                this.addBuff("Accolades Brilliance", this.name, 1, 1);
+        }
+    }
+
+    endTurn() {
+        super.endTurn();
+        if (this.fortification > 2) {
+            this.addBuff("Power of Unity", this.name, -1, 1);
+        }
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new Papasha(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}
+
+export class PapashaSummon extends Doll {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Papasha Summon", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+
+        // the summon inherits all of papasha's basic stats except crit which are locked to the base values outside of buffs
+        if (fortification < 3) {
+            this.crit_chance = 0.2;
+            this.crit_damage = 1.2;
+        }
+        else {
+            this.crit_chance = 0.5;
+            this.crit_damage = 1.4;
+            this.addBuff("Power of Unity", this.name, -1, 3);
+        }
+        if (keysEnabled[2])
+            this.attackBoost += 0.1;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        // papasha skill3 is used entirely by the summon with its stats and buffs, it also does extra damage if the target is large 
+        if (skillName == SkillNames.SKILL3 && target.getIsLarge())
+            conditionalTriggered[0] = true; 
+        // if v1+ with courage to endure, ignore 30% def of large targets
+        if (skillName == SkillNames.SUPPORT && this.hasBuff("Courage to Endure") && target.getIsLarge()) {
+            this.defenseIgnore += 0.3;
+        }
+        
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        if (skillName == SkillNames.SUPPORT && this.hasBuff("Courage to Endure") && target.getIsLarge()) {
+            this.defenseIgnore -= 0.3;
+        }
+        // v2+ papasha has the summon do a support attack after skill3 instead of no support
+        if (skillName == SkillNames.SKILL3 && this.fortification > 1)
+            this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered)
+    }
+
+    endTurn() {
+        super.endTurn();
+        if (this.fortification > 2) {
+            this.addBuff("Power of Unity", this.name, -1, 1);
+        }
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new PapashaSummon(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}

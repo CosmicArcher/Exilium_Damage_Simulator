@@ -415,23 +415,21 @@
     "Continuous Healing 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1
     },
     "Courage to Endure" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "SupportPerc" : 0.3
-    },
-    "Courage to Endure V1" : {
-        "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "SupportPerc" : 0.3
     },
     "Power of Unity" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stackable" : 1,
         "StackLimit" : 3,
         "TargetedDamage" : 0.1
@@ -439,16 +437,20 @@
     "Tenacity to Withstand" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Resolve to Defend" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Lightspike" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stackable" : 1,
         "StackLimit" : 8,
         "Crit" : 0.03,
@@ -456,7 +458,9 @@
     },
     "Lightspike V5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stackable" : 1,
         "StackLimit" : 8,
         "Crit" : 0.05,
@@ -500,5 +504,19 @@
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 1
+    },
+    "Critical Damage Up 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Crit_Damage" : 0.1
+    },
+    "Accolades Brilliance" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
+        "AttackPerc" : 0.1
     }
 } 

@@ -110,12 +110,18 @@ class Unit {
                                 this.applyBuffEffects(buffData, stackGain, true);
                         }
                     }
-                    
+                    // if the overburn sources are different, keep track of the one with higher attack
+                    if (buffName == "Overburn" && sourceName != buff[6]) {
+                        let dolls = [GameStateManager.getInstance().getDoll(sourceName), GameStateManager.getInstance().getDoll(buff[6])];
+                        if (dolls[0].getAttack() > dolls[1].getAttack())
+                            buff[6] = sourceName;
+                    }
                 }
                 if (!this.cloning) {
                     // we also do not want overburn application damage to trigger while cloning
                     if (buffName == "Overburn") {
-                        this.applyDoT(buffName, sourceName);
+                        let attacker = GameStateManager.getInstance().getDoll(sourceName);
+                        DamageManager.getInstance().applyFixedDamage(attacker.getAttack() * 0.1, sourceName);
                     }
                     EventManager.getInstance().broadcastEvent("statusApplied", [sourceName, this.name, buffName]);
                 }

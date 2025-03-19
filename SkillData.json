@@ -215,7 +215,9 @@
             "Element" : "Physical"
         },
         "Skill3" : {
-
+            "Conditional" : [{
+                "Condition_Text" : "isLarge"
+            }]
         },
         "Ultimate" : {
             "Type" : "Attack",
@@ -242,9 +244,10 @@
             "StabilityDamage" : 3,
             "Ammo_Type" : "Light",
             "Element" : "Physical",
-            "Conditional" : {
+            "Conditional" : [{
+                "Condition_Text" : "isLarge",
                 "Damage_Boost" : 0.5
-            }
+            }]
         }
     },
     "Daiyan" : {

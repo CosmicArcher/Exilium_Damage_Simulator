@@ -36,6 +36,7 @@ class Doll extends Unit {
         this.coverIgnore = 0;
         this.stabilityDamageModifier = 0;
         this.stabilityIgnore = 0;
+        this.attackBoost = 0;
         // base values changed by direct input rather than automatic from buff applications
         this.baseDefenseIgnore = 0;
         this.baseDamageDealt = 0;
@@ -57,6 +58,7 @@ class Doll extends Unit {
         this.baseCoverIgnore = 0;
         this.baseStabilityDamageModifier = 0;
         this.baseStabilityIgnore = 0;
+        this.baseAttackBoost = 0;
         // keys will be arranged numerically
         this.keysEnabled = keys;
 
@@ -66,10 +68,10 @@ class Doll extends Unit {
         this.initializeSkillData();
         // merge the skill json with the fortification and key modifications of skills
         this.applyFortificationData();
-        this.applyKeyData()
+        this.applyKeyData();
     }
 
-    getAttack() {return this.attack;}
+    getAttack() {return this.attack * (1 + this.attackBoost);}
     getCritRate() {return this.crit_chance;}
     getCritDamage() {return this.crit_damage;}
     // get any stats relevant to damage calculation
@@ -86,6 +88,7 @@ class Doll extends Unit {
     getCoverIgnore() {return this.coverIgnore;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
     getStabilityIgnore() {return this.stabilityIgnore;}
+    getAttackBoost() {return this.attackBoost;}
     // get the base stats for display mid-simulation
     getBaseDefenseIgnore() {return this.baseDefenseIgnore;}
     getBaseDamageDealt() {return this.baseDamageDealt;}
@@ -100,6 +103,7 @@ class Doll extends Unit {
     getBaseCoverIgnore() {return this.baseCoverIgnore;}
     getBaseStabilityDamageModifier() {return this.baseStabilityDamageModifier;}
     getBaseStabilityIgnore() {return this.baseStabilityIgnore;}
+    getBaseAttackBoost() {return this.baseAttackBoost;}
     // for direct buff input
     setDefenseIgnore(x) {
         this.resetDefenseIgnore();
@@ -166,6 +170,11 @@ class Doll extends Unit {
         this.baseStabilityIgnore = x;
         this.stabilityIgnore += x;
     }
+    setAttackBoost(x) {
+        this.resetAttackBoost();
+        this.baseAttackBoost = x;
+        this.attackBoost += x;
+    }
     // when using the setters, undo the addition of the previous base multipliers
     resetDefenseIgnore() {
         this.defenseIgnore -= this.baseDefenseIgnore;
@@ -218,6 +227,10 @@ class Doll extends Unit {
     resetStabilityIgnore() {
         this.stabilityIgnore -= this.baseStabilityIgnore;
         this.baseStabilityIgnore = 0;
+    }
+    resetAttackBoost() {
+        this.attackBoost -= this.baseAttackBoost;
+        this.baseAttackBoost = 0;
     }
     // get the data belonging to the doll from the loaded jsons
     initializeSkillData() {
@@ -647,11 +660,11 @@ class Doll extends Unit {
     copyNestedObject(obj) {
         let newObj = {};
         Object.keys(obj).forEach(d => {
-            // sometimes conditional contains buff array modifications so some values are arrays of objects
+            // conditionals and skill buffs contain arrays of objects
             if (obj[d].constructor == Array)
                 newObj[d] = this.copyBuffArray(obj[d]);
-            // if the key is fixed_damage, conditional or extra_attack, copy the nested object values
-            else if (d == SkillJSONKeys.FIXED_DAMAGE || d == SkillJSONKeys.CONDITIONAL || d == SkillJSONKeys.EXTRA_ATTACK)
+            // if the key is fixed_damage or extra_attack, copy the nested object values
+            else if (d == SkillJSONKeys.FIXED_DAMAGE || d == SkillJSONKeys.EXTRA_ATTACK)
                 newObj[d] = this.copyNestedObject(obj[d]);
             else
                 newObj[d] = obj[d];
@@ -684,7 +697,11 @@ class Doll extends Unit {
                     });
                 }
                 else {
-                    skillData[key] = modification[key];
+                    // if damage boost, add up the damage instead of replacing
+                    if (key != SkillJSONKeys.DAMAGE_BOOST || !skillData.hasOwnProperty(key))
+                        skillData[key] = modification[key];
+                    else 
+                        skillData[key] += modification[key];
                 }
             }
         });
@@ -709,6 +726,7 @@ class Doll extends Unit {
         newDoll.setCoverIgnore(this.baseCoverIgnore); 
         newDoll.setStabilityDamageModifier(this.baseStabilityDamageModifier);
         newDoll.setStabilityIgnore(this.baseStabilityIgnore);
+        newDoll.setAttackBoost(this.baseAttackBoost);
 
         if (!this.buffsEnabled)
             newDoll.disableBuffs();
