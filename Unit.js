@@ -36,7 +36,7 @@ class Unit {
             if (!this.cloning) {
                 // we also do not want overburn application damage to trigger while cloning
                 if (buffName == "Overburn") {
-                    DamageManager.getInstance().applyFixedDamage(source.getAttack() * 0.1);
+                    DamageManager.getInstance().applyFixedDamage(source.getAttack() * 0.1, source.getName());
                 }
                 EventManager.getInstance().broadcastEvent("statusApplied", [source, this, buffName]);
             }
@@ -106,7 +106,7 @@ class Unit {
             if (d[3]) {
                 // apply overburn damage over time effect, damage updates as the source's attack stat changes
                 if (d[0] == "Overburn") {
-                    DamageManager.getInstance().applyFixedDamage(d[5].getAttack() * 0.1);
+                    DamageManager.getInstance().applyFixedDamage(d[5].getAttack() * 0.1, d[5].getName());
                 }
                 // tick down all turn-based buffs by 1
                 d[2]--;

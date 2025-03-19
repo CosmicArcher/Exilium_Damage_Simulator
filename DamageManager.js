@@ -94,9 +94,10 @@ class DamageManager {
         return damage;
     }
     // will pass the damage to an event observer manager later
-    applyFixedDamage(damage) {
-        GameStateManager.getInstance().getTarget().takeDamage();
-        console.log(`fixed damage: ${damage}`);
+    applyFixedDamage(damage, sourceName) {
+        let target = GameStateManager.getInstance().getTarget();
+        target.takeDamage();
+        EventManager.getInstance().broadcastEvent("fixedDamage", [sourceName, target, damage, target.getStability()]);
     }
 }
 

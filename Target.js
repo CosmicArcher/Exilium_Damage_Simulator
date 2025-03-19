@@ -1,3 +1,4 @@
+import EventManager from "./EventManager.js";
 import Unit from "./Unit.js";
 
 class Target extends Unit {
@@ -97,6 +98,14 @@ class Target extends Unit {
         if(buffData.hasOwnProperty("StabilityDamageTaken"))
             this.stabilityDamageModifier -= buffData["StabilityDamageTaken"];
     }
+    addBuff(buffName, duration, source) {
+        super.addBuff(buffName, duration, source);
+        // if avalanche reaches 5 stacks, reduce 8 stability and consume all stacks 
+        if (buffName == "Avalanche") {
+            this.reduceStability(8);
+            EventManager.getInstance().broadcastEvent("avalanche", this.stability);
+        }
+    }
     // activate certain stability based damage reduction passives
     applyDRPerStab(x) {this.drPerStab = x;}
     applyDRWithStab(x) {this.drWithStab = x;}
@@ -136,6 +145,8 @@ class Target extends Unit {
         targetClone.applyDRPerStab(this.drPerStab);
         targetClone.applyDRWithStab(this.drWithStab);
         targetClone.setDefenseBuffs(this.defenseBuffs);
+        targetClone.setBrokenTurns(this.stabilityBrokenTurns);
+        targetClone.setStability(this.stability);
         // buffs are enabled by default so check if they are disabled when cloning
         if (!this.buffsEnabled)
             targetClone.disableBuffs();

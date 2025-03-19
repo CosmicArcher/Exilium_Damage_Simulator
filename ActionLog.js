@@ -11,6 +11,8 @@ class ActionLog {
             console.log("Action Log Instantiated");
             ActionLogSingleton = this;
             EventManager.getInstance().addListener("damageDealt", this.displayDamage);
+            EventManager.getInstance().addListener("fixedDamage", this.displayFixedDamage);
+            EventManager.getInstance().addListener("avalanche", this.displayAvalanche);
             EventManager.getInstance().addListener("statusApplied", this.displayStatus);
         }
     }
@@ -26,6 +28,25 @@ class ActionLog {
             d3.select("#ActionLog").insert("p", "p")
                                     .text(`${param[0].getName()} did ${param[2]} ${param[5] ? "Crit": "Non-Crit"} ${param[3]} damage to ${param[1].getName()}. 
                                                         Remaining Stability: ${param[4]}`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // [sourceName, target, damage, remaining stability]
+    displayFixedDamage(param) {
+        if (ActionLogSingleton) {
+            d3.select("#ActionLog").insert("p", "p")
+                                    .text(`${param[0]} did ${param[2]} Fixed damage to ${param[1].getName()}. 
+                                                        Remaining Stability: ${param[3]}`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // remaining stability
+    displayAvalanche(param) {
+        if (ActionLogSingleton) {
+            d3.select("#ActionLog").insert("p", "p")
+                                    .text(`Avalanche consumed, Remaining Stability: ${param}`);
         }
         else
             console.error("Singleton not yet initialized");

@@ -367,6 +367,10 @@ export class Suomi extends Supporter {
         return 0;
     }
 
+    applyAvalanche() {
+        GameStateManager.getInstance().getTarget().addBuff("Avalanche", -1, this);
+    }
+
     cloneUnit() {
         return super.cloneUnit(new Suomi(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }

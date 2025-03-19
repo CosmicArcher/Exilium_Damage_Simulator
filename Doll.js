@@ -441,7 +441,7 @@ class Doll extends Unit {
 
         damage += fixedDamage;
         if (fixedDamage > 0)
-            target.takeDamage();
+            DamageManager.getInstance().applyFixedDamage(fixedDamage, this.name);
 
         return damage;
     }
