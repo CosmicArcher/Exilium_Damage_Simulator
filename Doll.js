@@ -445,6 +445,11 @@ class Doll extends Unit {
         let coverIgnore = 0;
         if (skill.hasOwnProperty(SkillJSONKeys.COVER_IGNORE))
             coverIgnore = skill[SkillJSONKeys.COVER_IGNORE];
+        // get the temporary freeze damage dealt from v2+ suomi warding light
+        if (GameStateManager().getInstance().getDoll("Suomi").fortification > 1) {
+            if (this.hasBuff("Frost Barrier"))
+                this.elementDamageDealt.Freeze += 0.15;
+        }
         // get the temporary damage boost from skill conditionals when triggered
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt += skill[SkillJSONKeys.DAMAGE_BOOST];
@@ -452,6 +457,10 @@ class Doll extends Unit {
             skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore);
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt -= skill[SkillJSONKeys.DAMAGE_BOOST];
+        if (GameStateManager().getInstance().getDoll("Suomi").fortification > 1) {
+            if (this.hasBuff("Frost Barrier"))
+                this.elementDamageDealt.Freeze -= 0.15;
+        }
         // after doing damage, consume any buffs that are reduced on attack
         this.consumeAttackBuffs();
 
