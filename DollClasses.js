@@ -1,5 +1,6 @@
+import DamageManager from "./DamageManager.js";
 import Doll from "./Doll.js";
-import { AmmoTypes, Elements, SkillNames, CalculationTypes } from "./Enums.js";
+import { AmmoTypes, Elements, SkillNames, CalculationTypes, SkillJSONKeys } from "./Enums.js";
 import EventManager from "./EventManager.js";
 import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
@@ -55,8 +56,6 @@ export class Qiongjiu extends Supporter {
     constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
         super("Qiongjiu", defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled);
 
-        TurnManager.getInstance().registerTargetedSupporter(this.name, false);
-        TurnManager.getInstance().registerPriorityDebuffer(this.name);
         this.supportEnabled = true;
 
         if (this.fortification > 2)
@@ -140,7 +139,7 @@ export class Makiatto extends Interceptor {
     constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
         super("Makiatto", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
 
-        this.interceptEnabled = true;
+        this.interceptEnabled = false;
         // fortifications increase intercept limit during ult duration
         if (this.fortification == 6)
             this.interceptLimit = 4;
@@ -302,9 +301,6 @@ export class Suomi extends Supporter {
     constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
         super("Suomi", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
 
-        TurnManager.getInstance().registerTargetedSupporter(this.name, true);
-        TurnManager.getInstance().registerActionListener(this.name);
-
         this.supportEnabled = true;
         // 2nd key starts with full index
         if (this.keysEnabled[1]) 
@@ -354,10 +350,39 @@ export class Suomi extends Supporter {
                     }
                 });
             }
-            this.processAttack(skill, calculationType, target);
+            // deal fixed damage
+            let fixedDamage = 0;
+            if (skill.hasOwnProperty(SkillJSONKeys.FIXED_DAMAGE)) {
+                let data = skill[SkillJSONKeys.FIXED_DAMAGE];
+                switch (data[SkillJSONKeys.FIXED_DAMAGE_STAT]) {
+                    case "Defense":
+                        fixedDamage = this.defense;
+                        break;
+                    case "Attack":
+                        fixedDamage = this.attack;
+                        break;
+                    default:
+                        console.error([`${data[SkillJSONKeys.FIXED_DAMAGE_STAT]} fixed damage scaling for is not covered`, this]);
+                }
+                fixedDamage = Math.round(data[SkillJSONKeys.FIXED_DAMAGE_SCALING] * fixedDamage);
+            }
 
-            this.processPrePostBuffs(skill, target, null, 0);
-
+            this.consumeAttackBuffs();
+            DamageManager.getInstance().applyFixedDamage(fixedDamage, this.name);
+            // apply avalanche stacks
+            if (target) {
+                let statusEffects = skill[SkillJSONKeys.POST_TARGET_BUFF];
+                statusEffects.forEach(buff => {
+                    let stacks = 1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                        stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                    let duration = -1;
+                    if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                        duration = buff[SkillJSONKeys.BUFF_DURATION];
+                    target.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                });
+            }
+            // tick down buffs before applying shield to self
             this.endTurn();
             // suomi ult buffs all dolls after dealing damage to the enemy
             GameStateManager.getInstance().getAllDolls().forEach(doll => {

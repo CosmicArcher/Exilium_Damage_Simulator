@@ -27,7 +27,7 @@ class ActionLog {
     displayDamage(param) {
         if (ActionLogSingleton) {
             d3.select("#ActionLog").insert("p", "p")
-                                    .text(`${param[0].getName()} did ${param[2]} ${param[5] ? "Crit": "Non-Crit"} ${param[3]} damage to ${param[1].getName()}. 
+                                    .text(`${param[0].getName()} dealt ${param[2]} ${param[5] ? "crit": "non-crit"} ${param[3]} damage to ${param[1].getName()}. 
                                                         Remaining Stability: ${param[4]}`);
         }
         else
@@ -37,7 +37,7 @@ class ActionLog {
     displayFixedDamage(param) {
         if (ActionLogSingleton) {
             d3.select("#ActionLog").insert("p", "p")
-                                    .text(`${param[0]} did ${param[2]} Fixed damage to ${param[1].getName()}. 
+                                    .text(`${param[0]} dealt ${param[2]} Fixed damage to ${param[1].getName()}. 
                                                         Remaining Stability: ${param[3]}`);
         }
         else
