@@ -14,6 +14,7 @@ class ActionLog {
             EventManager.getInstance().addListener("fixedDamage", ActionLogSingleton.displayFixedDamage);
             EventManager.getInstance().addListener("avalanche", ActionLogSingleton.displayAvalanche);
             EventManager.getInstance().addListener("statusApplied", ActionLogSingleton.displayStatus);
+            EventManager.getInstance().addListener("stackConsumption", ActionLogSingleton.displayStackConsumption);
         }
     }
 
@@ -51,15 +52,18 @@ class ActionLog {
         else
             console.error("Singleton not yet initialized");
     }
-    // [source, targets[], buffName]
+    // [sourceName, target, buffName]
     displayStatus(param) {
         if (ActionLogSingleton) {
-            if (param[1].constructor == Array)
-                param[1].forEach(target => {
-                    d3.select("#ActionLog").insert("p", "p").text(`${param[0]} applied ${param[2]} to ${target}`);
-                });
-            else
-                d3.select("#ActionLog").insert("p", "p").text(`${param[0]} applied ${param[2]} to ${param[1]}`);
+            d3.select("#ActionLog").insert("p", "p").text(`${param[0]} applied ${param[2]} to ${param[1]}`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // [sourceName, stacks, buffName]
+    displayStackConsumption(param) {
+        if (ActionLogSingleton) {
+            d3.select("#ActionLog").insert("p", "p").text(`${param[0]} consumed ${param[1]} ${param[1] > 1 ? "stacks" : "stack"} of ${param[2]}`);
         }
         else
             console.error("Singleton not yet initialized");

@@ -1,3 +1,4 @@
+import { BuffJSONKeys } from "./Enums.js";
 import EventManager from "./EventManager.js";
 import Unit from "./Unit.js";
 
@@ -78,27 +79,33 @@ class Target extends Unit {
     setStability(x) {this.stability = x;}
     setBrokenTurns(x) {this.stabilityBrokenTurns = x;}
     // process buffs using json data
-    applyBuffEffects(buffData) {
-        super.applyBuffEffects(buffData);
+    applyBuffEffects(buffData, stacks = 1, stackable = false) {
+        super.applyBuffEffects(buffData, stacks, stackable);
+        let stackEffect = 1;
+        if (stackable)
+            stackEffect = stacks;
         if(buffData.hasOwnProperty("DamageTaken%"))
-            this.damageTaken += buffData["DamageTaken%"];
+            this.damageTaken += buffData["DamageTakenPerc"] * stackEffect;
         if(buffData.hasOwnProperty("AoEDamageTaken%"))
-            this.aoeDamageTaken += buffData["AoEDamageTaken%"];
+            this.aoeDamageTaken += buffData["AoEDamageTaken%"] * stackEffect;
         if(buffData.hasOwnProperty("TargetedDamageTaken%"))
-            this.targetedDamageTaken += buffData["TargetedDamageTaken%"];
+            this.targetedDamageTaken += buffData["TargetedDamageTaken%"] * stackEffect;
         if(buffData.hasOwnProperty("StabilityDamageTaken"))
-            this.stabilityDamageModifier += buffData["StabilityDamageTaken"];
+            this.stabilityDamageModifier += buffData["StabilityDamageTaken"] * stackEffect;
     }
-    removeBuffEffects(buffData) {
-        super.removeBuffEffects(buffData);
+    removeBuffEffects(buffData, stacks = 1, stackable = false) {
+        super.removeBuffEffects(buffData, stacks, stackable);
+        let stackEffect = 1;
+        if (stackable)
+            stackEffect = stacks;
         if(buffData.hasOwnProperty("DamageTaken%"))
-            this.damageTaken -= buffData["DamageTaken%"];
+            this.damageTaken -= buffData["DamageTakenPerc"] * stackEffect;
         if(buffData.hasOwnProperty("AoEDamageTaken%"))
-            this.aoeDamageTaken -= buffData["AoEDamageTaken%"];
+            this.aoeDamageTaken -= buffData["AoEDamageTaken%"] * stackEffect;
         if(buffData.hasOwnProperty("TargetedDamageTaken%"))
-            this.targetedDamageTaken -= buffData["TargetedDamageTaken%"];
+            this.targetedDamageTaken -= buffData["TargetedDamageTaken%"] * stackEffect;
         if(buffData.hasOwnProperty("StabilityDamageTaken"))
-            this.stabilityDamageModifier -= buffData["StabilityDamageTaken"];
+            this.stabilityDamageModifier -= buffData["StabilityDamageTaken"] * stackEffect;
     }
     addBuff(buffName, sourceName, duration = -1, stacks = 1) {
         super.addBuff(buffName, sourceName, duration, stacks);
@@ -120,12 +127,18 @@ class Target extends Unit {
     applyDRWithStab(x) {this.drWithStab = x;}
     // check if any buffs get consumed by defending and reduce a stack
     takeDamage() {
-        this.currentBuffs.forEach((d, i) => {
-            if (!d[3] && d[4]) { // check if buff is not turn based and stacks are consumed by defending
-                d[2]--;
-                if (d[2] == 0) {
-                    this.removeBuff(d[0]);
+        this.currentBuffs.forEach((buff) => {
+            if (buff[5] == "Defense") { // check if buff stacks are consumed by defending
+                buff[3]--;
+                // remove buff if 0 stacks
+                if (buff[3] == 0) {
+                    this.removeBuff(buff[0]);
                 }
+                // else check if buff stacks and reduce the effects of 1 stack 
+                else if (buff[1].hasOwnProperty(BuffJSONKeys.STACKABLE)) {
+                    this.removeBuffEffects(buff[0], 1, true);
+                }
+                EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, 1, buff[0]]);
             }
         });
     }

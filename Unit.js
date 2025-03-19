@@ -1,7 +1,7 @@
 import ResourceLoader from "./ResourceLoader.js";
 import DamageManager from "./DamageManager.js";
 import EventManager from "./EventManager.js";
-import { BuffJSONKeys } from "./Enums.js";
+import { BuffJSONKeys, Elements } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 // root class for dolls (attackers) and targets (defenders)
 class Unit {
@@ -53,6 +53,11 @@ class Unit {
     // these are called when buffs are added/removed
     addBuff(buffName, sourceName, duration = -1, stacks = 1) {
         let buffData = ResourceLoader.getInstance().getBuffData(buffName);
+        if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENT)) {
+            // freeze debuffs attempted to be applied while having avalanche add another stack, regardless of whether the target is immune to the freeze debuff
+            if (this.hasBuff("Avalanche") && buffData[BuffJSONKeys.ELEMENT] == Elements.FREEZE && buffData[BuffJSONKeys.BUFF_TYPE] == "Debuff")
+                this.addBuff("Avalanche", "Suomi", -1, 1);
+        } 
         if (buffData && this.buffsEnabled && !this.buffImmunity.includes(buffName)) {
             // check if the name is cleanse
             if (buffName == "Cleanse") {
@@ -121,7 +126,9 @@ class Unit {
         // sanity check by checking if the buff exists in the array first
         this.currentBuffs.forEach((buff,i) => {
             if (buff[0] == buffName) {
-                this.removeBuffEffects(buff[1], buff[3], buff[1].hasOwnProperty(BuffJSONKeys.STACKABLE));
+                // sometimes stackable buffs are removed through running out of stacks which would result in the remove effect being 0
+                // cover that case by removing at least 1 stack always
+                this.removeBuffEffects(buff[1], Math.max(buff[3], 1), buff[1].hasOwnProperty(BuffJSONKeys.STACKABLE));
                 this.currentBuffs.splice(i, 1);
                 return; // exit loop early once buff has been found
             }

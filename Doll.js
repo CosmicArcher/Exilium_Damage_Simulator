@@ -4,6 +4,7 @@ import { SkillNames, CalculationTypes, SkillJSONKeys, Elements } from "./Enums.j
 import GameStateManager from "./GameStateManager.js";
 import DamageManager from "./DamageManager.js";
 import RNGManager from "./RNGManager.js";
+import EventManager from "./EventManager.js";
 
 class Doll extends Unit {
     constructor(name, defense, attack, crit_chance, crit_damage, fortification, keys = [0,0,0,0,0,0]) {
@@ -347,9 +348,9 @@ class Doll extends Unit {
             if (this.hasBuff("Extra Action"))
                 this.turnAvailable = true;
 
-            return damage;
+            
         }
-        // if a buffing skill rather than attack, return 0 damage after processing buff data
+        // if a buffing skill rather than attack, process buff data with supportTarget in the target parameter
         else {
             this.processPrePostBuffs(skill, supportTarget, null, 1);
             // end turn and decrease counters on buffs if extra command or movement is not triggered
@@ -368,7 +369,10 @@ class Doll extends Unit {
                 this.processPrePostBuffs(skill, supportTarget, null, 0);
 
             console.log(this.currentBuffs);
-            return 0;
+        }
+        // suomi applies 1 stack of avalanche for any active skill use by anyone other than herself
+        if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
+            EventManager.getInstance().broadcastEvent("allyAction", this.name);
         }
     }
 
@@ -441,9 +445,15 @@ class Doll extends Unit {
         let coverIgnore = 0;
         if (skill.hasOwnProperty(SkillJSONKeys.COVER_IGNORE))
             coverIgnore = skill[SkillJSONKeys.COVER_IGNORE];
-        
+        // get the temporary damage boost from skill conditionals when triggered
+        if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
+            this.damageDealt += skill[SkillJSONKeys.DAMAGE_BOOST];
         let damage = DamageManager.getInstance().calculateDamage(this, target, this.attack * skill[SkillJSONKeys.MULTIPLIER], skill[SkillJSONKeys.ELEMENT], 
             skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore);
+        if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
+            this.damageDealt -= skill[SkillJSONKeys.DAMAGE_BOOST];
+        // after doing damage, consume any buffs that are reduced on attack
+        this.consumeAttackBuffs();
 
         damage += fixedDamage;
         if (fixedDamage > 0)
@@ -540,6 +550,27 @@ class Doll extends Unit {
                     console.error(["Support Target not found for pre-support buff", this]);
             }
         }
+    }
+    // reduce stacks for any buffs that consume stacks on attack
+    consumeAttackBuffs() {
+        this.currentBuffs.forEach((buff) => {
+            if (buff[5] == "Attack") { // check if buff stacks are consumed by defending
+                buff[3]--;
+                // remove buff if 0 stacks
+                if (buff[3] == 0) {
+                    this.removeBuff(buff[0]);
+                }
+                // else check if buff stacks and reduce the effects of 1 stack 
+                else if (buff[1].hasOwnProperty(BuffJSONKeys.STACKABLE)) {
+                    this.removeBuffEffects(buff[0], 1, true);
+                }
+                EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, 1, buff[0]]);
+            }
+            else if (buff[5] == "AllAttack") { // if all stacks are consumed in a single attack rather than gradually
+                EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, buff[3], buff[0]]);
+                this.removeBuff(buff[0]);
+            }
+        });
     }
     // because fortification will modify the skill json, we need a copy of it rather than a reference to the resourceloader's to prevent unintended effects
     copySkillJSON() {
