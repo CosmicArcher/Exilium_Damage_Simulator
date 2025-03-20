@@ -52,7 +52,7 @@ class ActionLog {
         else
             console.error("Singleton not yet initialized");
     }
-    // [sourceName, target, buffName, stacks]
+    // [sourceName, targetName, buffName, stacks]
     displayStatus(param) {
         if (ActionLogSingleton) {
             d3.select("#ActionLog").insert("p", "p")

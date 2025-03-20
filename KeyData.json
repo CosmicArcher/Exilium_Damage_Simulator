@@ -209,5 +209,64 @@
         },
         "Mobile Patrol" : {
         }
+    },
+    "Sabrina" : {
+
+    },
+    "Vepley" : {
+        "Safe Viewing Distance" : {
+
+        },
+        "Contamination Zone Tour" : {
+
+        },
+        "Fortune of an Idol" : {
+
+        },
+        "Dino Dash" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "Move Debuff",
+                            "Cover_Ignore" : 0.1
+                        }]
+                    }
+                }
+            }
+        },
+        "Stress Resistance Training" : {
+
+        },
+        "Stage Commitment" : {
+
+        }
+    },
+    "Peritya" : {
+        "Temporary Maintenance (unimplemented)" : {
+        },
+        "Impromptu Cat and Mouse" : {
+        },
+        "Auto Repair Program" : {
+        },
+        "Lazy Resistance" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Conditional" : [{
+                        "Condition_Text" : "Displacement Immune",
+                        "Damage_Boost" : 0.15
+                    }]
+                }
+            }
+        },
+        "Brief Respite" : {
+        },
+        "Friendly Contact" : {
+            "Skill" : {
+                "Skill2" : {
+                    "StabilityDamage" : 5
+                }
+            }
+        }
     }
 }

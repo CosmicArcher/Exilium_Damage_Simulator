@@ -1,6 +1,6 @@
 import DamageManager from "./DamageManager.js";
 import Doll from "./Doll.js";
-import { AmmoTypes, Elements, SkillNames, CalculationTypes, SkillJSONKeys, BuffJSONKeys } from "./Enums.js";
+import { AmmoTypes, Elements, SkillNames, CalculationTypes, SkillJSONKeys, BuffJSONKeys, AttackTypes } from "./Enums.js";
 import EventManager from "./EventManager.js";
 import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
@@ -66,8 +66,8 @@ export class Qiongjiu extends Supporter {
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
         // qj gets 1 index whenever she attacks
-        if (skillName != SkillNames.ULT && this.CIndex < 6)
-            this.CIndex++;
+        if (skillName != SkillNames.ULT)
+            this.adjustIndex(1);
         // qj skill2 key condition is at least one phase exploit
         if (skillName == SkillNames.SKILL2 && this.keysEnabled[4]) {
             let weaknesses = target.getPhaseWeaknesses();
@@ -263,14 +263,14 @@ export class Makiatto extends Interceptor {
             // key 1 conditional refunds 1 index on kill
             if (this.keysEnabled[0]) {
                 if (conditionalTriggered[1])
-                    this.CIndex++;
+                    this.adjustIndex(1);
             }
         }
         else if (skillName == SkillNames.SKILL3)
-            this.CIndex = Math.min(this.CIndex + 4, 6);
+            this.adjustIndex(4);
         // v6 makiatto regens 2 index per turn while ult is active
         if (this.hasBuff("Alert") && this.fortification == 6)
-            this.CIndex = Math.min(this.CIndex + 2, 6);
+            this.adjustIndex(2);
 
         return damage;
     }
@@ -338,7 +338,7 @@ export class Suomi extends Supporter {
             if (skillName == SkillNames.SKILL3) {
                 if (this.keysEnabled[2])
                     if (conditionalTriggered[1]) 
-                        this.CIndex++;
+                        this.adjustIndex(1);
             }
         }
         else {
@@ -404,14 +404,14 @@ export class Suomi extends Supporter {
             // suomi applies 1 stack of avalanche for any active skill use by anyone other than herself but groza might still be present in the team
             EventManager.getInstance().broadcastEvent("allyAction", this.name);
             // apply the 5 index cost of the ult
-            this.CIndex -= skill[SkillJSONKeys.COST];
+            this.adjustIndex(-skill[SkillJSONKeys.COST]);
         }
     }
 
     endTurn() {
         super.endTurn();
         // passive gives 2 index per end turn
-        this.CIndex = Math.min(this.CIndex + 2, 6);
+        this.adjustIndex(2);
     }
     // apply 1 avalanche stack each time an ally excluding herself uses a skill
     alertAllyEnd(unitName) {
@@ -455,8 +455,7 @@ export class Papasha extends Doll {
             
             super.getSkillDamage(skillName, target, calculationType == CalculationTypes.SIMULATION ? newSimType : calculationType, conditionalTriggered);
             // papasha gets 1 index per attack by herself or her summon
-            if (this.CIndex < 6)
-                this.CIndex++;
+            this.adjustIndex(1);
             // skill2 adds courage to endure on the summon if v1 or the target has stability after the nade, does not matter if the following support attack breaks it
             if (skillName == SkillNames.SKILL2) {
                 if (this.fortification > 0 || target.getStability() > 0)
@@ -534,8 +533,7 @@ export class PapashaSummon extends Doll {
 
         super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
         // summon also grants papasha 1 index per attack
-        if (ppsh.CIndex < 6)
-            ppsh.CIndex++;
+        ppsh.adjustIndex(1);
 
         if (skillName == SkillNames.SUPPORT && this.hasBuff("Courage to Endure") && target.getIsLarge()) {
             this.defenseIgnore -= 0.3;
@@ -543,8 +541,7 @@ export class PapashaSummon extends Doll {
         // v2+ papasha has the summon do a support attack after skill3 instead of no support
         if (skillName == SkillNames.SKILL3 && this.fortification > 1) {
             this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
-            if (ppsh.CIndex < 6)
-                ppsh.CIndex++;
+            ppsh.adjustIndex(1);
         }
     }
 
@@ -624,16 +621,15 @@ export class Daiyan extends Interceptor {
         if (this.fortification > 4 && permaTuning == 6 && target.getStability() == 0)
             this.coverIgnore -= 0.15;
         // passive gives 1 index if attacking an out of cover target
-        if (GameStateManager.getInstance().getCover() == 0 && this.CIndex < 6)
-            this.CIndex++;
+        if (GameStateManager.getInstance().getCover() == 0)
+            this.adjustIndex(1);
     }
 
     refreshSupportUses() {
         super.refreshSupportUses();
         // passive gives 1 stack of tuning and index at the start of each turn
         this.addBuff("Tuning", this.name, -1, 1);
-        if (this.CIndex < 6)
-            this.CIndex++;
+        this.adjustIndex(1);
     }
 
     removeBuff(buffName) {
@@ -728,11 +724,11 @@ export class Tololo extends Doll {
         if (skillName == SkillNames.SKILL2 || skillName == SkillNames.SKILL3) {
             // skill2 and 3 give 2 index if their first condition is met
             if (conditionalTriggered[0])
-                this.CIndex = Math.min(this.CIndex + 2, 6);
+                this.adjustIndex(2);
             // v2+ skill3 2nd conditional adds another index 
-            if (this.fortification > 1 && skillName == SkillNames.SKILL3 && this.CIndex < 6)
+            if (this.fortification > 1 && skillName == SkillNames.SKILL3)
                 if (conditionalTriggered[1])
-                    this.CIndex++;
+                    this.adjustIndex(1);
         }
         // ult condition also reduces ult cd by 2 or 3 turns depending on fortification
         if (skillName == SkillNames.ULT && conditionalTriggered[0]) {
@@ -743,8 +739,8 @@ export class Tololo extends Doll {
             }
             // v6 ult 2nd condition grants 1 index onkill
             if (this.fortification == 6) 
-                if (conditionalTriggered[1] && this.CIndex < 6)
-                    this.CIndex++;
+                if (conditionalTriggered[1])
+                    this.adjustIndex(1);
         }
 
         // passive consumes full index bar to grant extra action after any attack
@@ -769,7 +765,7 @@ export class Tololo extends Doll {
         }
     }
 
-    checkDamage(element) {
+    checkDamage(element, triggeringDollName) {
         if (element == Elements.HYDRO) {
             if (this.fortification < 5) {
                 this.addBuff("Lightspike", this.name, -1, 1);
@@ -856,14 +852,14 @@ export class MosinNagant extends Supporter {
             this.crit_damage -= 0.05 * ultStacks;
             // v3+ ult gives 1 index per unshakable confidence stack
             if (this.fortification > 2)
-                this.CIndex = Math.min(this.CIndex + ultStacks, 6);
+                this.adjustIndex(ultStacks);
         }
         // support gives 2 index per use
         else if (skillName == SkillNames.SUPPORT)
-            this.CIndex = Math.min(this.CIndex + 2, 6);
+            this.adjustIndex(2);
         // skill2 conditional refunds an index
-        else if (skillName == SkillNames.SKILL2 && this.fortification > 0 && conditionalTriggered[0] && this.CIndex < 6)
-            this.CIndex++;
+        else if (skillName == SkillNames.SKILL2 && this.fortification > 0 && conditionalTriggered[0])
+            this.adjustIndex(1);
     }
 
     useSupportSkill(target, calculationType, conditionalTriggered) {
@@ -871,8 +867,102 @@ export class MosinNagant extends Supporter {
         if (target[0].getStability() == 0)
             super.useSupportSkill(target, calculationType, conditionalTriggered);
     }
+    // trigger wise support on any electric debuff applied by other allies at v6
+    checkBuff(element, triggeringDollName) {
+        if (element == Elements.ELECTRIC && this.name != triggeringDollName && this.fortification == 6) {
+            TurnManager.getInstance().alertPendingSupport(this.name);
+        }
+    }
 
     cloneUnit() {
         return super.cloneUnit(new MosinNagant(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}
+
+export class Vepley extends Doll {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Vepley", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+
+        // assume that the enemy always has movement debuff with vepley present so key 1 always happens
+        if (keysEnabled[0])
+            this.stabilityDamageModifier += 2;
+        // passively has 20% damage on targets with movemenet debuffs
+        this.slowedDamageDealt += 0.2;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        let moveDebuff = target.hasBuffType("Movement", true);
+        if (moveDebuff) {
+            // skill3 v2 and key 4 have the same condition but they ended up on separate array indices
+            if (skillName == SkillNames.SKILL3)
+                for (let i = 1; i < conditionalTriggered.length; i++)
+                    conditionalTriggered[i] = true;
+        }
+        // skill3 inherent condition is target is out of cover
+        if (GameStateManager.getInstance().getCover() == 0 && skillName == SkillNames.SKILL3)
+            conditionalTriggered[0] = true;
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        // assume only 1 target is ever hit for index regen
+        this.adjustIndex(1);
+    }
+
+    refreshSupportUses() {
+        super.refreshSupportUses();
+        this.adjustIndex(1);
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new Vepley(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}
+
+export class Peritya extends Supporter {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Peritya", defense, attack, crit_chance, crit_damage, fortification, 6, keysEnabled);
+        // support is always available but requires aoe damage to trigger it
+        this.supportEnabled = true;
+        // key 5 starts with full index
+        if (this.keysEnabled[4])
+            this.CIndex = 6;
+        // v6 gives 10 support charges
+        if (fortification == 6)
+            this.supportLimit = 10;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        if (this.keysEnabled[3] && target.getIsLarge() && skillName == SkillNames.SKILL3)
+            conditionalTriggered[0] = true;
+        // assume that peritya always only hits 1 target with all her skills and that she maxes her passive
+        if (skillName == SkillNames.ULT) 
+            this.damageDealt += 0.05;
+        this.damageDealt += 0.3;
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        this.damageDealt -= 0.3;
+        if (skillName == SkillNames.ULT) 
+            this.damageDealt -= 0.05;
+        if (skillName == SkillNames.SKILL3)
+            this.cooldowns[2]--;
+        // it is very likely that peritya will have at least 1 step left each turn so always activate key 2 if present
+        if (this.keysEnabled[1])
+            this.addBuff("Movement Up 2", this.name, 1, 1);
+        if (skillName == SkillNames.SUPPORT) {
+            this.adjustIndex(1);
+        } // if she does not move before attacking gain 2 index at v5+ and is assumed always true in bossing
+        else if (this.fortification > 4)
+            this.adjustIndex(2);
+    }
+    // need to listen for an aoe attack to trigger support then inform that a support is pending
+    checkDamage(damageType, triggeringDollName) {
+        if (damageType == AttackTypes.AOE && triggeringDollName != this.name) {
+            TurnManager.getInstance().alertPendingSupport(this.name);
+        }
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new Peritya(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }

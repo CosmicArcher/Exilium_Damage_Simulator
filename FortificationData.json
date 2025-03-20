@@ -358,8 +358,11 @@
     "Vepley" : {
         "V2" : {
             "Skill3" : {
-                "Conditional" : {
-                    "Crit_Modifier" : 1
+                "Append" : {
+                    "Conditional" : [{
+                        "Condition_Text" : "Move Debuff",
+                        "Crit_Modifier" : 1
+                    }]
                 }
             }
         },
@@ -377,7 +380,14 @@
         }
     },
     "Peritya" : {
-        
+        "V1" : {
+            "Skill2" : {
+                "Pre_Target_Buff" : [{
+                    "Name" : "Cleanse",
+                    "Stacks" : 2
+                }]
+            }
+        }
     },
     "Sharkry" : {
         "V1" : {

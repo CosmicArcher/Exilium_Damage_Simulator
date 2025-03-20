@@ -1,6 +1,7 @@
-import { AttackTypes, SkillNames } from "./Enums.js";
+import { AttackTypes, BuffJSONKeys, CalculationTypes, SkillNames } from "./Enums.js";
 import EventManager from "./EventManager.js";
 import GameStateManager from "./GameStateManager.js";
+import ResourceLoader from "./ResourceLoader.js";
 
 
 let TurnManagerSingleton;
@@ -16,6 +17,7 @@ class TurnManager {
             TurnManagerSingleton.resetLists();
             EventManager.getInstance().addListener("allyAction", TurnManagerSingleton.activateActionListeners);
             EventManager.getInstance().addListener("damageDealtTypes", TurnManagerSingleton.activateDamageListeners);
+            EventManager.getInstance().addListener("statusApplied", TurnManagerSingleton.activateBuffListeners);
         }
     }
 
@@ -47,7 +49,7 @@ class TurnManager {
             console.error("Singleton not yet initialized");
     }
 
-    useDollSkill(dollName, skillName, calculationType = calculationType.EXPECTED, conditionalOverride = false) {
+    useDollSkill(dollName, skillName, calculationType = calculationType.EXPECTED, conditionalOverride = [false]) {
         if (TurnManagerSingleton) {
             // targeted non-support skills are the most common type of triggers to get supported
             let doll = GameStateManager.getInstance().getDoll(dollName);
@@ -144,6 +146,31 @@ class TurnManager {
         else
             console.error("Singleton not yet initialized");
     }
+    //[sourceName, target, buffName, stacks]
+    activateBuffListeners(buffData) {
+        if (TurnManagerSingleton) {
+            let buff = ResourceLoader.getInstance().getBuffData(buffData[2]);
+            let sourceName = buffData[0];
+            let targetName = buffData[1];
+            // check element, name, and type
+            if (TurnManagerSingleton.buffListeners.hasOwnProperty(buffData[2])) {
+                TurnManagerSingleton.buffListeners[buffData[2]].forEach(dollName => {
+                    let doll = GameStateManager.getInstance().getDoll(dollName)
+                    doll.checkBuff(buffData[2], sourceName);
+                });
+            }           
+            if (buff.hasOwnProperty(BuffJSONKeys.ELEMENT)) {
+                if (TurnManagerSingleton.buffListeners.hasOwnProperty(buff[BuffJSONKeys.ELEMENT])) {
+                    TurnManagerSingleton.buffListeners[buff[BuffJSONKeys.ELEMENT]].forEach(dollName => {
+                        let doll = GameStateManager.getInstance().getDoll(dollName)
+                        doll.checkBuff(element, sourceName);
+                    });
+                }
+            }
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
 
     registerActionListener(dollName) {
         if (TurnManagerSingleton) {
@@ -184,19 +211,19 @@ class TurnManager {
             if (TurnManagerSingleton.damageListeners.hasOwnProperty(element)) {
                 TurnManagerSingleton.damageListeners[element].forEach(dollName => {
                     let doll = GameStateManager.getInstance().getDoll(dollName)
-                    doll.checkDamage(element);
+                    doll.checkDamage(element, damageData[0]);
                 })
             }
             if (TurnManagerSingleton.damageListeners.hasOwnProperty(ammo)) {
                 TurnManagerSingleton.damageListeners[ammo].forEach(dollName => {
                     let doll = GameStateManager.getInstance().getDoll(dollName)
-                    doll.checkDamage(ammo);
+                    doll.checkDamage(ammo, damageData[0]);
                 })
             }
             if (TurnManagerSingleton.damageListeners.hasOwnProperty(damageType)) {
                 TurnManagerSingleton.damageListeners[damageType].forEach(dollName => {
                     let doll = GameStateManager.getInstance().getDoll(dollName)
-                    doll.checkDamage(damageType);
+                    doll.checkDamage(damageType, damageData[0]);
                 })
             }
         }
@@ -210,6 +237,14 @@ class TurnManager {
                 let doll = GameStateManager.getInstance().getDoll(dollName)
                 doll.alertAllyEnd(triggeringDollName);
             });
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // when a conditional support is met (aoe, debuff application, etc.)
+    alertPendingSupport(dollName) {
+        if (TurnManagerSingleton) {
+            TurnManagerSingleton.actionSequence.push([dollName, GameStateManager.getInstance().getTarget(), SkillNames.SUPPORT, CalculationTypes.EXPECTED, [false]]);
         }
         else
             console.error("Singleton not yet initialized");

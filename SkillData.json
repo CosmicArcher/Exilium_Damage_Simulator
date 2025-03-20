@@ -549,6 +549,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cooldown" : 2,
             "Multiplier" : 0.75,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 1,
@@ -557,14 +558,23 @@
         },
         "Skill3" : {
             "Type" : "Attack",
+            "Cost" : 1,
             "Multiplier" : 1.5,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
-            "Ammo_Type" : "Shotgun",
-            "Element" : "Physical"
+            "Ammo_Type" : "None",
+            "Element" : "Physical",
+            "Conditional" : [{
+                "Condition_Text" : "No Cover",
+                "Pre_Target_Buff" : [{
+                    "Name" : "Cleanse",
+                    "Stacks" : 2
+                }]
+            }]
         },
         "Ultimate" : {
             "Type" : "Attack",
+            "Cost" : 4,
             "Multiplier" : 1,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 2,
@@ -590,14 +600,19 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cooldown" : 2,
             "Multiplier" : 0.85,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 1,
             "Ammo_Type" : "Heavy",
-            "Element" : "Corrosion"
+            "Element" : "Corrosion",
+            "Pre_Target_Buff" : [{
+                "Name" : "Cleanse"
+            }]
         },
         "Skill3" : {
             "Type" : "Attack",
+            "Cooldown" : 3,
             "Multiplier" : 0.9,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 3,
@@ -606,6 +621,7 @@
         },
         "Ultimate" : {
             "Type" : "Attack",
+            "Cost" : 6,
             "Multiplier" : 1,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 2,

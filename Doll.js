@@ -401,7 +401,7 @@ class Doll extends Unit {
             EventManager.getInstance().broadcastEvent("allyAction", this.name);
             // apply the index cost or cooldown of the skill if present, assumed index >= cost when skill is used
             if (skill.hasOwnProperty(SkillJSONKeys.COST))
-                this.CIndex -= skill[SkillJSONKeys.COST];
+                this.adjustIndex(-skill[SkillJSONKeys.COST]);
             if (skill.hasOwnProperty(SkillJSONKeys.COOLDOWN)) {
                 switch(skillName) {
                     case SkillNames.BASIC:
@@ -747,6 +747,7 @@ class Doll extends Unit {
         for (let i = 0; i < 4; i++)
             cds.push(this.cooldowns[i]);
         newDoll.cooldowns = cds;
+        newDoll.turnAvailable = this.turnAvailable;
 
         newDoll.finishCloning();
         return newDoll;
@@ -754,6 +755,10 @@ class Doll extends Unit {
     // to be filled by child classes
     refreshSupportUses() {
 
+    }
+    // to ensure index consumption/gain does not exceed the bounds of 0-6
+    adjustIndex(gain) {
+        this.CIndex = Math.max(Math.min(6, this.CIndex + gain), 0);
     }
 }
 
