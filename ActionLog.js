@@ -52,10 +52,10 @@ class ActionLog {
         else
             console.error("Singleton not yet initialized");
     }
-    // [sourceName, target, buffName]
+    // [sourceName, target, buffName, stacks]
     displayStatus(param) {
         if (ActionLogSingleton) {
-            d3.select("#ActionLog").insert("p", "p").text(`${param[0]} applied ${param[2]} to ${param[1]}`);
+            d3.select("#ActionLog").insert("p", "p").text(`${param[0]} applied ${param[3] > 1 ? param[3] + " stacks of " : ""}${param[2]} to ${param[1]}`);
         }
         else
             console.error("Singleton not yet initialized");
