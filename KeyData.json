@@ -321,5 +321,49 @@
         },
         "Genius' Pride" : {
         }
+    },
+    "Ksenia" : {
+        "Win-Win Partnership" : {
+        },
+        "Equivalent Exchange" : {
+            "Skill" : {
+                "Skill2" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "onKill"
+                        }]
+                    }
+                }
+            }
+        },
+        "Steady Income" : {
+        },
+        "Mutual Benefit" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Post_Self_Buff" : [{
+                        "Name" : "Heat Recovery",
+                        "Duration" : 2
+                    }],
+                    "Conditional" : [{
+                        "Condition_Text" : "Full HP",
+                        "Append" : {
+                            "Post_Target_Buff" : [{
+                                "Name" : "Blazing Assault 2",
+                                "Duration" : 2
+                            }],
+                            "Post_Self_Buff" : [{
+                                "Name" : "Blazing Assault 2",
+                                "Duration" : 2
+                            }]
+                        }
+                    }]
+                }
+            }
+        },
+        "Friendship Gift" : {
+        },
+        "Discount Guide" : {
+        }
     }
 }

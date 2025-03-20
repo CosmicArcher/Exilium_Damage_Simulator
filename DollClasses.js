@@ -1099,3 +1099,87 @@ export class Cheeta extends Supporter {
         return super.cloneUnit(new Cheeta(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }
+
+export class Ksenia extends Supporter {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Ksenia", defense, attack, crit_chance, crit_damage, fortification, 1, keysEnabled);
+        // always has support enabled
+        this.supportEnabled = true;
+        // v4 increases the support limit
+        if (fortification > 3)
+            this.supportLimit = 2;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        // assume that the target always goes to full hp when healing
+        if (skillName == SkillNames.SKILL3)
+            conditionalTriggered[0] = true;
+        // skill 2 conditional is having 2+ burn buffs
+        if (skillName == SkillNames.SKILL2) {
+            let burnBuffs = 0;
+            this.currentBuffs.forEach(buff => {
+                if (buff[1].hasOwnProperty(BuffJSONKeys.ELEMENT)) {
+                    if (buff[1][BuffJSONKeys.ELEMENT] == Elements.BURN)
+                        burnBuffs++;
+                }
+            });
+            if (burnBuffs > 1)
+                conditionalTriggered[0] = true;
+        }
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        // key 3 gives 1 index when dealing burn damage
+        if (this.keysEnabled[2]) {
+            if (skillName == SkillNames.ULT)
+                this.adjustIndex(1);
+            else if (skillName == SkillNames.SKILL2 && conditionalTriggered[0])
+                this.adjustIndex(1);
+        }
+        // onkill condition of key 2 on skill 2 increases support limit by 1 for the turn only
+        if (this.keysEnabled[1] && skillName == SkillNames.SKILL2) {
+            if (conditionalTriggered[1])
+                this.supportsUsed--;
+        }
+    }
+
+    addBuff(buffName, sourceName, duration = -1, stacks = 1) {
+        // if buffs are already present, temporarily reduce stability to counteract the automatic addition of the passive effect later so that it does not stack
+        if (this.hasBuff("Heat Recovery") && buffName == "Heat Recovery")
+            this.stabilityDamageModifier--;
+        if (this.fortification > 1 && this.hasBuff("Blazing Assault 2") && buffName == "Blazing Assault 2")
+            this.stabilityDamageModifier--;
+        super.addBuff(buffName, sourceName, duration, stacks);
+        if (buffName ==  "Heat Recovery")
+            this.stabilityDamageModifier++;
+        if (this.fortification > 1 && buffName == "Blazing Assault 2")
+            this.stabilityDamageModifier++;
+    }
+
+    removeBuff(buffName) {
+        super.removeBuff(buffName);
+        if (buffName ==  "Heat Recovery")
+            this.stabilityDamageModifier--;
+        if (this.fortification > 1 && buffName == "Blazing Assault 2")
+            this.stabilityDamageModifier--;
+    }
+
+    endTurn() {
+        super.endTurn();
+        let burnBuffs = 0;
+        this.currentBuffs.forEach(buff => {
+            if (buff[1].hasOwnProperty(BuffJSONKeys.ELEMENT)) {
+                if (buff[1][BuffJSONKeys.ELEMENT] == Elements.BURN)
+                    burnBuffs++;
+            }
+        });
+        this.adjustIndex(burnBuffs);
+        // key 6 gives extra index if ending turn with heat recovery
+        if (this.keysEnabled[5] && this.hasBuff("Heat Recovery"))
+            this.adjustIndex(1);
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new Ksenia(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}

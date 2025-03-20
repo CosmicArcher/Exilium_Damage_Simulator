@@ -905,6 +905,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cost" : 2,
             "Multiplier" : 0.75,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
@@ -914,7 +915,7 @@
                 "Name" : "Flammable",
                 "Stacks" : 2
             }],
-            "Conditional" : {
+            "Conditional" : [{
                 "Condition_Text" : "Has 2+ Burn Buffs",
                 "Extra_Attack" : {
                     "Type" : "Attack",
@@ -924,26 +925,29 @@
                     "Ammo_Type" : "Light",
                     "Element" : "Burn"
                 }
-            }
+            }]
         },
         "Skill3" : {
             "Type" : "Buff",
+            "Cost" : 2,
             "Target" : "Ally",
             "Post_Target_Buff" : [{
                 "Name" : "Heat Recovery",
                 "Duration" : 2
             }],
             "Conditional" : [{
-                "Append" : 1,
                 "Condition_Text" : "Full HP",
-                "Post_Target_Buff" : [{
-                    "Name" : "Blazing Assault 2",
-                    "Duration" : 2
-                }]
+                "Append" : {
+                    "Post_Target_Buff" : [{
+                        "Name" : "Blazing Assault 2",
+                        "Duration" : 2
+                    }]
+                }
             }]
         },
         "Ultimate" : {
             "Type" : "Attack",
+            "Cooldown" : 2,
             "Multiplier" : 1.6,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 5,
