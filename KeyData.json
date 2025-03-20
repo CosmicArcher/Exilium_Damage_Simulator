@@ -268,5 +268,39 @@
                 }
             }
         }
+    },
+    "Sharkry" : {
+        "Devilish Whisper" : {
+        },
+        "Thermal Feedback" : {
+        },
+        "Deadly Allure" : {
+        },
+        "Idol Training Day" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "Has Overburn",
+                            "Pre_Self_Buff" : [{
+                                "Name" : "Blazing Assault 2",
+                                "Duration" : 2
+                            }]
+                        }]
+                    }
+                }
+            }
+        },
+        "Target is Your Heart" : {
+            "Skill" : {
+                "Skill2" : {
+                    "Conditional" : [{
+                        "Condition_Text" : "onKill"
+                    }]
+                }
+            }
+        },
+        "Palm-Blown Kiss" : {
+        }
     }
 }

@@ -648,6 +648,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cooldown" : 2,
             "Multiplier" : 1.4,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 3,
@@ -660,6 +661,7 @@
         },
         "Skill3" : {
             "Type" : "Attack",
+            "Cooldown" : 2,
             "Multiplier" : 1.5,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 3,
@@ -669,22 +671,25 @@
                 "Name" : "Zoom In",
                 "Stacks" : 1
             }],
-            "Conditional" : {
+            "Conditional" : [{
+                "Condition_Text" : "Has Overburn",
                 "Element" : "Burn",
-                "Post_Target_Buff" : [{
+                "Pre_Target_Buff" : [{
                     "Name" : "Flammable",
                     "Stacks" : 2
                 }]
-            }
+            }]
         },
         "Ultimate" : {
             "Type" : "Buff",
+            "Cost" : 3,
             "Target" : "Self",
+            "Pre_Self_Buff" : [{
+                "Name" : "Extra Command"
+            }],
             "Post_Self_Buff" : [{
                 "Name" : "Zoom In",
                 "Stacks" : 1
-            }, {
-                "Name" : "Extra Command"
             }]
         },
         "Support" : {

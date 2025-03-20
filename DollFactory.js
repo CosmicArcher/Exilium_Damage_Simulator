@@ -1,4 +1,4 @@
-import {Daiyan, Makiatto, MosinNagant, Papasha, PapashaSummon, Peritya, Qiongjiu, Suomi, Tololo, Vepley} from "./DollClasses.js";
+import {Daiyan, Makiatto, MosinNagant, Papasha, PapashaSummon, Peritya, Qiongjiu, Sharkry, Suomi, Tololo, Vepley} from "./DollClasses.js";
 import { AttackTypes, Elements } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 import TurnManager from "./TurnManager.js";
@@ -63,6 +63,11 @@ class DollFactory {
                 case "Peritya":
                     newDoll = new Peritya(defense, attack, crit_chance, crit_damage, fortification, keys);
                     TurnManager.getInstance().registerDamageListener(name, AttackTypes.AOE);
+                    break;
+                case "Sharkry":
+                    newDoll = new Sharkry(defense, attack, crit_chance, crit_damage, fortification, keys);
+                    TurnManager.getInstance().registerBuffListener(name, "Overburn");
+                    break;
                 default:
                     console.log(`${name} doll class does not exist`);
             }

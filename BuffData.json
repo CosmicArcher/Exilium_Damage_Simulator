@@ -309,14 +309,18 @@
     },
     "Flammable" : {
         "Buff_Type" : "Debuff",
-        "Defense_Consumed" : 1,
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 1,
         "Element" : "Burn",
         "StabilityTaken" : 2,
         "Stack_Limit" : 2
     },
     "Zoom In" : {
         "Buff_Type" : "Buff",
-        "Defense_Consumed" : 0,
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "AllAttack",
+        "Cleanseable" : 0,
         "DamagePerc" : 0.15,
         "StabilityDamage" : 2,
         "Stackable" : 1,
@@ -324,7 +328,9 @@
     },
     "Zoom In V5" : {
         "Buff_Type" : "Buff",
-        "Defense_Consumed" : 0,
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "AllAttack",
+        "Cleanseable" : 0,
         "DamagePerc" : 0.2,
         "StabilityDamage" : 2,
         "Stackable" : 1,
@@ -332,12 +338,15 @@
     },
     "Support" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 1
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Heat Recovery" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 1,
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 0,
         "Stack_Limit" : 1,
         "Element" : "Burn"
     },

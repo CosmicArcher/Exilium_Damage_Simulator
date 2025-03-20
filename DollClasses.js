@@ -966,3 +966,82 @@ export class Peritya extends Supporter {
         return super.cloneUnit(new Peritya(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }
+
+export class Sharkry extends Supporter {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Sharkry", defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled);
+        // support is activated by equipping key 2
+        if (keysEnabled[1])
+            this.supportEnabled = true;
+        // key 1 starts with full index
+        if (this.keysEnabled[0])
+            this.CIndex = 6;
+
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        let buffs = 0;
+        if (target.hasBuff("Overburn")) { 
+            if (skillName == SkillNames.SKILL3) {
+                conditionalTriggered[0] = true;
+                // key 4 adds another skill3 conditional that also requires overburn
+                if (this.keysEnabled[3])
+                    conditionalTriggered[1] = true;
+            }
+            // passively gains 20% crit vs overburn targets
+            this.crit_chance += 0.2;
+            // v4+ adds 10% more crit chance and 3% crit damage per buff
+            if (this.fortification > 3) {
+                this.crit_chance += 0.1;
+                this.currentBuffs.forEach(buff => {
+                    if (buff[1][BuffJSONKeys.BUFF_TYPE] == "Buff")
+                        buffs++;
+                });
+                this.crit_damage += Math.min(buffs, 5) * 0.03;
+            }
+        }
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        if (target.hasBuff("Overburn")) {
+            // passively gains 20% crit vs overburn targets
+            this.crit_chance -= 0.2;
+            // v4+ adds 10% more crit chance and 3% crit damage per buff
+            if (this.fortification > 3) {
+                this.crit_chance -= 0.1;
+                this.crit_damage -= Math.min(buffs, 5) * 0.03;
+            }
+        }
+        // key 5 conditional grants 1 stack of zoomin on kill but the version of zoom in changes depending on fortification
+        if (conditionalTriggered[0] && skillName == SkillNames.SKILL2) {
+            if (this.fortification < 5)
+                this.addBuff("Zoom In", this.name, 1, 1);
+            else
+                this.addBuff("Zoom In V5", this.name, 1, 1);
+        }
+    }
+    // need to listen for an aoe attack to trigger support then inform that a support is pending
+    checkBuff(buffName, triggeringDollName) {
+        if (buffName == "Overburn") {
+            TurnManager.getInstance().alertPendingSupport(this.name);
+            // adds 1 index whenever overburn is applied
+            this.adjustIndex(1);
+        }
+    }
+
+    refreshSupportUses() {
+        super.refreshSupportUses();
+        // passively gains 1 index per turn
+        this.adjustIndex(1);
+        // v6 also gains 1 zoom in stack per turn
+        if (this.fortification == 6)
+            this.addBuff("Zoom In V5", this.name, -1, 1);
+        // key 3 gives blazing assault if anyone has overburn on turn start
+        if (this.keysEnabled[2] && GameStateManager.getInstance().getTarget().hasBuff("Overburn"))
+            this.addBuff("Blazing Assault 2", this.name, 1, 1);
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new Sharkry(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}

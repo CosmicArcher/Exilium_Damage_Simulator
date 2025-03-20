@@ -406,14 +406,13 @@
                 }, {
                     "Name" : "Damage Up 1",
                     "Duration" : 1
-                }, {
-                    "Name" : "Extra Command"
                 }]
             }
         },
         "V3" : {
             "Skill3" : {
                 "Conditional" : [{
+                    "Condition_Text" : "Has Overburn",
                     "Element" : "Burn",
                     "Post_Target_Buff" : [{
                         "Name" : "Flammable",
@@ -437,6 +436,7 @@
                     "Stacks" : 1
                 }],
                 "Conditional" : [{
+                    "Condition_Text" :"Has Overburn",
                     "Element" : "Burn",
                     "Post_Target_Buff" : [{
                         "Name" : "Flammable",
@@ -459,8 +459,6 @@
                 }, {
                     "Name" : "Damage Up 1",
                     "Duration" : 1
-                }, {
-                    "Name" : "Extra Command"
                 }]
             }
         }
