@@ -77,7 +77,7 @@
         "Turn_Based" : 0,
         "Defense_Consumed" : 1,
         "DefensePerc" : 0.25,
-        "StackLimit" : 3,
+        "Stack_Limit" : 3,
         "Stackable" : 1,
         "Cleanseable" : 1,
         "Stat" : "Defense"
@@ -85,127 +85,144 @@
     "Overburn" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "Element" : "Burn"
-        
     },
     "Avalanche" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Element" : "Freeze",
-        "StackLimit" : 5
+        "Stack_Limit" : 5
     },
     "Frozen" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "Element" : "Freeze",
         "Stat" : "Movement",
-        "StackLimit" : 2
+        "Stack_Limit" : 2
     },
     "Frigid" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "Element" : "Freeze",
         "Stat" : "Movement"
     },
     "Support Boost 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "SupportPerc" : 0.15,
         "ExposedPerc" : 0.1,
-        "StackLimit" : -1
+        "Stack_Limit" : -1
     },
     "Support Boost 1 V1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "SupportPerc" : 0.3,
         "ExposedPerc" : 0.1,
-        "StackLimit" : -1
+        "Stack_Limit" : -1
     },
     "Support Boost 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "SupportPerc" : 0.3,
         "ExposedPerc" : 0.1,
-        "StackLimit" : -1
+        "Stack_Limit" : -1
     },
     "Support Boost 2 V4" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "SupportPerc" : 0.3,
         "ExposedPerc" : 0.1,
-        "StackLimit" : -1
+        "Stack_Limit" : -1
     },
     "Alert" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Frost Barrier" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Cold Conviction" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "AttackPerc" : 0.1,
         "Stat" : "Attack",
         "Stackable" : 1,
-        "StackLimit" : 3
+        "Stack_Limit" : 3
     },
     "Lone Wolf" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0
     },
     "Steady Progress" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Murderous Intent" : {
-        "Buff_Type" : "Buff",
+        "Buff_Type" : "Neutral",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Tuning" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stackable" : 1,
-        "StackLimit" : 10,
+        "Stack_Limit" : 10,
         "Crit" : 0.03,
         "Crit_Damage" : 0.03
     },
     "Pitch Perfect" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Permanent Tuning" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
-        "Defense_Consumed": 0,
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stackable" : 1,
-        "StackLimit" : 3,
+        "Stack_Limit" : 3,
         "Crit" : 0.03,
         "Crit_Damage" : 0.03
     },
     "Permanent Tuning V3" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
-        "Defense_Consumed": 0,
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stackable" : 1,
-        "StackLimit" : 6,
+        "Stack_Limit" : 6,
         "Crit" : 0.03,
         "Crit_Damage" : 0.03
     },
@@ -233,14 +250,14 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
-        "StackLimit" : 99,
+        "Stack_Limit" : 99,
         "DamagePerc" : 0.3
     },
     "Active Engagement V5" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
-        "StackLimit" : 99,
+        "Stack_Limit" : 99,
         "DamagePerc" : 0.4
     },
     "Feeling Full" : {
@@ -269,7 +286,7 @@
         "Defense_Consumed" : 1,
         "Element" : "Burn",
         "StabilityTaken" : 2,
-        "StackLimit" : 2
+        "Stack_Limit" : 2
     },
     "Zoom In" : {
         "Buff_Type" : "Buff",
@@ -277,7 +294,7 @@
         "DamagePerc" : 0.15,
         "StabilityDamage" : 2,
         "Stackable" : 1,
-        "StackLimit" : 2
+        "Stack_Limit" : 2
     },
     "Zoom In V5" : {
         "Buff_Type" : "Buff",
@@ -285,7 +302,7 @@
         "DamagePerc" : 0.2,
         "StabilityDamage" : 2,
         "Stackable" : 1,
-        "StackLimit" : 2
+        "Stack_Limit" : 2
     },
     "Support" : {
         "Buff_Type" : "Neutral",
@@ -295,7 +312,7 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 1,
-        "StackLimit" : 1,
+        "Stack_Limit" : 1,
         "Element" : "Burn"
     },
     "Cold Snap" : {
@@ -309,14 +326,14 @@
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
         "DamagePerc" : 0.1,
-        "StackLimit" : 99
+        "Stack_Limit" : 99
     },
     "Arctic Benediction V1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Defense_Consumed" : 0,
         "DamagePerc" : 0.2,
-        "StackLimit" : 99
+        "Stack_Limit" : 99
     },
     "Glacial Domain" : {
         "Buff_Type" : "Buff",
@@ -331,13 +348,13 @@
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Element" : "Corrosion",
-        "StackLimit" : 10
+        "Stack_Limit" : 10
     },
     "Corrosive Pressure V2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Element" : "Corrosion",
-        "StackLimit" : 15,
+        "Stack_Limit" : 15,
         "DefensePerc" : -0.01
     },
     "Toxic Invasion" : {
@@ -364,14 +381,14 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "AoEDamageTakenPerc" : 0.25,
-        "StackLimit" : 3
+        "Stack_Limit" : 3
     },
     "Emergency Plan" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "AoEDamageTakenPerc" : 0.25,
         "Stackable" : 1,
-        "StackLimit" : 3
+        "Stack_Limit" : 3
     },
     "Insight" : {
         "Buff_Type" : "Buff",
@@ -381,14 +398,14 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Stackable" : 1,
-        "StackLimit" : 4,
+        "Stack_Limit" : 4,
         "DamagePerc" : 0.075
     },
     "Defensive Support" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Stackable" : 1,
-        "StackLimit" : 4,
+        "Stack_Limit" : 4,
         "DefensePerc" : 0.3,
         "Stat" : "Defense"
     },
@@ -402,14 +419,14 @@
         "Turn_Based" : 1,
         "Defense_Consumed" : 1,
         "DamageTakenPerc" : -0.3,
-        "StackLimit" : 5,
+        "Stack_Limit" : 5,
         "Element" : "Freeze"
     },
     "Shelter" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 1,
-        "StackLimit" : 3,
+        "Stack_Limit" : 3,
         "StabilityTaken" : -2
     },
     "Continuous Healing 1" : {
@@ -431,7 +448,7 @@
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
-        "StackLimit" : 3,
+        "Stack_Limit" : 3,
         "TargetedDamage" : 0.1
     },
     "Tenacity to Withstand" : {
@@ -452,7 +469,7 @@
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
-        "StackLimit" : 8,
+        "Stack_Limit" : 8,
         "Crit" : 0.03,
         "Crit_Damage" : 0.03
     },
@@ -462,7 +479,7 @@
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
-        "StackLimit" : 8,
+        "Stack_Limit" : 8,
         "Crit" : 0.05,
         "Crit_Damage" : 0.05
     },
@@ -480,7 +497,7 @@
     "Unshakable Confidence" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "StackLimit" : 4
+        "Stack_Limit" : 4
     },
     "Mark of Prey" : {
         "Buff_Type" : "Debuff",
@@ -490,12 +507,12 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Defense_Consumed" : 1,
-        "StackLimit" : 2
+        "Stack_Limit" : 2
     },
     "Hunters Talent" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "StackLimit" : 99
+        "Stack_Limit" : 99
     },
     "Cleanse" : {
     },

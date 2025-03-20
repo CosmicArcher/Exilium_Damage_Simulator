@@ -1,6 +1,6 @@
 import DamageManager from "./DamageManager.js";
 import Doll from "./Doll.js";
-import { AmmoTypes, Elements, SkillNames, CalculationTypes, SkillJSONKeys } from "./Enums.js";
+import { AmmoTypes, Elements, SkillNames, CalculationTypes, SkillJSONKeys, BuffJSONKeys } from "./Enums.js";
 import EventManager from "./EventManager.js";
 import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
@@ -16,7 +16,7 @@ class Supporter extends Doll {
         this.supportEnabled = false;
     }
 
-    useSupportSkill(target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = false) {
+    useSupportSkill(target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
         if (this.supportsUsed < this.supportLimit && this.supportEnabled) {
             this.supportsUsed++;
             return this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
@@ -39,7 +39,7 @@ class Interceptor extends Doll {
         this.interceptEnabled = false;
     }
 
-    useSupportSkill(target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = false) {
+    useSupportSkill(target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
         if (this.interceptsUsed < this.interceptLimit && this.interceptEnabled) {
             this.interceptsUsed++;
             return this.getSkillDamage(SkillNames.INTERCEPT, target, calculationType, conditionalTriggered);
@@ -452,6 +452,9 @@ export class Papasha extends Doll {
             }
             
             super.getSkillDamage(skillName, target, calculationType == CalculationTypes.SIMULATION ? newSimType : calculationType, conditionalTriggered);
+            // papasha gets 1 index per attack by herself or her summon
+            if (this.CIndex < 6)
+                this.CIndex++;
             // skill2 adds courage to endure on the summon if v1 or the target has stability after the nade, does not matter if the following support attack breaks it
             if (skillName == SkillNames.SKILL2) {
                 if (this.fortification > 0 || target.getStability() > 0)
@@ -525,15 +528,22 @@ export class PapashaSummon extends Doll {
         if (skillName == SkillNames.SUPPORT && this.hasBuff("Courage to Endure") && target.getIsLarge()) {
             this.defenseIgnore += 0.3;
         }
-        
+        let ppsh = GameStateManager.getInstance().getDoll("Papasha");
+
         super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+        // summon also grants papasha 1 index per attack
+        if (ppsh.CIndex < 6)
+            ppsh.CIndex++;
 
         if (skillName == SkillNames.SUPPORT && this.hasBuff("Courage to Endure") && target.getIsLarge()) {
             this.defenseIgnore -= 0.3;
         }
         // v2+ papasha has the summon do a support attack after skill3 instead of no support
-        if (skillName == SkillNames.SKILL3 && this.fortification > 1)
-            this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered)
+        if (skillName == SkillNames.SKILL3 && this.fortification > 1) {
+            this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
+            if (ppsh.CIndex < 6)
+                ppsh.CIndex++;
+        }
     }
 
     endTurn() {
@@ -545,5 +555,111 @@ export class PapashaSummon extends Doll {
 
     cloneUnit() {
         return super.cloneUnit(new PapashaSummon(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}
+
+export class Daiyan extends Interceptor {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Daiyan", defense, attack, crit_chance, crit_damage, fortification, 1, keysEnabled);
+
+        this.interceptEnabled = false;
+        // key 2 starts with full index
+        if (keysEnabled[1])
+            this.CIndex = 6;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        // key 4 is assumed always true
+        if (this.keysEnabled[3])
+            this.addBuff("Tuning", this.name, -1, 1);
+
+        let totalTuning = 0;
+        let permaTuning = 0;
+        for (let i = 0; i < this.currentBuffs.length; i++) {
+            if (this.currentBuffs[i][0].match("Tuning"))
+                totalTuning += this.currentBuffs[i][3];
+            if (this.currentBuffs[i][0] == "Permanent Tuning V3")
+                permaTuning += this.currentBuffs[i][3];
+        }
+        // passive gives 20% damage buff when more than 3 tuning
+        if (totalTuning > 3)
+            this.damageDealt += 0.2;
+        // v4+ passive gives another 20% at more than 5 stacks and upgrades her intercept
+        if (totalTuning > 5 && this.fortification > 3) {
+            this.damageDealt += 0.2;
+            if (skillName == SkillNames.INTERCEPT)
+                conditionalTriggered[0] = true;
+        }
+        // v5+ passive gets 15% cover ignore on exposed enemies at max permanent tuning stacks
+        if (this.fortification > 4 && permaTuning == 6 && target.getStability() == 0)
+            this.coverIgnore += 0.15;
+        // v1+ skill2 condition is no cleanseable buffs on the target
+        if (skillName == SkillNames.SKILL2) {
+            if (this.fortification > 0) {
+                let buffs = target.getBuffs();
+                let cleanseableBuffs = 0;
+                for (let i = 0; i < buffs.length && !cleanseableBuffs; i++) {
+                    if (buffs[i][1][BuffJSONKeys.CLEANSEABLE])
+                        cleanseableBuffs = 1;
+                }
+                if (!cleanseableBuffs)
+                    conditionalTriggered[0] = true;
+            }
+            // key 5 adds 1 stack of cleanse per 3 tuning stacks
+            if (this.keysEnabled[4] && totalTuning >= 3)
+                target.addBuff("Cleanse", this.name, -1, Math.floor(totalTuning / 3));
+        }
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+        // ult reduces 1 turn cd per tuning stack before the attack
+        if (skillName == SkillNames.ULT)
+            this.cooldowns[3] -= totalTuning;
+        // undo temporary buffs
+        if (totalTuning > 3)
+            this.damageDealt -= 0.2;
+        if (totalTuning > 5 && this.fortification > 3) 
+            this.damageDealt -= 0.2;
+        if (this.fortification > 4 && permaTuning == 6 && target.getStability() == 0)
+            this.coverIgnore -= 0.15;
+        // passive gives 1 index if attacking an out of cover target
+        if (GameStateManager.getInstance().getCover() == 0 && this.CIndex < 6)
+            this.CIndex++;
+    }
+
+    refreshSupportUses() {
+        super.refreshSupportUses();
+        // passive gives 1 stack of tuning and index at the start of each turn
+        this.addBuff("Tuning", this.name, -1, 1);
+        if (this.CIndex < 6)
+            this.CIndex++;
+    }
+
+    removeBuff(buffName) {
+        super.removeBuff(buffName);
+        // check if tuning stacks were removed and if it has fallen below 2 stacks, disable intercept
+        if (buffName.match("Tuning")) {
+            let totalTuning = 0;
+            for (let i = 0; i < this.currentBuffs.length; i++) {
+                if (this.currentBuffs[i][0].match("Tuning"))
+                    totalTuning += this.currentBuffs[i][3];
+            }
+            if (totalTuning <= 2)
+                this.interceptEnabled = false;
+        }
+    }
+    addBuff(buffName, sourceName, duration = -1, stacks = 1) {
+        super.addBuff(buffName, sourceName, duration, stacks);
+        // add up total tuning stacks, if 2+ stacks, enable intercept
+        let totalTuning = 0;
+        for (let i = 0; i < this.currentBuffs.length; i++) {
+            if (this.currentBuffs[i][0].match("Tuning"))
+                totalTuning += this.currentBuffs[i][3];
+        }
+        if (totalTuning > 2)
+            this.interceptEnabled = true;
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new Daiyan(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }

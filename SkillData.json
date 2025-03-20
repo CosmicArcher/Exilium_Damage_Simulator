@@ -208,6 +208,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cost" : 2,
             "Multiplier" : 0.8,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 2,
@@ -215,12 +216,14 @@
             "Element" : "Physical"
         },
         "Skill3" : {
+            "Cost" : 4,
             "Conditional" : [{
                 "Condition_Text" : "isLarge"
             }]
         },
         "Ultimate" : {
             "Type" : "Attack",
+            "Cooldown" : 2,
             "Multiplier" : 1.5,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 3,
@@ -261,36 +264,41 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cost" : 1,
             "Multiplier" : 1.5,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
             "Ammo_Type" : "Light",
-            "Element" : "Physical"
+            "Element" : "Physical",
+            "Pre_Target_Buff" : [{
+                "Name" : "Cleanse"
+            }]
         },
         "Skill3" : {
             "Type" : "Buff",
+            "Cost" : 4,
             "Target" : "Self",
+            "Pre_Self_Buff" : [{
+                "Name" : "Extra Command"
+            }],
             "Post_Self_Buff" : [{
                 "Name" : "Tuning",
-                "Duration" : -1,
                 "Stacks" : 3
             }, {
                 "Name" : "Pitch Perfect",
                 "Duration" : 1
-            }, {
-                "Name" : "Extra Command"
             }]
         },
         "Ultimate" : {
             "Type" : "Attack",
+            "Cooldown" : 6,
             "Multiplier" : 1.9,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 2,
             "Ammo_Type" : "Medium",
             "Element" : "Physical",
             "Post_Self_Buff" : [{
-                "Name" : "Permanent Tuning",
-                "Duration" : -1
+                "Name" : "Permanent Tuning"
             }]
         },
         "Intercept" : {
@@ -301,8 +309,7 @@
             "Ammo_Type" : "Light",
             "Element" : "Physical",
             "Post_Self_Buff" : [{
-                "Name" : "Permanent Tuning",
-                "Duration" : -1
+                "Name" : "Permanent Tuning"
             }]
         }
     },

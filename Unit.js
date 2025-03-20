@@ -75,7 +75,7 @@ class Unit {
                 });
             }
             else {
-                //
+                // default values if not turn based or stacking skill
                 if (!buffData[BuffJSONKeys.TURN_BASED])
                     duration = -1;
                 if (!buffData.hasOwnProperty(BuffJSONKeys.STACK_LIMIT))
@@ -86,6 +86,7 @@ class Unit {
                     if (this.currentBuffs[i][0] == buffName)
                         index = i;
                 }
+                let stackGain = stacks;
                 // if does not currently have the buff, add to the list
                 if (index == -1) {
                     this.currentBuffs.push([buffName, buffData, duration, stacks, buffData[BuffJSONKeys.TURN_BASED], buffData[BuffJSONKeys.CONSUMPTION_MODE], sourceName]);
@@ -104,7 +105,7 @@ class Unit {
                     // if the buff is below its stack limit, increase the stack count based on the stacks parameter
                     if (buffData.hasOwnProperty(BuffJSONKeys.STACK_LIMIT)) {
                         if (buff[3] < buffData[BuffJSONKeys.STACK_LIMIT]) {
-                            let stackGain = Math.min(buffData[BuffJSONKeys.STACK_LIMIT] - buff[3], stacks);
+                            stackGain = Math.min(buffData[BuffJSONKeys.STACK_LIMIT] - buff[3], stacks);
                             buff[3] += stackGain;
                             if (buffData.hasOwnProperty(BuffJSONKeys.STACKABLE))
                                 this.applyBuffEffects(buffData, stackGain, true);
@@ -123,7 +124,7 @@ class Unit {
                         let attacker = GameStateManager.getInstance().getDoll(sourceName);
                         DamageManager.getInstance().applyFixedDamage(attacker.getAttack() * 0.1, sourceName);
                     }
-                    EventManager.getInstance().broadcastEvent("statusApplied", [sourceName, this.name, buffName]);
+                    EventManager.getInstance().broadcastEvent("statusApplied", [sourceName, this.name, buffName, stackGain]);
                 }
             }
         }
@@ -184,9 +185,17 @@ class Unit {
         }
         return false;
     }
-
+    // give a copy to prevent unintended changes to the buff array when using it as a get function
     getBuffs() {
-        return this.currentBuffs;
+        let buffs = [];
+        this.currentBuffs.forEach(buff => {
+            let newBuff = [];
+            buff.forEach(d => {
+                newBuff.push(d);
+            });
+            buffs.push(newBuff);
+        });
+        return buffs;
     }
     // target defense buffs are added to attacker's defense ignore so we need to be able to get it
     getDefenseBuffs() {return this.defenseBuffs;}
