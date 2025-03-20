@@ -160,5 +160,28 @@
         },
         "Lasting Legacy" : {
         }
+    },
+    "Tololo" : {
+        "Comet Tail Transit" : {
+
+        },
+        "Principles of Observational Astronomy" : {
+            "Skill" : {
+                "Skill2" : {
+                    "Post_Target_Buff" : [{
+                        "Name" : "Congestion",
+                        "Duration" : 2
+                    }]
+                }
+            }
+        },
+        "Invisible Light" : {
+        },
+        "Retrograde Motion" : {
+        },
+        "Galactic Cruise" : {
+        },
+        "Stellar Eclipse" : {
+        }
     }
 }

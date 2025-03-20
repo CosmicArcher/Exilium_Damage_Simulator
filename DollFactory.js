@@ -1,4 +1,5 @@
-import {Daiyan, Makiatto, Papasha, PapashaSummon, Qiongjiu, Suomi} from "./DollClasses.js";
+import {Daiyan, Makiatto, Papasha, PapashaSummon, Qiongjiu, Suomi, Tololo} from "./DollClasses.js";
+import { Elements } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 import TurnManager from "./TurnManager.js";
 
@@ -46,6 +47,10 @@ class DollFactory {
                     break;
                 case "Daiyan":
                     newDoll = new Daiyan(defense, attack, crit_chance, crit_damage, fortification, keys);
+                    break;
+                case "Tololo":
+                    newDoll = new Tololo(defense, attack, crit_chance, crit_damage, fortification, keys);                   
+                    TurnManager.getInstance().registerDamageListener(name, Elements.HYDRO);
                     break;
                 default:
                     console.log(`${name} doll class does not exist`);

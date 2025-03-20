@@ -15,6 +15,7 @@ class TurnManager {
             TurnManagerSingleton = this;
             TurnManagerSingleton.resetLists();
             EventManager.getInstance().addListener("allyAction", TurnManagerSingleton.activateActionListeners);
+            EventManager.getInstance().addListener("damageDealtTypes", TurnManagerSingleton.activateDamageListeners);
         }
     }
 
@@ -33,8 +34,10 @@ class TurnManager {
             TurnManagerSingleton.priorityDebuffers = [];
             // action sequence goes priority debuff > priority attack > attacker > wise supports > regular support, doll slot number is the ingame tiebreaker
             TurnManagerSingleton.actionSequence = [];
-            // supports that only activate under certain conditions, condtional is used as the key
-            TurnManagerSingleton.conditionalSupporters = {};
+            // supports that only activate when a buff is applied, buffName is used as the key
+            TurnManagerSingleton.buffListeners = {};
+            // dolls that buff themselves or support when a specific damage type or element is dealt to an enemy
+            TurnManagerSingleton.damageListeners = {};
             // flag to tell if the action sequence is already being processed top to bottom to ensure the function is only called once
             TurnManagerSingleton.actionsRunning = false;
             // for groza and suomi passives listening for other doll end turn
@@ -100,7 +103,8 @@ class TurnManager {
 
                 console.log("Actions left: " + TurnManagerSingleton.actionSequence.length);
             }
-            TurnManagerSingleton.actionsRunning = false;  
+            TurnManagerSingleton.actionsRunning = false;
+            // once all the supports and skill are used, lock the end state and prepare a new set of clones for the next action
             GameStateManager.getInstance().lockAction();
         }
         else
@@ -125,16 +129,16 @@ class TurnManager {
         else
             console.error("Singleton not yet initialized");
     }
-
-    registerConditionalSupporter(dollName, condition) {
+    // listens for a specific buff to be applied to a target before they can use their support attack
+    registerBuffListener(dollName, condition) {
         if (TurnManagerSingleton) {
             // check if array for that key already exists
-            if (TurnManagerSingleton.conditionalSupporters.hasOwnProperty(condition))
-                TurnManagerSingleton.conditionalSupporters[condition].push(dollName);
+            if (TurnManagerSingleton.buffListeners.hasOwnProperty(condition))
+                TurnManagerSingleton.buffListeners[condition].push(dollName);
             // initialize array if the key does not exist yet
             else {
-                TurnManagerSingleton.conditionalSupporters[condition] = [];
-                TurnManagerSingleton.conditionalSupporters[condition].push(dollName);
+                TurnManagerSingleton.buffListeners[condition] = [];
+                TurnManagerSingleton.buffListeners[condition].push(dollName);
             }
         }
         else
@@ -154,6 +158,61 @@ class TurnManager {
             let doll = GameStateManager.getInstance().getDoll(dollName)
             doll.alertAllyEnd(triggeringDollName);
         });
+    }
+    // listens for a specific element or damage type to be dealt and calls the relevant function
+    registerDamageListener(dollName, condition) {
+        if (TurnManagerSingleton) {
+            // check if array for that key already exists
+            if (TurnManagerSingleton.damageListeners.hasOwnProperty(condition))
+                TurnManagerSingleton.damageListeners[condition].push(dollName);
+            // initialize array if the key does not exist yet
+            else {
+                TurnManagerSingleton.damageListeners[condition] = [];
+                TurnManagerSingleton.damageListeners[condition].push(dollName);
+            }
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    //[dollName, skillName, element, ammo, damageType, damageDealt]
+    activateDamageListeners(damageData) {
+        if (TurnManagerSingleton) {
+            let element = damageData[2];
+            let ammo = damageData[3];
+            let damageType = damageData[4];
+            // check if array for that key already exists
+            if (TurnManagerSingleton.damageListeners.hasOwnProperty(element)) {
+                TurnManagerSingleton.damageListeners[element].forEach(dollName => {
+                    let doll = GameStateManager.getInstance().getDoll(dollName)
+                    doll.checkDamage(element);
+                })
+            }
+            if (TurnManagerSingleton.damageListeners.hasOwnProperty(ammo)) {
+                TurnManagerSingleton.damageListeners[ammo].forEach(dollName => {
+                    let doll = GameStateManager.getInstance().getDoll(dollName)
+                    doll.checkDamage(ammo);
+                })
+            }
+            if (TurnManagerSingleton.damageListeners.hasOwnProperty(damageType)) {
+                TurnManagerSingleton.damageListeners[damageType].forEach(dollName => {
+                    let doll = GameStateManager.getInstance().getDoll(dollName)
+                    doll.checkDamage(damageType);
+                })
+            }
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+
+    activateActionListeners(triggeringDollName) {
+        if (TurnManagerSingleton) {
+            TurnManagerSingleton.actionListeners.forEach(dollName => {
+                let doll = GameStateManager.getInstance().getDoll(dollName)
+                doll.alertAllyEnd(triggeringDollName);
+            });
+        }
+        else
+            console.error("Singleton not yet initialized");
     }
 }
 

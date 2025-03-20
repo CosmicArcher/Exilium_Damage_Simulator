@@ -23,7 +23,7 @@ class DamageManager {
         return DamageManagerSingleton;
     }
 
-    calculateDamage(attacker, target, baseDamage, element, ammoType, damageType, isCrit, critDamage, stabilityDamage, coverIgnore = 0) {
+    calculateDamage(attacker, target, baseDamage, element, ammoType, damageType, isCrit, critDamage, stabilityDamage, coverIgnore = 0, skillName) {
         let weaknesses = 0;
         target.getPhaseWeaknesses().forEach(d => {
             if (d == element || d == ammoType)
@@ -91,6 +91,8 @@ class DamageManager {
         // inform the target that it has been "hit" and reduce the counters of any buffs that last for a number of hits rather than turns
         target.takeDamage();
         EventManager.getInstance().broadcastEvent("damageDealt", [attacker, target, damage, element, target.getStability(), isCrit]);
+        // alert any listeners that damage of this type triggers effects on
+        EventManager.getInstance().broadcastEvent("damageDealtTypes", [attacker.getName(), skillName, element, ammoType, damageType, damage]);
         return damage;
     }
     // will pass the damage to an event observer manager later

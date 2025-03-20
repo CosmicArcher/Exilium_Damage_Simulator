@@ -671,11 +671,13 @@ DollFactory.getInstance();
 
     elementOptions = d3.select("#ElementWeakness").append("div").attr("class", "dropdownBox").style("display", "none");
     Object.values(Elements).forEach(d => {
-        elementOptions.append("a")
-        .text(d)
-        .on("click", () => {
-            selectPhase(d);
-        });
+        if (d != Elements.PHYSICAL) {
+            elementOptions.append("a")
+            .text(d)
+            .on("click", () => {
+                selectPhase(d);
+            });
+        }
     });
     ammoOptions = d3.select("#AmmoWeakness").append("div").attr("class", "dropdownBox").style("display", "none");
     Object.values(AmmoTypes).forEach(d => {

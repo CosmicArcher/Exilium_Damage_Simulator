@@ -251,22 +251,36 @@
     "Tololo" : {
         "V1" : {
             "Skill2" : {
-                "Conditional" : {
+                "Conditional" : [{
+                    "Condition_Text" : "Phase Exploit",
                     "Cover_Ignore" : 0.15
-                }
+                }]
             }
         },
         "V2" : {
             "Skill3" : {
-                "Conditional" : {
-                    "Element" : "Hydro"
+                "Append" : {
+                    "Conditional" : [{
+                        "Condition_Text" : "3 Buffs",
+                        "Element" : "Hydro"
+                    }]
                 }
             }
         },
         "V3" : {
             "Ultimate" : {
-                "Conditional" :  {
+                "Conditional" :  [{
+                    "Condition_Text" :"3 Buffs",
                     "Damage_Boost" : 0.3
+                }]
+            }
+        },
+        "V6" : {
+            "Ultimate" : {
+                "Append" : {
+                    "Conditional" : [{
+                        "Condition_Text" : "onKill"
+                    }]
                 }
             }
         }

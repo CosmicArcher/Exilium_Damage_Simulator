@@ -244,6 +244,22 @@
     "Movement Down 2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
+        "Stat" : "Movement"
+    },
+    "Movement Up 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
+        "Stat" : "Movement"
+    },
+    "Movement Up 2" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stat" : "Movement"
     },
     "Active Engagement" : {
@@ -318,41 +334,53 @@
     "Cold Snap" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "Element" : "Freeze",
         "Stat" : "Movement"
     },
     "Arctic Benediction" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "DamagePerc" : 0.1,
         "Stack_Limit" : 99
     },
     "Arctic Benediction V1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "DamagePerc" : 0.2,
         "Stack_Limit" : 99
     },
     "Glacial Domain" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Glacial Domain V5" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "DefenseIgnore" : 0.3
     },
     "Corrosive Pressure" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Element" : "Corrosion",
         "Stack_Limit" : 10
     },
     "Corrosive Pressure V2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Element" : "Corrosion",
         "Stack_Limit" : 15,
         "DefensePerc" : -0.01
@@ -360,21 +388,29 @@
     "Toxic Invasion" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Element" : "Corrosion"
     },
     "Toxic Invasion V5" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Element" : "Corrosion"
     },
     "Damage Up 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "DamagePerc" : 0.1
     },
     "Damage Up 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "DamagePerc" : 0.2
     },
     "Standard Approach" : {
@@ -535,5 +571,47 @@
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "AttackPerc" : 0.1
+    },
+    "Congestion" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Element" : "Hydro"
+    },
+    "Targeted Attack Boost 2" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "TargetedDamage" : 0.2
+    },
+    "Critical Rate Boost 2" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Crit" : 0.2
+    },
+    "Phase Boost 2" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Phase_Damage" : 0.2
+    },
+    "Piercing 2" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Ignore" : 0.3
+    },
+    "Piercing 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Ignore" : 0.2
     }
 } 

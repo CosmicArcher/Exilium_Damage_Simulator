@@ -340,7 +340,7 @@ class Doll extends Unit {
             // if out of turn attack, temporarily increase damage dealt stat then undo once damage has been calculated
             if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
                 this.damageDealt += this.supportDamageDealt;
-            let damage = this.processAttack(skill, calculationType, enemyTarget);
+            let damage = this.processAttack(skill, calculationType, enemyTarget, skillName);
             if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
                 this.damageDealt -= this.supportDamageDealt;
 
@@ -351,7 +351,7 @@ class Doll extends Unit {
 
                 this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 1);
 
-                damage += this.processAttack(extraAttack, calculationType, enemyTarget);
+                damage += this.processAttack(extraAttack, calculationType, enemyTarget, skillName);
 
                 this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 0);
             }
@@ -433,7 +433,7 @@ class Doll extends Unit {
         }
     }
 
-    processAttack(skill, calculationType, target) {
+    processAttack(skill, calculationType, target, skillName) {
         // set whether the attack crits or not
         let isCrit;
         let tempCritDmg = this.crit_damage;
@@ -508,7 +508,7 @@ class Doll extends Unit {
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt += skill[SkillJSONKeys.DAMAGE_BOOST];
         let damage = DamageManager.getInstance().calculateDamage(this, target, this.attack * skill[SkillJSONKeys.MULTIPLIER], skill[SkillJSONKeys.ELEMENT], 
-            skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore);
+            skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore, skillName);
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt -= skill[SkillJSONKeys.DAMAGE_BOOST];
         if (GameStateManager.getInstance().hasDoll("Suomi")) {
@@ -519,7 +519,7 @@ class Doll extends Unit {
         }
         // after doing damage, consume any buffs that are reduced on attack
         this.consumeAttackBuffs();
-
+        // add fixed damage
         damage += fixedDamage;
         if (fixedDamage > 0)
             DamageManager.getInstance().applyFixedDamage(fixedDamage, this.name);

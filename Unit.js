@@ -104,11 +104,26 @@ class Unit {
                     }
                     // if the buff is below its stack limit, increase the stack count based on the stacks parameter
                     if (buffData.hasOwnProperty(BuffJSONKeys.STACK_LIMIT)) {
-                        if (buff[3] < buffData[BuffJSONKeys.STACK_LIMIT]) {
-                            stackGain = Math.min(buffData[BuffJSONKeys.STACK_LIMIT] - buff[3], stacks);
-                            buff[3] += stackGain;
-                            if (buffData.hasOwnProperty(BuffJSONKeys.STACKABLE))
+                        // permanent tuning stacks count towards tuning 10 stack limit
+                        if (buffName == "Tuning") {
+                            let permTuningStacks = 0;
+                            for (let i = 0; i < this.currentBuffs.length; i++) {
+                                if (this.currentBuffs[i][0].match("Permanent Tuning"))
+                                    permTuningStacks = this.currentBuffs[i][3];
+                            }
+                            if (buff[3] + permTuningStacks < buffData[BuffJSONKeys.STACK_LIMIT]) {
+                                stackGain = Math.min(buffData[BuffJSONKeys.STACK_LIMIT] - buff[3] - permTuningStacks, stacks);
+                                buff[3] += stackGain;
                                 this.applyBuffEffects(buffData, stackGain, true);
+                            }
+                        }
+                        else {
+                            if (buff[3] < buffData[BuffJSONKeys.STACK_LIMIT]) {
+                                stackGain = Math.min(buffData[BuffJSONKeys.STACK_LIMIT] - buff[3], stacks);
+                                buff[3] += stackGain;
+                                if (buffData.hasOwnProperty(BuffJSONKeys.STACKABLE))
+                                    this.applyBuffEffects(buffData, stackGain, true);
+                            }
                         }
                     }
                     // if the overburn sources are different, keep track of the one with higher attack

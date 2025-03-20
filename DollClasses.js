@@ -663,3 +663,122 @@ export class Daiyan extends Interceptor {
         return super.cloneUnit(new Daiyan(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }
+
+export class Tololo extends Doll {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Tololo", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+
+        // passively starts with full index
+        this.CIndex = 6;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        // count number of buffs before attack for conditionals
+        let buffCount = 0;
+        this.currentBuffs.forEach(buff => {
+            if(buff[1][BuffJSONKeys.BUFF_TYPE] == "Buff")
+                buffCount++;
+        });
+        if (buffCount >= 2) {
+            // skill3 condition is 2+ buffs
+            if (skillName == SkillNames.SKILL3) {
+                conditionalTriggered[0] = true;
+            }
+            if (buffCount >= 3) {
+                // v2+ skill3 condition is 3+ buffs compounded on top of the original condition
+                if (this.fortification > 1 && skillName == SkillNames.SKILL3)
+                    conditionalTriggered[1] = true;
+                // ult condition is 3+ buffs
+                else if (skillName == SkillNames.ULT)
+                    conditionalTriggered[0] = true;
+            }
+        }
+        // count number of weaknesses exploited
+        let exploit = 0;
+        let weaknesses = target.getPhaseWeaknesses();
+        if (skillName == SkillNames.ULT) {
+            if (weaknesses.includes(Elements.HYDRO))
+                exploit = 1;
+        }
+        else {
+            if (weaknesses.includes(AmmoTypes.MEDIUM)) 
+                exploit = 1;
+            else if (weaknesses.includes(Elements.HYDRO)) {
+                if (skillName == SkillNames.SKILL2)
+                    exploit = 1;
+                else if (skillName == SkillNames.SKILL3 && this.fortification > 1) {
+                    if (conditionalTriggered[1])
+                        exploit = 1;
+                }
+            }
+        }
+        if (exploit) {
+            // key 5 cleanses 2 buffs if exploiting phase weakness
+            if (this.keysEnabled[4])
+               target.addBuff("Cleanse", this.name, 1, 2);
+            // v1+ skill2 conditional is phase exploit
+            if (skillName == SkillNames.SKILL2 && this.fortification > 0)
+                conditionalTriggered[0] = true;
+        }
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        if (skillName == SkillNames.SKILL2 || skillName == SkillNames.SKILL3) {
+            // skill2 and 3 give 2 index if their first condition is met
+            if (conditionalTriggered[0])
+                this.CIndex = Math.min(this.CIndex + 2, 6);
+            // v2+ skill3 2nd conditional adds another index 
+            if (this.fortification > 1 && skillName == SkillNames.SKILL3 && this.CIndex < 6)
+                if (conditionalTriggered[1])
+                    this.CIndex++;
+        }
+        // ult condition also reduces ult cd by 2 or 3 turns depending on fortification
+        if (skillName == SkillNames.ULT && conditionalTriggered[0]) {
+            if (conditionalTriggered[0]) {
+                this.cooldowns[3] -= 2;
+                if (this.fortification > 2)
+                    this.cooldowns[3]--;
+            }
+            // v6 ult 2nd condition grants 1 index onkill
+            if (this.fortification == 6) 
+                if (conditionalTriggered[1] && this.CIndex < 6)
+                    this.CIndex++;
+        }
+
+        // passive consumes full index bar to grant extra action after any attack
+        if (this.CIndex == 6) {
+            this.turnAvailable = true;
+            this.CIndex = 0;
+            // key 1 grants movement up for 1 turn when triggering passive
+            if (this.keysEnabled[0])
+                this.addBuff("Movemenet Up 1", this.name, 1, 1);
+            // key 3 grants attack up and damage up 2 for 1 turn when triggering passive
+            if (this.keysEnabled[2]) {
+                this.addBuff("Attack Up 2", this.name, 1, 1);
+                this.addBuff("Damage Up 2", this.name, 1, 1);
+            }
+            // v4 grants extra buffs for 2 turns
+            if (this.fortification > 3) {
+                this.addBuff("Targeted Attack Boost 2", this.name, 2, 1);
+                this.addBuff("Critical Rate Boost 2", this.name, 2, 1);
+                this.addBuff("Phase Boost 2", this.name, 2, 1);
+                this.addBuff("Piercing 2", this.name, 2, 1);
+            }
+        }
+    }
+
+    checkDamage(element) {
+        if (element == Elements.HYDRO) {
+            if (this.fortification < 5) {
+                this.addBuff("Lightspike", this.name, -1, 1);
+            }
+            else {
+                this.addBuff("Lightspike V5", this.name, -1, 1);
+            }
+        }
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new Tololo(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}
