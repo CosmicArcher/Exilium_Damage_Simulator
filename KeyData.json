@@ -302,5 +302,24 @@
         },
         "Palm-Blown Kiss" : {
         }
+    },
+    "Cheeta" : {
+        "Legitimate Research Expenses" : {
+        },
+        "Super Useful Invention" : {
+        },
+        "Goldfinger" : {
+        },
+        "Big Prank" : {
+        },
+        "Genius Support Plan" : {
+            "Skill" : {
+                "Skill3" : {
+                    "Type" : "Buff"
+                }
+            }
+        },
+        "Genius' Pride" : {
+        }
     }
 }

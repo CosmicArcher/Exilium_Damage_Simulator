@@ -161,7 +161,7 @@ class Target extends Unit {
     applyDRPerStab(x) {this.drPerStab = x;}
     applyDRWithStab(x) {this.drWithStab = x;}
     // check if any buffs get consumed by defending and reduce a stack
-    takeDamage() {
+    takeDamage(element) {
         this.currentBuffs.forEach((buff) => {
             if (buff[5] == "Defense") { // check if buff stacks are consumed by defending
                 buff[3]--;
@@ -172,6 +172,26 @@ class Target extends Unit {
                 // else check if buff stacks and reduce the effects of 1 stack 
                 else if (buff[1].hasOwnProperty(BuffJSONKeys.STACKABLE)) {
                     this.removeBuffEffects(buff[0], 1, true);
+                }
+                EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, 1, buff[0]]);
+            }
+            // flammable does not have defense tag but will be reduced when hit by burn damage
+            else if (buff[0] == "Flammable" && element == Elements.BURN) {
+                buff[3]--;
+                if (buff[3] == 0) {
+                    this.removeBuff(buff[0]);
+                }
+                EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, 1, buff[0]]);
+            }
+        });
+    }
+    // called to decrease the counter of buffs that only tick down from the primary attacker and not supports
+    takePrimaryDamage() {
+        this.currentBuffs.forEach((buff) => {
+            if (buff[0] == "Edifice") { // edifice is the only buff that works that way at the moment
+                buff[3]--;
+                if (buff[3] == 0) {
+                    this.removeBuff(buff[0]);
                 }
                 EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, 1, buff[0]]);
             }

@@ -75,12 +75,21 @@
     "Edifice" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "DefensePerc" : 0.25,
         "Stack_Limit" : 3,
         "Stackable" : 1,
-        "Cleanseable" : 1,
         "Stat" : "Defense"
+    },
+    "Siege" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
+        "DamagePerc" : 0.15,
+        "Stackable" : 1,
+        "Stack_Limit" : 99
     },
     "Overburn" : {
         "Buff_Type" : "Debuff",
@@ -310,7 +319,7 @@
     "Flammable" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 0,
-        "Consumption_Mode" : "Defense",
+        "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Burn",
         "StabilityTaken" : 2,

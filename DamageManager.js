@@ -33,6 +33,9 @@ class DamageManager {
         let totalStabDamage = Math.max(0, stabilityDamage + target.getStabilityDamageModifier() + attacker.getStabilityDamageModifier());
         totalStabDamage += weaknesses * 2;
         let weaknessModifier = 1 + weaknesses * 0.1;
+        // flammable increases burn stability damage by 2 and gets consumed when it triggers
+        if (target.hasBuff("Flammable") && element == Elements.BURN)
+            totalStabDamage += 2;
         // if any phase weakness is exploited, stability damage happens before the attack rather than after
         if (weaknesses > 0)
             target.reduceStability(totalStabDamage);

@@ -72,6 +72,13 @@ class Unit {
                 }
                 cleanseNames.forEach(buff => {
                     this.removeBuff(buff);
+                    // cleansing edifice grants all dolls 1 stack of siege buff
+                    if (buff == "Edifice") {
+                        let dolls = GameStateManager.getInstance().getAllDolls();
+                        dolls.forEach(doll => {
+                            doll.addBuff("Siege", this.name, -1, 1);
+                        });
+                    }
                 });
             }
             else {

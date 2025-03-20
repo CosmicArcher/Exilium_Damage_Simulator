@@ -390,8 +390,31 @@ class Doll extends Unit {
 
             if (skill[SkillJSONKeys.BUFF_TARGET] == "All") {
                 GameStateManager.getInstance().getAllDolls().forEach(doll => {
-                    this.processPrePostBuffs(skill, doll, null, 0);
+                    if (skill.hasOwnProperty(SkillJSONKeys.POST_TARGET_BUFF)) {
+                        let statusEffects = skill[SkillJSONKeys.POST_TARGET_BUFF];
+                        statusEffects.forEach(buff => {
+                            let stacks = 1;
+                            if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                                stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                            let duration = -1;
+                            if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                                duration = buff[SkillJSONKeys.BUFF_DURATION];
+                            doll.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                        });
+                    }
                 });
+                if (skill.hasOwnProperty(SkillJSONKeys.POST_SELF_BUFF)) {
+                    let statusEffects = skill[SkillJSONKeys.POST_SELF_BUFF];
+                    statusEffects.forEach(buff => {
+                        let stacks = 1;
+                        if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
+                            stacks = buff[SkillJSONKeys.BUFF_STACKS];
+                        let duration = -1;
+                        if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
+                            duration = buff[SkillJSONKeys.BUFF_DURATION];
+                        this.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                    });
+                }
             }
             else
                 this.processPrePostBuffs(skill, supportTarget, null, 0);
@@ -523,6 +546,9 @@ class Doll extends Unit {
         }
         // after doing damage, consume any buffs that are reduced on attack
         this.consumeAttackBuffs();
+        // for removing edifice stacks normally
+        if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName))
+            target.takePrimaryDamage();
         // add fixed damage
         damage += fixedDamage;
         if (fixedDamage > 0)

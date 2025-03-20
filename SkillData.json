@@ -757,6 +757,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cost" : 2,
             "Multiplier" : 1.3,
             "Damage_Type" : "Targeted",
             "StabilityDamage" : 4,
@@ -769,6 +770,7 @@
         },
         "Skill3" : {
             "Type" : "Attack",
+            "Cost" : 3,
             "Multiplier" : 0.8,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 2,
@@ -777,6 +779,7 @@
         },
         "Ultimate" : {
             "Type" : "Buff",
+            "Cooldown" : 3,
             "Target" : "All",
             "Post_Target_Buff" : [{
                 "Name" : "Blazing Assault 2",

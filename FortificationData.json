@@ -471,6 +471,11 @@
             "Skill2" : {
                 "Multiplier" : 1.4
             }
+        },
+        "V3" : {
+            "Skill3" : {
+                "Cost" : 2
+            }
         }
     },
     "Groza" : {

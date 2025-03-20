@@ -1045,3 +1045,57 @@ export class Sharkry extends Supporter {
         return super.cloneUnit(new Sharkry(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }
+
+export class Cheeta extends Supporter {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Cheeta", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
+        // key 1 starts with full index
+        if (this.keysEnabled[0])
+            this.CIndex = 6;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        // key 4 gives 3% atk per buff
+        let buffCount = 0;
+        if (this.keysEnabled[3]) {
+            this.currentBuffs.forEach(buff => {
+                if (buff[1][BuffJSONKeys.BUFF_TYPE] == "Buff")
+                    buffCount++;
+            });
+            this.attackBoost += 0.03 * Math.min(buffCount, 5);
+        }
+        // skill2 conditional is to have blazing assault
+        if (skillName == SkillNames.SKILL2 && this.hasBuff("Blazing Assault 2"))
+            conditionalTriggered[0] = true;
+
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        if (this.keysEnabled[3])
+            this.attackBoost -= 0.03 * Math.min(buffCount, 5);
+        // if used ult, enable support attacks
+        if (skillName == SkillNames.ULT)
+            this.supportEnabled = true;
+    }
+
+    refreshSupportUses() {
+        super.refreshSupportUses();
+        // the buff called "support" uniquely ticks down at the start of each round rather than the end of her turn
+        let foundSupport = 0;
+        for (let i = 0; i < this.currentBuffs.length && !foundSupport; i++) {
+            if (this.currentBuffs[i][0] == "Support") {
+                this.currentBuffs[i][2]--;
+                // losing the buff disables her support attacks
+                if (this.currentBuffs[i][2] == 0) {
+                    this.supportEnabled = false;
+                    this.removeBuff("Support");
+                }
+                foundSupport = 1;
+            }
+        }
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new Cheeta(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}
