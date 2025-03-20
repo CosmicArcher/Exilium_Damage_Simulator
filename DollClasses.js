@@ -111,10 +111,11 @@ export class Qiongjiu extends Supporter {
     useSupportSkill(target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = false) {
         if (this.supportsUsed < this.supportLimit && this.supportEnabled) {
             this.supportsUsed++;
-            let damage = this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
             // V4 vuln application requires her to have support boost 2 stacks and the target to be out of cover
             if (this.hasBuff("Support Boost 2 V4") && GameStateManager.getInstance().getCover() == 0)
                 target[0].addBuff("Vulnerability 1", this.name, 1, 1);
+            let damage = this.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
+            
             return damage;
         }
         return 0;
@@ -327,7 +328,8 @@ export class Suomi extends Supporter {
             }
             // v3+ skill3 grants an extra stack of defensive support if near a large target
             if (skillName == SkillNames.SKILL3) {
-                if (this.fortification > 2 && target.getIsLarge()) 
+                let enemyTarget = GameStateManager.getInstance().getTarget();
+                if (this.fortification > 2 && enemyTarget.getIsLarge()) 
                     conditionalTriggered[0] = true;
             }
 
@@ -780,5 +782,97 @@ export class Tololo extends Doll {
 
     cloneUnit() {
         return super.cloneUnit(new Tololo(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+    }
+}
+
+export class MosinNagant extends Supporter {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Mosin-Nagant", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
+        // support is always available but requires specific conditions to be used
+        this.supportEnabled = true;
+        // track skill3 uses for bonus effects
+        this.skill3Uses = 0;
+        // v6 gives 3 supports per turn
+        if (fortification == 6)
+            this.supportLimit = 3;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        // 2 of the skill check if a phase weakness is exploited for conditional
+        let exploit = 0;
+        let weaknesses;
+        if (target.constructor == Array)
+            weaknesses = target[0].getPhaseWeaknesses();
+        else
+            weaknesses = target.getPhaseWeaknesses();
+        if (this.hasBuff("Active Engagement") || this.hasBuff("Active Engagement V5")) { 
+            if (weaknesses.includes(Elements.ELECTRIC))
+                exploit = 1;
+            // key 2 adds a condition if skill2 does electric damage which is the same as checking if active engagement buff is present
+            if (skillName == SkillNames.SKILL2 && this.keysEnabled[1]) {
+                // depending on whether v1 added another condition, the index of the key's condition changes
+                if (this.fortification == 0)
+                    conditionalTriggered[0] = true;
+                else
+                    conditionalTriggered[1] = true;
+            }
+        }
+        else if (weaknesses.includes(AmmoTypes.HEAVY))
+            exploit = 1;
+        // check skill3 conditional
+        if (skillName == SkillNames.SKILL3) {
+            this.skill3Uses++;
+            // put it on a 1 turn cooldown to prevent it from being used multiple times on the same turn
+            this.cooldowns[2] = 1;
+            // if used 3 times, grant shock, v5 lowers the requirement to 2 times
+            if (this.skill3Uses == 3 || (this.skill3Uses == 2 && this.fortification > 4)) {
+                conditionalTriggered[0] = true;
+                this.skill3Uses = 0;
+            }
+        }
+        else if (exploit && (skillName == SkillNames.ULT || (skillName == SkillNames.SKILL2 && this.fortification > 0)))
+            conditionalTriggered[0] = true;
+        // unshakable confidence only buffs ult crit
+        let ultStacks = 0;
+        if (skillName == SkillNames.ULT) {
+            for (let i = 0; i < this.currentBuffs.length && ultStacks == 0; i++) {
+                if (this.currentBuffs[i][0] == "Unshakable Confidence")
+                    ultStacks = this.currentBuffs[i][3];
+            }
+            this.crit_chance += 0.05 * ultStacks;
+            this.crit_damage += 0.05 * ultStacks;
+        }
+        // key 4 gives 15% cover ignore if has shock buff
+        let hasShock = this.hasBuff("Shock");
+        if (this.keysEnabled[3] && hasShock)
+            this.coverIgnore += 0.15;
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        if (this.keysEnabled[3] && hasShock)
+            this.coverIgnore -= 0.15;
+        if (skillName == SkillNames.ULT) {
+            this.crit_chance -= 0.05 * ultStacks;
+            this.crit_damage -= 0.05 * ultStacks;
+            // v3+ ult gives 1 index per unshakable confidence stack
+            if (this.fortification > 2)
+                this.CIndex = Math.min(this.CIndex + ultStacks, 6);
+        }
+        // support gives 2 index per use
+        else if (skillName == SkillNames.SUPPORT)
+            this.CIndex = Math.min(this.CIndex + 2, 6);
+        // skill2 conditional refunds an index
+        else if (skillName == SkillNames.SKILL2 && this.fortification > 0 && conditionalTriggered[0] && this.CIndex < 6)
+            this.CIndex++;
+    }
+
+    useSupportSkill(target, calculationType, conditionalTriggered) {
+        // mosin support only triggers if the target has no stability after the primary attacker
+        if (target[0].getStability() == 0)
+            super.useSupportSkill(target, calculationType, conditionalTriggered);
+    }
+
+    cloneUnit() {
+        return super.cloneUnit(new MosinNagant(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
     }
 }

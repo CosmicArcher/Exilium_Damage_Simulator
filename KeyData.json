@@ -163,7 +163,6 @@
     },
     "Tololo" : {
         "Comet Tail Transit" : {
-
         },
         "Principles of Observational Astronomy" : {
             "Skill" : {
@@ -182,6 +181,33 @@
         "Galactic Cruise" : {
         },
         "Stellar Eclipse" : {
+        }
+    },
+    "Mosin-Nagant" : {
+        "Security Patrol Squad" : {
+        },
+        "Preparatory Defense" : {
+            "Skill" : {
+                "Skill2" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "Electric",
+                            "Post_Target_Buff" : [{
+                                "Name" : "Paralysis",
+                                "Duration" : 1
+                            }]
+                        }]
+                    }
+                }
+            }
+        },
+        "Maintain Order" : {
+        },
+        "Positive Mindset" : {
+        },
+        "Focus on Work" : {
+        },
+        "Mobile Patrol" : {
         }
     }
 }

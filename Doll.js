@@ -399,7 +399,7 @@ class Doll extends Unit {
         // suomi applies 1 stack of avalanche for any active skill use by anyone other than herself
         if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
             EventManager.getInstance().broadcastEvent("allyAction", this.name);
-            // apply the index cost or cooldown of the skill if present
+            // apply the index cost or cooldown of the skill if present, assumed index >= cost when skill is used
             if (skill.hasOwnProperty(SkillJSONKeys.COST))
                 this.CIndex -= skill[SkillJSONKeys.COST];
             if (skill.hasOwnProperty(SkillJSONKeys.COOLDOWN)) {
@@ -504,10 +504,14 @@ class Doll extends Unit {
                     this.elementDamageDealt.Freeze += 0.15;
             }
         }
+        // active engagement temporarily changes damage type to electric
+        let element = skill[SkillJSONKeys.ELEMENT];
+        if (this.hasBuff("Active Engagement") || this.hasBuff("Active Engagement V5"))
+            element = Elements.ELECTRIC;
         // get the temporary damage boost from skill conditionals when triggered
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt += skill[SkillJSONKeys.DAMAGE_BOOST];
-        let damage = DamageManager.getInstance().calculateDamage(this, target, this.attack * skill[SkillJSONKeys.MULTIPLIER], skill[SkillJSONKeys.ELEMENT], 
+        let damage = DamageManager.getInstance().calculateDamage(this, target, this.attack * skill[SkillJSONKeys.MULTIPLIER], element, 
             skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore, skillName);
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt -= skill[SkillJSONKeys.DAMAGE_BOOST];

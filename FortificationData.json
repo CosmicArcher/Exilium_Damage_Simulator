@@ -286,39 +286,39 @@
         }
     },
     "Mosin-Nagant" : {
+        "V1" : {
+            "Skill2" : {
+                "Conditional" : [{
+                    "Condition_Text" : "Phase Exploit"
+                }]
+            }
+        },
         "V2" : {
             "Support" : {
                 "Post_Self_Buff" : [{
                     "Name" : "Insight",
                     "Duration" : 2
                 }, {
-                    "Name" : "Unshakable Confidence",
-                    "Duration" : -1
+                    "Name" : "Unshakable Confidence"
                 }]
             }
         },
         "V4" : {
             "Support" : {
                 "Pre_Self_Buff" : [{
-                    "Name" : "Active Engagement",
-                    "Duration" : -1,
-                    "Stacks" : 1
+                    "Name" : "Active Engagement"
                 }]
             }
         },
         "V5" : {
             "Skill3" : {
                 "Post_Self_Buff" : [{
-                    "Name" :  "Active Engagement V5",
-                    "Duration" : -1,
-                    "Stacks" : 1
+                    "Name" :  "Active Engagement V5"
                 }]
             },
             "Support" : {
                 "Pre_Self_Buff" : [{
-                    "Name" : "Active Engagement V5",
-                    "Duration" : -1,
-                    "Stacks" : 1
+                    "Name" : "Active Engagement V5"
                 }]
             }
         }

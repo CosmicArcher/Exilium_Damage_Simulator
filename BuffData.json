@@ -245,56 +245,66 @@
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0,
+        "Cleanseable" : 1,
         "Stat" : "Movement"
     },
     "Movement Up 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0,
+        "Cleanseable" : 1,
         "Stat" : "Movement"
     },
     "Movement Up 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0,
+        "Cleanseable" : 1,
         "Stat" : "Movement"
     },
     "Active Engagement" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "Stack_Limit" : 99,
         "DamagePerc" : 0.3
     },
     "Active Engagement V5" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "Defense_Consumed" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "Stack_Limit" : 99,
         "DamagePerc" : 0.4
     },
     "Feeling Full" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Vulnerability 1" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "DamageTakenPerc" : 0.1,
         "Stat" : "DamageTaken"
     },
     "Vulnerability 2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "DamageTakenPerc" : 0.2,
         "Stat" : "DamageTaken"
     },
     "Overzealous" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
         "Stat" : "DamageTaken"
     },
     "Flammable" : {
@@ -522,32 +532,42 @@
     "Conductivity" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 1,
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 1,
         "Element" : "Electric"
     },
     "Shock" : {
-        "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "Attack",
+        "Cleanseable" : 0,
         "Element" : "Electric"
     },
     "Unshakable Confidence" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stack_Limit" : 4
     },
     "Mark of Prey" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Camouflage" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 1,
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 0,
         "Stack_Limit" : 2
     },
     "Hunters Talent" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stack_Limit" : 99
     },
     "Cleanse" : {
@@ -613,5 +633,12 @@
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Defense_Ignore" : 0.2
+    },
+    "Paralysis" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Element" : "Electric"
     }
 } 
