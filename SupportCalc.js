@@ -745,7 +745,6 @@ d3.select("#calculateButton").on("click", () => {
     let conditionalOverride = getConditionalOverrides();
     // the first doll is the primary attacker, all others support if applicable
     TurnManager.getInstance().useDollSkill(newDolls[0].getName(), selectedSkill, CalculationTypes.EXPECTED, conditionalOverride[0]);
-    d3.select("#ActionLog").insert("p","p").text("Expected Damage");
 })
 
 d3.select("#Doll_1").style("background-color", slotColors[0]);
