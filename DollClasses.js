@@ -371,10 +371,10 @@ export class Suomi extends Supporter {
                 let data = skill[SkillJSONKeys.FIXED_DAMAGE];
                 switch (data[SkillJSONKeys.FIXED_DAMAGE_STAT]) {
                     case "Defense":
-                        fixedDamage = this.defense;
+                        fixedDamage = this.getDefense();
                         break;
                     case "Attack":
-                        fixedDamage = this.attack;
+                        fixedDamage = this.getAttack();
                         break;
                     default:
                         console.error([`${data[SkillJSONKeys.FIXED_DAMAGE_STAT]} fixed damage scaling for is not covered`, this]);

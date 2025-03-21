@@ -21,7 +21,8 @@ class Unit {
     }
 
     setDefense(x) {this.defense = x;}
-    getDefense() {return this.defense;}
+    getDefense() {return this.defense * (1 + this.defenseBuffs);}
+    getBaseDefense() {return this.defense;}
     getName() {return this.name;}
     // process buffs using json data
     applyBuffEffects(buffData, stacks = 1, stackable = false) {

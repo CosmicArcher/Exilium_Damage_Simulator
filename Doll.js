@@ -73,10 +73,15 @@ class Doll extends Unit {
         this.applyFortificationData();
         this.applyKeyData();
     }
+    // for tracking which dolls have turns available
+    getTurnAvailable() {return this.turnAvailable;}
+    getIndex() {return this.CIndex;}
 
     getAttack() {return this.attack * (1 + this.attackBoost + GlobalBuffManager.getInstance().getGlobalAttack());}
     getCritRate() {return this.critChance;}
     getCritDamage() {return this.critDamage;}
+    getBaseCrit() {return this.baseCritChance;}
+    getBaseCritDamage() {return this.baseCritDamage;}
     // get any stats relevant to damage calculation
     getDefenseIgnore() {return this.defenseIgnore;}
     getDamageDealt() {return this.damageDealt;}
@@ -522,10 +527,10 @@ class Doll extends Unit {
             let data = skill[SkillJSONKeys.FIXED_DAMAGE];
             switch (data[SkillJSONKeys.FIXED_DAMAGE_STAT]) {
                 case "Defense":
-                    fixedDamage = this.defense;
+                    fixedDamage = this.getDefense();
                     break;
                 case "Attack":
-                    fixedDamage = this.attack;
+                    fixedDamage = this.getAttack();
                     break;
                 default:
                     console.error([`${data[SkillJSONKeys.FIXED_DAMAGE_STAT]} fixed damage scaling for is not covered`, this]);
@@ -773,6 +778,7 @@ class Doll extends Unit {
         newDoll.setStabilityDamageModifier(this.baseStabilityDamageModifier);
         newDoll.setStabilityIgnore(this.baseStabilityIgnore);
         newDoll.setAttackBoost(this.baseAttackBoost);
+        newDoll.setDefenseBuffs(this.defenseBuffs);
 
         if (!this.buffsEnabled)
             newDoll.disableBuffs();
