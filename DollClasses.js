@@ -148,15 +148,11 @@ export class Makiatto extends Interceptor {
             this.interceptLimit = 3;
         if (keysEnabled[1]) // key 2 starts full index
             this.CIndex = 6;
-        if (keysEnabled[4]) // key 5 applies murderous intent on the  highest hp enemy, sim is meant for single target
-            GameStateManager.getInstance().getTarget().addBuff("Murderous Intent", this.name, -1, 1);
         if (keysEnabled[5])
             this.attackBuff += 0.1;
         // Makiatto passive
         this.crit_chance += 0.4;
         this.crit_damage -= 0.1;
-        this.addBuff("Insight", this.name, 2, 1);
-        this.addBuff("Steady Progress", this.name, 2, 1);
     }
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
@@ -285,10 +281,13 @@ export class Makiatto extends Interceptor {
         if (buffName == "Alert")
             this.interceptEnabled = false;
     }
-    
-    endTurn() {
-        super.endTurn();
-        // Passive constantly refreshes these buffs as long as 80%+ hp which is assumed always true
+
+    refreshSupportUses() {
+        super.refreshSupportUses();
+        // key 5 applies murderous intent on the  highest hp enemy, sim is meant for single target
+        let target = GameStateManager.getInstance().getBaseTarget();
+        if (this.keysEnabled[4] && !target.hasBuff("Murderous Intent")) 
+            target.addBuff("Murderous Intent", this.name, -1, 1);
         this.addBuff("Insight", this.name, 2, 1);
         this.addBuff("Steady Progress", this.name, 2, 1);
     }

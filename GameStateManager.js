@@ -47,7 +47,11 @@ class GameStateManager {
     }
     startSimulation() {
         if (GameStateManagerSingleton) {
-            // clone the latest version of the units
+            // activate all the turn start effects
+            GameStateManagerSingleton.dolls[0].forEach(doll => {
+                doll.refreshSupportUses();
+            });
+            // clone the first version of the units
             let target = GameStateManagerSingleton.target[0];
             let dolls = GameStateManagerSingleton.dolls[0];
             let newTarget = target.cloneUnit();
@@ -74,6 +78,14 @@ class GameStateManager {
     getTarget() {
         if (GameStateManagerSingleton) {
             return GameStateManagerSingleton.target[GameStateManagerSingleton.actionCount+1];
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // for dolls like makiatto that apply a debuff on the target at the start of combat at 0 actions
+    getBaseTarget() {
+        if (GameStateManagerSingleton) {
+            return GameStateManagerSingleton.target[0];
         }
         else
             console.error("Singleton not yet initialized");

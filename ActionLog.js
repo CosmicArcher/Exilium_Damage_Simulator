@@ -10,14 +10,15 @@ class ActionLog {
         else {
             console.log("Action Log Instantiated");
             ActionLogSingleton = this;
+            // queue for displaying each logged text using a setInterval()
             ActionLogSingleton.logQueue = [];
+            ActionLogSingleton.isDisplaying = false;
+            // event listeners for different text display
             EventManager.getInstance().addListener("damageDealt", ActionLogSingleton.displayDamage);
             EventManager.getInstance().addListener("fixedDamage", ActionLogSingleton.displayFixedDamage);
             EventManager.getInstance().addListener("avalanche", ActionLogSingleton.displayAvalanche);
             EventManager.getInstance().addListener("statusApplied", ActionLogSingleton.displayStatus);
             EventManager.getInstance().addListener("stackConsumption", ActionLogSingleton.displayStackConsumption);
-
-            setInterval(ActionLogSingleton.updateLog, 150);
         }
     }
 
@@ -72,6 +73,8 @@ class ActionLog {
     addLog(text) {
         if (ActionLogSingleton) {
             ActionLogSingleton.logQueue.push(text);
+            if (!ActionLogSingleton.isDisplaying)
+                ActionLogSingleton.startLog();
         }
         else
             console.error("Singleton not yet initialized");
@@ -84,6 +87,28 @@ class ActionLog {
                 newLog.style("margin-left", "-350px");
                 newLog.transition().style("margin-left", "0px");
             }
+            else
+                ActionLogSingleton.pauseLog();
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+
+    startLog() {
+        if (ActionLogSingleton) {
+            ActionLogSingleton.timedInterval = setInterval(ActionLogSingleton.updateLog, 150);
+            ActionLogSingleton.isDisplaying = true;
+            console.log("Starting Action Log");
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+
+    pauseLog() {
+        if (ActionLogSingleton) {
+            clearInterval(ActionLogSingleton.timedInterval);
+            ActionLogSingleton.isDisplaying = false;
+            console.log("Stopping Action Log");
         }
         else
             console.error("Singleton not yet initialized");
