@@ -163,10 +163,7 @@ export class Makiatto extends Interceptor {
         if (keysEnabled[1]) // key 2 starts full index
             this.CIndex = 6;
         if (keysEnabled[5])
-            this.attackBuff += 0.1;
-        // Makiatto passive
-        this.crit_chance += 0.4;
-        this.crit_damage -= 0.1;
+            this.attackBoost += 0.1;
     }
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
@@ -218,7 +215,7 @@ export class Makiatto extends Interceptor {
         // v1+ skill 2 and v6 intercept conditional is the first attack critting, that assumption is handled by all except simulation inside the doll class
         if (!conditionalTriggered[0] && calculationType == CalculationTypes.SIMULATION) {
             // do a crit roll outside of the proper function, if it crits then set the onCrit condition to true regardless of the toggle input
-            if ((skillName == SkillNames.SKILL2 && this.fortification > 0) || (skillName == SkillNames.INTERCEPT && this.fortification == 6))
+            if ((skillName == SkillNames.INTERCEPT && this.fortification == 6))
                 conditionalTriggered[0] = RNGManager.getInstance().getRNG() <= this.crit_chance;
         }
         

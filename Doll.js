@@ -341,7 +341,20 @@ class Doll extends Unit {
             // if out of turn attack, temporarily increase damage dealt stat then undo once damage has been calculated
             if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
                 this.damageDealt += this.supportDamageDealt;
-            let damage = this.processAttack(skill, calculationType, enemyTarget, skillName);
+            let damage;
+            // if simulating with v1+ makiatto skill2, do the crit roll outside of the function to track the condition flag for the next hit
+            if (calculationType == CalculationTypes.SIMULATION && this.name == "Makiatto" && this.fortification > 0 && skillName == SkillNames.SKILL2) {
+                let isCrit = RNGManager.getInstance().getRNG() <= this.crit_chance;
+                damage = this.processAttack(skill, isCrit ? CalculationTypes.CRIT : CalculationTypes.NOCRIT, enemyTarget, skillName);
+                // modify the skill data for condition pass if isCrit is true
+                if (isCrit) {
+                    let conditionalData = skill[SkillJSONKeys.CONDITIONAL][0];
+                    this.mergeData(skill, conditionalData);
+                }
+            }
+            else 
+                damage = this.processAttack(skill, calculationType, enemyTarget, skillName);
+
             if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
                 this.damageDealt -= this.supportDamageDealt;
 
@@ -739,7 +752,6 @@ class Doll extends Unit {
     }
     // to enable turn rewinding, each move uses clones of the previous state and rewind just returns to that set of clones
     cloneUnit(newDoll = null) {
-        console.log(newDoll);
         if (!newDoll)
             newDoll = new Doll(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled);   
         newDoll.CIndex = this.CIndex;
@@ -778,7 +790,6 @@ class Doll extends Unit {
         newDoll.turnAvailable = this.turnAvailable;
 
         newDoll.finishCloning();
-        console.log(newDoll);
         return newDoll;
     }
     // to be filled by child classes

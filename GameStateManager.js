@@ -1,3 +1,5 @@
+import { CalculationTypes } from "./Enums.js";
+
 let GameStateManagerSingleton;
 
 class GameStateManager {
@@ -24,6 +26,8 @@ class GameStateManager {
             GameStateManagerSingleton.target = [null];
             GameStateManagerSingleton.coverValue = 0;
             GameStateManagerSingleton.dolls = [[]];
+            // to set different calculation types for each doll, some expected damage, others always crit, some rng, etc.
+            GameStateManagerSingleton.calcTypes = [];
             // rewinding will be implemented as each action creating a clone of all units and modifying them when using skills and applying buffs
             // rewinding to a specific action will delete all indices after that action
             GameStateManagerSingleton.actionCount = 0;
@@ -79,6 +83,8 @@ class GameStateManager {
     registerDoll(doll) {
         if (GameStateManagerSingleton) {
             GameStateManagerSingleton.dolls[0].push(doll);
+            // default to expected type
+            GameStateManagerSingleton.calcTypes.push(CalculationTypes.EXPECTED);
         }
         else
             console.error("Singleton not yet initialized");
@@ -190,6 +196,25 @@ class GameStateManager {
             GameStateManagerSingleton.dolls.splice(actionNumber+1, lengthToCut);
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+
+    setDollCalcType(calculationType, index) {
+        if (GameStateManagerSingleton) {
+            GameStateManagerSingleton.calcTypes[index] = calculationType;
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    getDollCalcType(dollName) {
+        if (GameStateManagerSingleton) {
+            for (let i = 0; i < GameStateManagerSingleton.dolls[0].length; i++) {
+                if (GameStateManagerSingleton.dolls[0][i].getName() == dollName)
+                    return GameStateManagerSingleton.calcTypes[i];
+            }
+            console.error(`${dollName} does not exist in Game State Manager singleton`);
         }
         else
             console.error("Singleton not yet initialized");

@@ -1,5 +1,4 @@
 import DamageManager from "./DamageManager.js";
-import Doll from "./Doll.js";
 import ResourceLoader from "./ResourceLoader.js";
 import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
@@ -16,6 +15,7 @@ var selectedDolls = [""];
 var selectedFortifications = [0];
 var selectedKeys = [[0,0,0,0,0,0]];
 var selectedSkill = "";
+var calcSettings = [CalculationTypes.EXPECTED];
 var numDolls = 1;
 // papasha summon does not count towards the limit of 4 supports
 var numSummons = 0;
@@ -25,6 +25,7 @@ var dollOptions;
 var keyOptions;
 var phaseDiv = [null];
 var fortOptions;
+var calcOptions;
 // for use when dynamically adding and removing doll slots
 var slotColors = ["olive", "violet", "deeppink", "orange", "dodgerblue", "aquamarine"];
 
@@ -68,7 +69,7 @@ function minimizeSlots() {
 function addDoll() {
     numDolls++;
     updateSupportCounter();
-    let newNode = d3.select("#Doll_1").node().cloneNode(true);
+    let newNode = document.getElementById("Doll_1").cloneNode(true);
     newNode.className = "slotMaximized";
     newNode.firstElementChild.textContent = "-";
     newNode.id = "Doll_" + numDolls;
@@ -104,6 +105,27 @@ function addDoll() {
     updateConditionalToggles(numDolls - 1);
 
     initializeDollButtons(numDolls - 1);
+
+    // add a row under the calculation settings section
+    let newSetting = document.getElementById("CalcSettings").children[1].cloneNode(true);
+    newSetting.firstChild.textContent = "Doll: ";
+    newSetting.firstElementChild.textContent = "Calculation";
+    newSetting.id = "Settings_" + numDolls;
+    d3.select(newSetting.lastElementChild).on("click", () => {
+        // reuse the dropdown among all buttons for this setting
+        newSetting.lastElementChild.appendChild(calcOptions.node());
+        // toggle the dropdown list
+        if (calcOptions.style("display") == "none") { 
+            hideDropdowns();
+            calcOptions.style("display", "block");
+        }
+        else
+            hideDropdowns();
+    });
+    // add a line break to get spacing between each row
+    d3.select("#CalcSettings").append("br");
+    document.getElementById("CalcSettings").appendChild(newSetting);
+    calcSettings.push(CalculationTypes.EXPECTED);
 }
 // remove index from all arrays and shift the ids and colors of later slots
 function removeDoll(index) {
@@ -127,6 +149,9 @@ function removeDoll(index) {
     }
     // delete the html element
     d3.select("#Doll_" + (index + 1)).remove();
+    // remove the doll's entry in the calculation settings section too
+    calcSettings.splice(index, 1);
+    spliceNodeList(document.getElementById("CalcSettings").children, 2 * index + 1, 2);
     // if papasha is deleted, remove her summon as well if it is not on the first slot
     if (doll == "Papasha") {
         for (let i = 1; i < numDolls; i++) {
@@ -134,320 +159,6 @@ function removeDoll(index) {
                 removeDoll(i);
         }
     }
-}
-
-function getNestedInput(arr, htmlElement) {
-    htmlElement.childNodes.forEach(d => {
-        if (d.type == "text")
-            arr.push(+d.value);
-        else if (d.childNodes.length > 0)
-            getNestedInput(arr, d);
-    });
-}
-
-function getTargetStats() {
-    // def, weaknesses, cover, stability, def buffs, damage taken, targeted, aoe, stab damage modifier, dr per stab, dr with stab 
-    /*let targetStats = [0,[],0,  0,           0,          0,          0,       0,      0,                    0,           0];
-    targetStats[0] = getValuefromInput("#targetDef");
-    targetStats[1] = selectedPhases;
-    targetStats[2] = getValuefromInput("#targetCover");
-    targetStats[3] = getValuefromInput("#targetStability");
-    targetStats[4] = getValuefromInput("#targetDefBuffs");
-    targetStats[5] = getValuefromInput("#targetDamageTaken");
-    targetStats[6] = getValuefromInput("#targetTargetedDamage");
-    targetStats[7] = getValuefromInput("#targetAoEDamage");
-    targetStats[8] = getValuefromInput("#targetStabilityMod");
-    targetStats[9] = getValuefromInput("#targetDRPerStab");
-    targetStats[10] = getValuefromInput("#targetDRWithStab");*/
-
-    let targetStats = [];
-    getNestedInput(targetStats, document.getElementById("TargetColumn"));
-
-    return targetStats;
-}
-
-function getGlobalStats() {
-    let arr = [];
-    getNestedInput(arr, document.getElementById("GlobalBuffs"));
-
-    return arr;
-}
-
-function getDollStats(index) {
-    let dollStats = [];
-    getNestedInput(dollStats, document.getElementById("Doll_" + (index + 1)));
-
-    return dollStats;
-}
-
-function getConditionalOverrides() {
-    let overrides = [];
-    let conditionalDiv = document.getElementById("Skill").nextElementSibling;
-    overrides.push([]);
-    // number of conditionals is 1/3 of the number of elements 
-    for (let i = 0; i < conditionalDiv.children.length / 3; i++) {
-        overrides[0].push(conditionalDiv.children[i*3].checked);
-    }
-
-    for (let i = 1; i < numDolls; i++) {
-        conditionalDiv = document.getElementById("Doll_" + (i + 1)).children[13];
-        overrides.push([]);
-        for (let j = 0; j < conditionalDiv.children.length / 3; j++) {
-            overrides[0].push(conditionalDiv.children[j*3].checked);
-        }
-    }
-    return overrides;
-}
-
-function getSkillConditionals(skillName, index) {
-    let conditionals = [];
-    // get the doll's inherent skill conditionals
-    let baseSkill = ResourceLoader.getInstance().getSkillData(selectedDolls[index])[skillName];
-    if (baseSkill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
-        baseSkill[SkillJSONKeys.CONDITIONAL].forEach(obj => {
-            conditionals.push(obj);
-        });
-    }
-    // check if the fortifications add a conditional to the skill
-    let fortificationData = ResourceLoader.getInstance().getFortData(selectedDolls[index]);
-    for (let i = 1; i <= selectedFortifications[index]; i++) {
-        // check each fortification
-        if (fortificationData.hasOwnProperty("V"+i)) {
-            let fortification = fortificationData["V"+i];
-            // check if the fortification modifies the skill
-            if (fortification.hasOwnProperty(skillName)) {
-                // check if the modification overwrites the conditional
-                if (fortification[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
-                    conditionals = [];
-                    fortification[skillName][SkillJSONKeys.CONDITIONAL].forEach(obj => {
-                        conditionals.push(obj);
-                    });
-                }
-                // check if the modification appends to the conditionals instead
-                if (fortification[skillName].hasOwnProperty(SkillJSONKeys.APPEND)) {
-                    if (fortification[skillName][SkillJSONKeys.APPEND].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
-                        fortification[skillName][SkillJSONKeys.APPEND][SkillJSONKeys.CONDITIONAL].forEach(obj => {
-                            conditionals.push(obj);
-                        });
-                    }
-                }
-            }
-        }
-    }
-    // check the currently equipped keys if they add conditionals
-    let keyData = getDollKeys(index);
-    for (let i = 0; i < 6; i++) {
-        // check if the key is equipped
-        if (selectedKeys[index][i]) {
-            // check if the key modifies a skill
-            if (keyData[Object.keys(keyData)[i]].hasOwnProperty("Skill")) {
-                let skill = keyData[Object.keys(keyData)[i]]["Skill"];
-                // check each skill modified by the key
-                Object.keys(skill).forEach(skill_name => {
-                    if (skillName == skill_name) {
-                        //check if modification overwrites the conditional
-                        if (skill[skill_name].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
-                            conditionals = [];
-                            skill[skill_name][SkillJSONKeys.CONDITIONAL].forEach(obj => {
-                                conditionals.push(obj);
-                            });
-                        }
-                        // check if key appends a conditional rather than overwriting it
-                        if (skill[skill_name].hasOwnProperty(SkillJSONKeys.APPEND)) {
-                            if (skill[skill_name][SkillJSONKeys.APPEND].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
-                                skill[skill_name][SkillJSONKeys.APPEND][SkillJSONKeys.CONDITIONAL].forEach(obj => {
-                                    conditionals.push(obj);
-                                });
-                            }
-                        }
-                    }
-                });
-            }
-        }
-    }
-    return conditionals;
-}
-// adjust the conditionalDiv content based on how many conditionals are present in the doll's skill
-function updateConditionalToggles(index) {
-    let skillConditionals;
-    let conditionalDiv;
-    // get the skill conditionals and the html element holding the toggles
-    if (index == 0) {
-        if (selectedSkill != "") 
-            skillConditionals = getSkillConditionals(selectedSkill, index);
-        else
-            skillConditionals = [];
-        conditionalDiv = document.getElementById("Skill").nextElementSibling;
-    }
-    else {
-        // update function can be called on new slot generation hence selected doll at index may still be blank
-        if (selectedDolls[index] != "")
-            skillConditionals = getSkillConditionals(SkillNames.SUPPORT, index);
-        else
-            skillConditionals = [];
-        // support units do not have the skill html element so we get them by traversing through the html children array
-        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[13];
-    }
-    if (skillConditionals.length > 0) {
-        d3.select(conditionalDiv).style("display", "block");
-        // adjust the number of toggles to match the number of conditionals
-        while (skillConditionals.length > conditionalDiv.children.length / 3) {
-            d3.select(conditionalDiv).append("input").attr("type", "checkbox");
-            d3.select(conditionalDiv).append("label");
-            d3.select(conditionalDiv).append("br");
-        }
-        if (skillConditionals.length < conditionalDiv.children.length / 3) 
-            spliceNodeList(conditionalDiv.children, 3, conditionalDiv.children.length - skillConditionals.length * 3);
-        // apply each condition description to the toggle text
-        skillConditionals.forEach((condition, index) => {
-            conditionalDiv.children[index * 3].nextSibling.textContent = condition[SkillJSONKeys.CONDITION_TEXT] + " Condition Met";
-        });
-    }
-    else {
-        d3.select(conditionalDiv).style("display", "none");
-        conditionalDiv.firstElementChild.checked = false;
-        // delete any excess toggles when disabled
-        if (conditionalDiv.children.length > 3) 
-            spliceNodeList(conditionalDiv.children, 3, conditionalDiv.children.length - 3);
-    }
-}
-
-// get the skill keys of doll at index
-function getDollSkills(index) {
-    let dollSkills = ResourceLoader.getInstance().getSkillData(selectedDolls[index]);
-    return Object.keys(dollSkills);
-}
-// get the key data of doll at index
-function getDollKeys(index) {
-    return ResourceLoader.getInstance().getKeyData(selectedDolls[index]);
-}
-// for doll slot 1, all other slots use support if possible
-function createSkillDropdown() {
-    let skills = getDollSkills(0);
-    // clear the selected skill text because of the new doll chosen
-    if (skillOptions)
-        skillOptions.remove();
-    selectedSkill = "";
-    d3.select("#SkillSelected").text("Skill: ");
-    let conditionalDiv = d3.select("#Skill").node().nextElementSibling;
-    d3.select(conditionalDiv).style("display", "none");
-    d3.select(conditionalDiv.firstElementChild).node().checked = false;
-    // change selected skill text when dropdown option is clicked
-    skillOptions = d3.select("#Skill").append("div").attr("class", "dropdownBox").style("display", "none");
-    skills.forEach(d => {
-        skillOptions.append("a")
-                    .text(d)
-                    .on("click", () => {
-                        selectedSkill = d;
-                        d3.select("#SkillSelected").text("Skill: " + d);
-                        // activate the damage calculation button once a skill has been selected
-                        d3.select("#calculateButton").node().disabled = false;
-                        // if the skill has a conditional, show the override tickbox, otherwise hide and deselect it
-                        updateConditionalToggles(0);
-                    });
-    });
-}
-// create the dropdown for the keys
-function createKeyDropdown(index, htmlElement) {
-    let keys = Object.keys(getDollKeys(index));
-    // remove key button
-    keys.push("None");
-    // only show keys that have not yet been equipped and "None"
-    let filteredKeys = keys.filter((d, key_index) => {
-        return !selectedKeys[index][key_index];
-    });
-    keyOptions = d3.select(htmlElement).append("div").attr("class", "dropdownBox").style("display", "none");
-    filteredKeys.forEach(key_name => {
-        keyOptions.append("a")
-                    .text(key_name)
-                    .on("click", (event) => {
-                        let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
-                        let keyDisplay = event.target.parentNode.parentNode.nextElementSibling;
-                        if (key_name != "None") {
-                            // if a key has already been selected in this slot, deselect it in the selected keys
-                            if (keyDisplay.textContent != "None") {
-                                selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
-                                // if doll is papasha, also change her summon's keys
-                                if (selectedDolls[dollIndex] == "Papasha") {
-                                    selectedDolls.forEach((doll, i) => {
-                                        if (doll == "Papasha Summon") {
-                                            selectedKeys[i][keys.indexOf(keyDisplay.textContent)] = 0;
-                                        }
-                                    });
-                                }
-                            }
-                            // add the key in the selected keys of the doll
-                            selectedKeys[dollIndex][keys.indexOf(key_name)] = 1;
-                            // if doll is papasha, also change her summon's keys
-                            if (selectedDolls[dollIndex] == "Papasha") {
-                                selectedDolls.forEach((doll, i) => {
-                                    if (doll == "Papasha Summon") {
-                                        selectedKeys[i][keys.indexOf(key_name)] = 1;
-                                    }
-                                });
-                            }
-                            keyDisplay.textContent = key_name;
-                        }
-                        else {
-                            // if a key has already been selected in this slot, deselect it in the selected keys
-                            if (keyDisplay.textContent != "None") {
-                                selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
-                                // if doll is papasha, also change her summon's keys
-                                if (selectedDolls[dollIndex] == "Papasha") {
-                                    selectedDolls.forEach((doll, i) => {
-                                        if (doll == "Papasha Summon") {
-                                            selectedKeys[i][keys.indexOf(keyDisplay.textContent)] = 0;
-                                        }
-                                    });
-                                }
-                            }
-                            keyDisplay.textContent = "None";
-                        }
-                        // sometimes keys add conditionals so changing a key might add or remove some
-                        updateConditionalToggles(dollIndex);
-                    });
-    });
-}
-
-function updateSelectedDoll(index) {
-    d3.select(document.getElementById("Doll_" + (index + 1)).children[index == 0 ? 1 : 2]).text("Doll: V" + selectedFortifications[index] + " " + selectedDolls[index]);
-}
-// change weakness text based on selected list, write none if empty
-function updatePhaseText() {
-    let newText = "Phase Weaknesses:";
-    if (selectedPhases.length == 0)
-        newText += " None";
-    else 
-        selectedPhases.forEach(d => newText += " " + d);
-    d3.select("#PhasesSelected").text(newText);
-}
-
-function selectPhase(phaseAttribute) {
-    // check if phase is already in the list, if yes remove, otherwise add to the list
-    let removedPhase = false;
-    selectedPhases.forEach((d, i, a) => {
-        if (d == phaseAttribute) {
-            a.splice(i, 1);
-            removedPhase = true;
-        }
-    });
-    if (!removedPhase)
-        selectedPhases.push(phaseAttribute);
-    updatePhaseText();
-}
-// when any button is pressed, hide all currently displayed dropdowns
-function hideDropdowns() {
-    elementOptions.style("display", "none");
-    ammoOptions.style("display", "none");
-    if (fortOptions)
-        fortOptions.style("display", "none");
-    if (skillOptions)
-        skillOptions.style("display", "none");
-    if (keyOptions)
-        keyOptions.style("display", "none");
-    phaseDiv.forEach(div => {
-        div.style("display", "none");
-    });
 }
 // because initializing doll buttons will be repeated each time a new doll is added
 function initializeDollButtons(index) {
@@ -650,6 +361,323 @@ function createDollsFromInput() {
     }
     return dolls;
 }
+// for doll slot 1, all other slots use support if possible
+function createSkillDropdown() {
+    let skills = getDollSkills(0);
+    // clear the selected skill text because of the new doll chosen
+    if (skillOptions)
+        skillOptions.remove();
+    selectedSkill = "";
+    d3.select("#SkillSelected").text("Skill: ");
+    let conditionalDiv = d3.select("#Skill").node().nextElementSibling;
+    d3.select(conditionalDiv).style("display", "none");
+    d3.select(conditionalDiv.firstElementChild).node().checked = false;
+    // change selected skill text when dropdown option is clicked
+    skillOptions = d3.select("#Skill").append("div").attr("class", "dropdownBox").style("display", "none");
+    skills.forEach(d => {
+        skillOptions.append("a")
+                    .text(d)
+                    .on("click", () => {
+                        selectedSkill = d;
+                        d3.select("#SkillSelected").text("Skill: " + d);
+                        // activate the damage calculation button once a skill has been selected
+                        d3.select("#calculateButton").node().disabled = false;
+                        // if the skill has a conditional, show the override tickbox, otherwise hide and deselect it
+                        updateConditionalToggles(0);
+                    });
+    });
+}
+// create the dropdown for the keys
+function createKeyDropdown(index, htmlElement) {
+    let keys = Object.keys(getDollKeys(index));
+    // remove key button
+    keys.push("None");
+    // only show keys that have not yet been equipped and "None"
+    let filteredKeys = keys.filter((d, key_index) => {
+        return !selectedKeys[index][key_index];
+    });
+    keyOptions = d3.select(htmlElement).append("div").attr("class", "dropdownBox").style("display", "none");
+    filteredKeys.forEach(key_name => {
+        keyOptions.append("a")
+                    .text(key_name)
+                    .on("click", (event) => {
+                        let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
+                        let keyDisplay = event.target.parentNode.parentNode.nextElementSibling;
+                        if (key_name != "None") {
+                            // if a key has already been selected in this slot, deselect it in the selected keys
+                            if (keyDisplay.textContent != "None") {
+                                selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
+                                // if doll is papasha, also change her summon's keys
+                                if (selectedDolls[dollIndex] == "Papasha") {
+                                    selectedDolls.forEach((doll, i) => {
+                                        if (doll == "Papasha Summon") {
+                                            selectedKeys[i][keys.indexOf(keyDisplay.textContent)] = 0;
+                                        }
+                                    });
+                                }
+                            }
+                            // add the key in the selected keys of the doll
+                            selectedKeys[dollIndex][keys.indexOf(key_name)] = 1;
+                            // if doll is papasha, also change her summon's keys
+                            if (selectedDolls[dollIndex] == "Papasha") {
+                                selectedDolls.forEach((doll, i) => {
+                                    if (doll == "Papasha Summon") {
+                                        selectedKeys[i][keys.indexOf(key_name)] = 1;
+                                    }
+                                });
+                            }
+                            keyDisplay.textContent = key_name;
+                        }
+                        else {
+                            // if a key has already been selected in this slot, deselect it in the selected keys
+                            if (keyDisplay.textContent != "None") {
+                                selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
+                                // if doll is papasha, also change her summon's keys
+                                if (selectedDolls[dollIndex] == "Papasha") {
+                                    selectedDolls.forEach((doll, i) => {
+                                        if (doll == "Papasha Summon") {
+                                            selectedKeys[i][keys.indexOf(keyDisplay.textContent)] = 0;
+                                        }
+                                    });
+                                }
+                            }
+                            keyDisplay.textContent = "None";
+                        }
+                        // sometimes keys add conditionals so changing a key might add or remove some
+                        updateConditionalToggles(dollIndex);
+                    });
+    });
+}
+// when any button is pressed, hide all currently displayed dropdowns
+function hideDropdowns() {
+    elementOptions.style("display", "none");
+    ammoOptions.style("display", "none");
+    if (fortOptions)
+        fortOptions.style("display", "none");
+    if (skillOptions)
+        skillOptions.style("display", "none");
+    if (keyOptions)
+        keyOptions.style("display", "none");
+    phaseDiv.forEach(div => {
+        div.style("display", "none");
+    });
+    if (calcOptions)
+        calcOptions.style("display", "none");
+}
+
+function getNestedInput(arr, htmlElement) {
+    htmlElement.childNodes.forEach(d => {
+        if (d.type == "text")
+            arr.push(+d.value);
+        else if (d.childNodes.length > 0)
+            getNestedInput(arr, d);
+    });
+}
+
+function getTargetStats() {
+    // def, weaknesses, cover, stability, def buffs, damage taken, targeted, aoe, stab damage modifier, dr per stab, dr with stab 
+    /*let targetStats = [0,[],0,  0,           0,          0,          0,       0,      0,                    0,           0];
+    targetStats[0] = getValuefromInput("#targetDef");
+    targetStats[1] = selectedPhases;
+    targetStats[2] = getValuefromInput("#targetCover");
+    targetStats[3] = getValuefromInput("#targetStability");
+    targetStats[4] = getValuefromInput("#targetDefBuffs");
+    targetStats[5] = getValuefromInput("#targetDamageTaken");
+    targetStats[6] = getValuefromInput("#targetTargetedDamage");
+    targetStats[7] = getValuefromInput("#targetAoEDamage");
+    targetStats[8] = getValuefromInput("#targetStabilityMod");
+    targetStats[9] = getValuefromInput("#targetDRPerStab");
+    targetStats[10] = getValuefromInput("#targetDRWithStab");*/
+
+    let targetStats = [];
+    getNestedInput(targetStats, document.getElementById("TargetColumn"));
+
+    return targetStats;
+}
+
+function getGlobalStats() {
+    let arr = [];
+    getNestedInput(arr, document.getElementById("GlobalBuffs"));
+
+    return arr;
+}
+
+function getDollStats(index) {
+    let dollStats = [];
+    getNestedInput(dollStats, document.getElementById("Doll_" + (index + 1)));
+
+    return dollStats;
+}
+
+function getConditionalOverrides() {
+    let overrides = [];
+    let conditionalDiv = document.getElementById("Skill").nextElementSibling;
+    overrides.push([]);
+    // number of conditionals is 1/3 of the number of elements 
+    for (let i = 0; i < conditionalDiv.children.length / 3; i++) {
+        overrides[0].push(conditionalDiv.children[i*3].checked);
+    }
+
+    for (let i = 1; i < numDolls; i++) {
+        conditionalDiv = document.getElementById("Doll_" + (i + 1)).children[13];
+        overrides.push([]);
+        for (let j = 0; j < conditionalDiv.children.length / 3; j++) {
+            overrides[0].push(conditionalDiv.children[j*3].checked);
+        }
+    }
+    return overrides;
+}
+
+function getSkillConditionals(skillName, index) {
+    let conditionals = [];
+    // get the doll's inherent skill conditionals
+    let baseSkill = ResourceLoader.getInstance().getSkillData(selectedDolls[index])[skillName];
+    if (baseSkill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+        baseSkill[SkillJSONKeys.CONDITIONAL].forEach(obj => {
+            conditionals.push(obj);
+        });
+    }
+    // check if the fortifications add a conditional to the skill
+    let fortificationData = ResourceLoader.getInstance().getFortData(selectedDolls[index]);
+    for (let i = 1; i <= selectedFortifications[index]; i++) {
+        // check each fortification
+        if (fortificationData.hasOwnProperty("V"+i)) {
+            let fortification = fortificationData["V"+i];
+            // check if the fortification modifies the skill
+            if (fortification.hasOwnProperty(skillName)) {
+                // check if the modification overwrites the conditional
+                if (fortification[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+                    conditionals = [];
+                    fortification[skillName][SkillJSONKeys.CONDITIONAL].forEach(obj => {
+                        conditionals.push(obj);
+                    });
+                }
+                // check if the modification appends to the conditionals instead
+                if (fortification[skillName].hasOwnProperty(SkillJSONKeys.APPEND)) {
+                    if (fortification[skillName][SkillJSONKeys.APPEND].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+                        fortification[skillName][SkillJSONKeys.APPEND][SkillJSONKeys.CONDITIONAL].forEach(obj => {
+                            conditionals.push(obj);
+                        });
+                    }
+                }
+            }
+        }
+    }
+    // check the currently equipped keys if they add conditionals
+    let keyData = getDollKeys(index);
+    for (let i = 0; i < 6; i++) {
+        // check if the key is equipped
+        if (selectedKeys[index][i]) {
+            // check if the key modifies a skill
+            if (keyData[Object.keys(keyData)[i]].hasOwnProperty("Skill")) {
+                let skill = keyData[Object.keys(keyData)[i]]["Skill"];
+                // check each skill modified by the key
+                Object.keys(skill).forEach(skill_name => {
+                    if (skillName == skill_name) {
+                        //check if modification overwrites the conditional
+                        if (skill[skill_name].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+                            conditionals = [];
+                            skill[skill_name][SkillJSONKeys.CONDITIONAL].forEach(obj => {
+                                conditionals.push(obj);
+                            });
+                        }
+                        // check if key appends a conditional rather than overwriting it
+                        if (skill[skill_name].hasOwnProperty(SkillJSONKeys.APPEND)) {
+                            if (skill[skill_name][SkillJSONKeys.APPEND].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+                                skill[skill_name][SkillJSONKeys.APPEND][SkillJSONKeys.CONDITIONAL].forEach(obj => {
+                                    conditionals.push(obj);
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    }
+    return conditionals;
+}
+// adjust the conditionalDiv content based on how many conditionals are present in the doll's skill
+function updateConditionalToggles(index) {
+    let skillConditionals;
+    let conditionalDiv;
+    // get the skill conditionals and the html element holding the toggles
+    if (index == 0) {
+        if (selectedSkill != "") 
+            skillConditionals = getSkillConditionals(selectedSkill, index);
+        else
+            skillConditionals = [];
+        conditionalDiv = document.getElementById("Skill").nextElementSibling;
+    }
+    else {
+        // update function can be called on new slot generation hence selected doll at index may still be blank
+        if (selectedDolls[index] != "")
+            skillConditionals = getSkillConditionals(SkillNames.SUPPORT, index);
+        else
+            skillConditionals = [];
+        // support units do not have the skill html element so we get them by traversing through the html children array
+        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[13];
+    }
+    if (skillConditionals.length > 0) {
+        d3.select(conditionalDiv).style("display", "block");
+        // adjust the number of toggles to match the number of conditionals
+        while (skillConditionals.length > conditionalDiv.children.length / 3) {
+            d3.select(conditionalDiv).append("input").attr("type", "checkbox");
+            d3.select(conditionalDiv).append("label");
+            d3.select(conditionalDiv).append("br");
+        }
+        if (skillConditionals.length < conditionalDiv.children.length / 3) 
+            spliceNodeList(conditionalDiv.children, 3, conditionalDiv.children.length - skillConditionals.length * 3);
+        // apply each condition description to the toggle text
+        skillConditionals.forEach((condition, index) => {
+            conditionalDiv.children[index * 3].nextSibling.textContent = condition[SkillJSONKeys.CONDITION_TEXT] + " Condition Met";
+        });
+    }
+    else {
+        d3.select(conditionalDiv).style("display", "none");
+        conditionalDiv.firstElementChild.checked = false;
+        // delete any excess toggles when disabled
+        if (conditionalDiv.children.length > 3) 
+            spliceNodeList(conditionalDiv.children, 3, conditionalDiv.children.length - 3);
+    }
+}
+// get the skill keys of doll at index
+function getDollSkills(index) {
+    let dollSkills = ResourceLoader.getInstance().getSkillData(selectedDolls[index]);
+    return Object.keys(dollSkills);
+}
+// get the key data of doll at index
+function getDollKeys(index) {
+    return ResourceLoader.getInstance().getKeyData(selectedDolls[index]);
+}
+
+function updateSelectedDoll(index) {
+    document.getElementById("Doll_" + (index + 1)).children[index == 0 ? 1 : 2].textContent = "Doll: V" + selectedFortifications[index] + " " + selectedDolls[index];
+    document.getElementById("Settings_" + (index + 1)).firstChild.textContent = selectedDolls[index];
+}
+// change weakness text based on selected list, write none if empty
+function updatePhaseText() {
+    let newText = "Phase Weaknesses:";
+    if (selectedPhases.length == 0)
+        newText += " None";
+    else 
+        selectedPhases.forEach(d => newText += " " + d);
+    d3.select("#PhasesSelected").text(newText);
+}
+
+function selectPhase(phaseAttribute) {
+    // check if phase is already in the list, if yes remove, otherwise add to the list
+    let removedPhase = false;
+    selectedPhases.forEach((d, i, a) => {
+        if (d == phaseAttribute) {
+            a.splice(i, 1);
+            removedPhase = true;
+        }
+    });
+    if (!removedPhase)
+        selectedPhases.push(phaseAttribute);
+    updatePhaseText();
+}
+
 
 // initialize the singletons
 {
@@ -711,6 +739,21 @@ GlobalBuffManager.getInstance();
         else
             hideDropdowns();
     });
+    d3.select("#TargetColumn").insert("button", "h2")
+                                .text("-")
+                                .style("float", "right")
+                                .style("margin-right", "10px")
+                                .on("click", (event) => {
+                                    // check which state the button is to determine whether to maximize or minimize the target card
+                                    if (event.target.textContent == "-") {
+                                        event.target.textContent = "+";
+                                        event.target.parentNode.className = "slotMinimized";
+                                    }
+                                    else {
+                                        event.target.textContent = "-";
+                                        event.target.parentNode.className = "slotMaximized";
+                                    }
+                                });
 }
 // add extra support slot, up to 4 non-summons
 d3.select("#AddSupport").on("click", () => {
@@ -721,6 +764,33 @@ d3.select("#AddSupport").on("click", () => {
 });
 
 initializeDollButtons(0);
+
+// initialize calc settings dropdown
+{
+    calcOptions = d3.select(document.getElementById("Settings_1").lastElementChild).append("div").attr("class", "dropdownBox").style("display", "none");
+    Object.values(CalculationTypes).forEach(type  => {
+        calcOptions.append("a")
+                    .text(type)
+                    .on("click", (event) => {
+                        // update the setting for the doll this setting belongs to
+                        let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(9) - 1;
+                        calcSettings[dollIndex] = type;
+                        // update the button text
+                        event.target.parentNode.parentNode.textContent = type;
+                    });
+    });
+    d3.select(document.getElementById("Settings_1").lastElementChild).on("click", () => {
+        // reuse the dropdown among all buttons for this setting
+        document.getElementById("Settings_1").lastElementChild.appendChild(calcOptions.node());
+        // toggle the dropdown list
+        if (calcOptions.style("display") == "none") { 
+            hideDropdowns();
+            calcOptions.style("display", "block");
+        }
+        else
+            hideDropdowns();
+    });
+}
 
 d3.select("#calculateButton").on("click", () => {
     hideDropdowns();
@@ -749,11 +819,16 @@ d3.select("#calculateButton").on("click", () => {
     GlobalBuffManager.getInstance().setGlobalElementalDamage(Elements.FREEZE, globalBuffs[4]);
 
     let newDolls = createDollsFromInput();
+    // set the calculation types for each doll
+    for (let i = 0; i < numDolls; i++) {
+        GameStateManager.getInstance().setDollCalcType(calcSettings[i], i);
+    }
+
     GameStateManager.getInstance().startSimulation();
     //let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
     let conditionalOverride = getConditionalOverrides();
     // the first doll is the primary attacker, all others support if applicable
-    TurnManager.getInstance().useDollSkill(newDolls[0].getName(), selectedSkill, CalculationTypes.EXPECTED, conditionalOverride[0]);
+    TurnManager.getInstance().useDollSkill(newDolls[0].getName(), selectedSkill, conditionalOverride[0]);
 })
 
 d3.select("#Doll_1").style("background-color", slotColors[0]);

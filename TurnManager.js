@@ -49,23 +49,29 @@ class TurnManager {
             console.error("Singleton not yet initialized");
     }
 
-    useDollSkill(dollName, skillName, calculationType = calculationType.EXPECTED, conditionalOverride = [false]) {
+    useDollSkill(dollName, skillName, conditionalOverride = [false]) {
         if (TurnManagerSingleton) {
             // targeted non-support skills are the most common type of triggers to get supported
             let doll = GameStateManager.getInstance().getDoll(dollName);
             let target = GameStateManager.getInstance().getTarget();
+            let calcType;
             if (doll.getSkillAttackType(skillName) == AttackTypes.TARGETED && skillName != SkillNames.SUPPORT) {
                 // regular support should be at the bottom of the sequence stack
                 TurnManagerSingleton.targetedSupporters.forEach(supportName => {
-                    if (supportName != dollName) // a doll cannot support themself
-                        TurnManagerSingleton.actionSequence.push([supportName, [target, doll], SkillNames.SUPPORT, calculationType, [false]]);
+                    if (supportName != dollName) { // a doll cannot support themself 
+                        calcType = GameStateManager.getInstance().getDollCalcType(supportName);
+                        TurnManagerSingleton.actionSequence.push([supportName, [target, doll], SkillNames.SUPPORT, calcType, [false]]);
+                    }
                 });
                 // add in the attacker that triggered it all
-                TurnManagerSingleton.actionSequence.push([dollName, target, skillName, calculationType, conditionalOverride]);
+                calcType = GameStateManager.getInstance().getDollCalcType(dollName);
+                TurnManagerSingleton.actionSequence.push([dollName, target, skillName, calcType, conditionalOverride]);
                 // the priority supports added to the top of the stack
                 TurnManagerSingleton.prioritySupporters.forEach(supportName => {
-                    if (supportName != dollName) // a doll cannot support themself
-                        TurnManagerSingleton.actionSequence.push([supportName, [target, doll], SkillNames.SUPPORT, calculationType, [false]]);
+                    if (supportName != dollName) {// a doll cannot support themself
+                        calcType = GameStateManager.getInstance().getDollCalcType(supportName);
+                        TurnManagerSingleton.actionSequence.push([supportName, [target, doll], SkillNames.SUPPORT, calcType, [false]]);
+                    }
                 });
                 // priority debuffs are  called immediately since only debuffs will be applied and nothing else
                 TurnManagerSingleton.priorityDebuffers.forEach(supportName => {
@@ -81,7 +87,8 @@ class TurnManager {
             }
             else {
                 // if not a targeted non-support attack, only use the skill
-                TurnManagerSingleton.actionSequence.push([dollName, target, skillName, calculationType, conditionalOverride]);
+                calcType = GameStateManager.getInstance().getDollCalcType(dollName);
+                TurnManagerSingleton.actionSequence.push([dollName, target, skillName, calcType, conditionalOverride]);
                 if (!TurnManagerSingleton.actionsRunning)
                     TurnManagerSingleton.processActionSequence();
             }

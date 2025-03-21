@@ -67,7 +67,7 @@ const CalculationTypes = {
     EXPECTED: "Expected",
     CRIT: "Crit",
     NOCRIT: "NoCrit",
-    SIMULATION: "Simulation"
+    SIMULATION: "Random"
 }
 
 const BuffJSONKeys = {

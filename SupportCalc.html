@@ -97,7 +97,7 @@
                     <input type = "text" id = "targetDRWithStab">
                 </div>
             </div>
-            <div id = "GlobalBuffs">
+            <div id = "GlobalBuffs", style="border-top: 1px solid black;">
                 <h2>Global Buffs</h2>
                 <label for = "globalAttack">Global Attack Buff (0.0x):</label>
                 <input type = "text" id = "globalAttack"><br>
@@ -107,7 +107,7 @@
                 <input type = "text" id = "globalAoEDamage"><br>
                 <label for = "globalTargetedDamage">Global Targeted Damage (0.0x):</label>
                 <input type = "text" id = "globalTargetedDamage"><br>
-                <label for = "globalFreezeDamage">Global Freeze Damage (Minus Dush) (0.0x):</label>
+                <label for = "globalFreezeDamage">Global Freeze Damage (Except Dush) (0.0x):</label>
                 <input type = "text" id = "globalFreezeDamage">
             </div>
         </div>
@@ -179,6 +179,13 @@
         <div class="column" style="background-color: lightgoldenrodyellow;">
             <div style="overflow-y: auto; overflow-x: hidden; height: 300px;" id = "ActionLog"></div>
             <button type = "button" id = "calculateButton" disabled>Calculate Damage</button>
+            <div id = "CalcSettings" style="white-space: initial;">
+                <h4>Damage Calculation Setting</h4>
+                <div id = "Settings_1">
+                    <td>Doll:</td>
+                    <button style="margin-left: 5px;">Calculation</button>
+                </div>
+            </div>
         </div>
     </div>
 
