@@ -33,9 +33,6 @@ class DollFactory {
                     break;
                 case "Makiatto":
                     newDoll = new Makiatto(defense, attack, crit_chance, crit_damage, fortification, keys);
-                    // Makiatto passive
-                    newDoll.crit_chance += 0.4;
-                    newDoll.crit_damage -= 0.1;
                     break;
                 case "Suomi":
                     newDoll = new Suomi(defense, attack, crit_chance, crit_damage, fortification, keys);

@@ -8,11 +8,13 @@ import GlobalBuffManager from "./GlobalBuffManager.js"
 import EventManager from "./EventManager.js";
 
 class Doll extends Unit {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification, keys = [0,0,0,0,0,0]) {
+    constructor(name, defense, attack, baseCrit, baseCritDamage, fortification, keys = [0,0,0,0,0,0]) {
         super(name, defense);
         this.attack = attack;
-        this.crit_chance = crit_chance;
-        this.crit_damage = crit_damage;
+        this.baseCritChance = baseCrit;
+        this.baseCritDamage = baseCritDamage;
+        this.critChance = baseCrit;
+        this.critDamage = baseCritDamage;
         this.fortification = fortification;
         // resource used for some skills and doll mechanics
         this.CIndex = 3;
@@ -73,8 +75,8 @@ class Doll extends Unit {
     }
 
     getAttack() {return this.attack * (1 + this.attackBoost + GlobalBuffManager.getInstance().getGlobalAttack());}
-    getCritRate() {return this.crit_chance;}
-    getCritDamage() {return this.crit_damage;}
+    getCritRate() {return this.critChance;}
+    getCritDamage() {return this.critDamage;}
     // get any stats relevant to damage calculation
     getDefenseIgnore() {return this.defenseIgnore;}
     getDamageDealt() {return this.damageDealt;}
@@ -344,7 +346,7 @@ class Doll extends Unit {
             let damage;
             // if simulating with v1+ makiatto skill2, do the crit roll outside of the function to track the condition flag for the next hit
             if (calculationType == CalculationTypes.SIMULATION && this.name == "Makiatto" && this.fortification > 0 && skillName == SkillNames.SKILL2) {
-                let isCrit = RNGManager.getInstance().getRNG() <= this.crit_chance;
+                let isCrit = RNGManager.getInstance().getRNG() <= this.critChance;
                 damage = this.processAttack(skill, isCrit ? CalculationTypes.CRIT : CalculationTypes.NOCRIT, enemyTarget, skillName);
                 // modify the skill data for condition pass if isCrit is true
                 if (isCrit) {
@@ -473,8 +475,8 @@ class Doll extends Unit {
     processAttack(skill, calculationType, target, skillName) {
         // set whether the attack crits or not
         let isCrit;
-        let tempCritDmg = this.crit_damage;
-        let tempCritRate = this.crit_chance;
+        let tempCritDmg = this.critDamage;
+        let tempCritRate = this.critChance;
         // if attack modifies crit, add it before incorporating it into the calculation type
         if (skill.hasOwnProperty(SkillJSONKeys.CRIT_DAMAGE_MODIFIER))
             tempCritDmg += skill[SkillJSONKeys.CRIT_DAMAGE_MODIFIER];
@@ -503,8 +505,8 @@ class Doll extends Unit {
                     && skill[SkillJSONKeys.STABILITYDAMAGE] == 1) {
                     let noCritRate = 1 - tempCritRate;
                     tempCritDmg = noCritRate * noCritRate; // case 1: Both first and second shots failed to crit
-                    tempCritDmg += noCritRate * tempCritRate * this.crit_damage; // case 2: First shot fails to crit and second shot crits
-                    tempCritDmg += tempCritRate * (this.crit_damage + 0.8);
+                    tempCritDmg += noCritRate * tempCritRate * this.critDamage; // case 2: First shot fails to crit and second shot crits
+                    tempCritDmg += tempCritRate * (this.critDamage + 0.8);
                 }
                 break;
             case CalculationTypes.SIMULATION:
@@ -753,7 +755,7 @@ class Doll extends Unit {
     // to enable turn rewinding, each move uses clones of the previous state and rewind just returns to that set of clones
     cloneUnit(newDoll = null) {
         if (!newDoll)
-            newDoll = new Doll(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled);   
+            newDoll = new Doll(this.name, this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled);   
         newDoll.CIndex = this.CIndex;
         newDoll.setDefenseIgnore(this.baseDefenseIgnore);
         newDoll.setDamageDealt(this.baseDamageDealt); 

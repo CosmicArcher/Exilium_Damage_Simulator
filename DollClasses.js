@@ -146,7 +146,7 @@ export class Qiongjiu extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Qiongjiu(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Qiongjiu(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -164,6 +164,9 @@ export class Makiatto extends Interceptor {
             this.CIndex = 6;
         if (keysEnabled[5])
             this.attackBoost += 0.1;
+        // Makiatto passive
+        this.critChance += 0.4;
+        this.critDamage -= 0.1;
     }
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
@@ -216,7 +219,7 @@ export class Makiatto extends Interceptor {
         if (!conditionalTriggered[0] && calculationType == CalculationTypes.SIMULATION) {
             // do a crit roll outside of the proper function, if it crits then set the onCrit condition to true regardless of the toggle input
             if ((skillName == SkillNames.INTERCEPT && this.fortification == 6))
-                conditionalTriggered[0] = RNGManager.getInstance().getRNG() <= this.crit_chance;
+                conditionalTriggered[0] = RNGManager.getInstance().getRNG() <= this.critChance;
         }
         
         let damage = super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
@@ -304,7 +307,7 @@ export class Makiatto extends Interceptor {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Makiatto(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Makiatto(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -430,7 +433,7 @@ export class Suomi extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Suomi(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Suomi(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -511,22 +514,20 @@ export class Papasha extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Papasha(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Papasha(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
 export class PapashaSummon extends Doll {
     constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Papasha Summon", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+        super("Papasha Summon", defense, attack, 0.2, 1.2, fortification, keysEnabled);
 
         // the summon inherits all of papasha's basic stats except crit which are locked to the base values outside of buffs
-        if (fortification < 3) {
-            this.crit_chance = 0.2;
-            this.crit_damage = 1.2;
-        }
-        else {
-            this.crit_chance = 0.5;
-            this.crit_damage = 1.4;
+        if (fortification > 2) {
+            this.baseCritChance = 0.5;
+            this.baseCritDamage = 1.4;
+            this.critChance = 0.5;
+            this.critDamage = 1.4;
             this.addBuff("Power of Unity", this.name, -1, 3);
         }
         if (keysEnabled[2])
@@ -565,7 +566,7 @@ export class PapashaSummon extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new PapashaSummon(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new PapashaSummon(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -673,7 +674,7 @@ export class Daiyan extends Interceptor {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Daiyan(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Daiyan(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -792,7 +793,7 @@ export class Tololo extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Tololo(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Tololo(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -890,7 +891,7 @@ export class MosinNagant extends Supporter {
     }
 
     cloneUnit() {
-        let doll = new MosinNagant(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled);
+        let doll = new MosinNagant(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled);
         doll.skill3Uses = this.skill3Uses;
         return super.cloneUnit(doll);
     }
@@ -931,7 +932,7 @@ export class Vepley extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Vepley(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Vepley(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -980,7 +981,7 @@ export class Peritya extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Peritya(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Peritya(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -1064,7 +1065,7 @@ export class Sharkry extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Sharkry(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Sharkry(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -1118,7 +1119,7 @@ export class Cheeta extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Cheeta(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Cheeta(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
 
@@ -1202,6 +1203,6 @@ export class Ksenia extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Ksenia(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Ksenia(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
