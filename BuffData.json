@@ -396,7 +396,7 @@
         "Cleanseable" : 0,
         "DefenseIgnore" : 0.3
     },
-    "Corrosive Pressure" : {
+    "Corrosive Infusion" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
@@ -404,7 +404,7 @@
         "Element" : "Corrosion",
         "Stack_Limit" : 10
     },
-    "Corrosive Pressure V2" : {
+    "Corrosive Infusion V2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
@@ -413,14 +413,14 @@
         "Stack_Limit" : 15,
         "DefensePerc" : -0.01
     },
-    "Toxic Invasion" : {
+    "Toxic Infiltration" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Element" : "Corrosion"
     },
-    "Toxic Invasion V5" : {
+    "Toxic Infiltration V5" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",

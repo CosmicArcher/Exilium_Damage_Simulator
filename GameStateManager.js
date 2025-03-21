@@ -8,7 +8,7 @@ class GameStateManager {
         else {
             console.log("Game State Manager Instantiated");
             GameStateManagerSingleton = this;
-            // track total damage dealt and end turn on every unit
+            // track actions made and end turn on every unit
             GameStateManagerSingleton.resetSimulation();
         }
     }
@@ -18,23 +18,9 @@ class GameStateManager {
             new GameStateManager();
         return GameStateManagerSingleton;
     }
-    // track total damage for ease of strat comparison
-    addTotalDamage(x) {
-        if (GameStateManagerSingleton)
-            GameStateManagerSingleton.totalDamage[actionCount+1] += x;
-        else
-            console.error("Singleton not yet initialized");
-    }
-    getTotalDamage() {
-        if (GameStateManagerSingleton)
-            return GameStateManagerSingleton.totalDamage[actionCount+1];
-        else
-            console.error("Singleton not yet initialized");
-    }
     // return to a clean slate to test a completely different setup
     resetSimulation() {
         if (GameStateManagerSingleton) {
-            GameStateManagerSingleton.totalDamage = [0];
             GameStateManagerSingleton.target = [null];
             GameStateManagerSingleton.coverValue = 0;
             GameStateManagerSingleton.dolls = [[]];
@@ -62,7 +48,6 @@ class GameStateManager {
             // put the latest units as the ones in the get functions
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
-            GameStateManagerSingleton.totalDamage.push(0);
         }
         else
             console.error("Singleton not yet initialized");
@@ -104,6 +89,18 @@ class GameStateManager {
             for (let i = 0; i < GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1].length; i++) {
                 if (GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1][i].getName() == dollName)
                     return GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1][i];
+            }
+            console.error(`${dollName} does not exist in Game State Manager singleton`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // for passives that want to give buffs to other dolls on action 0
+    getBaseDoll(dollName) {
+        if (GameStateManagerSingleton) {
+            for (let i = 0; i < GameStateManagerSingleton.dolls[0].length; i++) {
+                if (GameStateManagerSingleton.dolls[0][i].getName() == dollName)
+                    return GameStateManagerSingleton.dolls[0][i];
             }
             console.error(`${dollName} does not exist in Game State Manager singleton`);
         }
@@ -169,7 +166,6 @@ class GameStateManager {
             // put the latest units as the ones in the get functions
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
-            GameStateManagerSingleton.totalDamage.push(GameStateManagerSingleton.totalDamage[GameStateManagerSingleton.actionCount+1]);
             GameStateManagerSingleton.actionCount++;
         }
         else
@@ -192,10 +188,8 @@ class GameStateManager {
             // put these new clones as the ones in the get functions by removing all entries after actionNumber then appending the clones
             GameStateManagerSingleton.target.splice(actionNumber+1, lengthToCut);
             GameStateManagerSingleton.dolls.splice(actionNumber+1, lengthToCut);
-            GameStateManagerSingleton.totalDamage.splice(actionNumber+1, lengthToCut);
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
-            GameStateManagerSingleton.totalDamage.push(GameStateManagerSingleton.totalDamage[actionNumber]);
         }
         else
             console.error("Singleton not yet initialized");

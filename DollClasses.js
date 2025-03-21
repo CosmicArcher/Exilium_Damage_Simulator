@@ -27,6 +27,13 @@ class Supporter extends Doll {
     refreshSupportUses() {
         this.supportsUsed = 0;
     }
+
+    cloneUnit(doll) {
+        doll.supportsUsed = this.supportsUsed;
+        doll.supportLimit = this.supportLimit;
+        doll.supportEnabled = this.supportEnabled;
+        return super.cloneUnit(doll);
+    }
 }
 
 class Interceptor extends Doll {
@@ -49,6 +56,13 @@ class Interceptor extends Doll {
 
     refreshSupportUses() {
         this.interceptsUsed = 0;
+    }
+
+    cloneUnit(doll) {
+        doll.interceptsUsed = this.interceptsUsed;
+        doll.interceptLimit = this.interceptLimit;
+        doll.interceptEnabled = this.interceptEnabled;
+        return super.cloneUnit(doll);
     }
 }
 
@@ -483,6 +497,8 @@ export class Papasha extends Doll {
         super.refreshSupportUses();
         if (this.keysEnabled[5]) {
             let summon = GameStateManager.getInstance().getDoll("Papasha Summon");
+            if (!summon)
+                summon = GameStateManager.getInstance().getBaseDoll("Papasha Summon");
             if (this.getAttack() > summon.getAttack())
                 summon.addBuff("Accolades Brilliance", this.name, 1, 1);
             else
@@ -610,8 +626,11 @@ export class Daiyan extends Interceptor {
 
         super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
         // ult reduces 1 turn cd per tuning stack before the attack
-        if (skillName == SkillNames.ULT)
+        if (skillName == SkillNames.ULT) {
             this.cooldowns[3] -= totalTuning;
+            // ult consumes all non-permanent tuning stacks
+            this.removeBuff("Tuning");
+        }
         // undo temporary buffs
         if (totalTuning > 3)
             this.damageDealt -= 0.2;
@@ -874,7 +893,9 @@ export class MosinNagant extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new MosinNagant(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled));
+        let doll = new MosinNagant(this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled);
+        doll.skill3Uses = this.skill3Uses;
+        return super.cloneUnit(doll);
     }
 }
 
@@ -1036,8 +1057,13 @@ export class Sharkry extends Supporter {
         if (this.fortification == 6)
             this.addBuff("Zoom In V5", this.name, -1, 1);
         // key 3 gives blazing assault if anyone has overburn on turn start
-        if (this.keysEnabled[2] && GameStateManager.getInstance().getTarget().hasBuff("Overburn"))
-            this.addBuff("Blazing Assault 2", this.name, 1, 1);
+        if (this.keysEnabled[2]) {
+            let target = GameStateManager.getInstance().getTarget();
+            if (!target)
+                target = GameStateManager.getInstance().getBaseTarget();
+            if (target.hasBuff("Overburn"))
+                this.addBuff("Blazing Assault 2", this.name, 1, 1);
+        } 
     }
 
     cloneUnit() {

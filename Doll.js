@@ -4,6 +4,7 @@ import { SkillNames, CalculationTypes, SkillJSONKeys, Elements } from "./Enums.j
 import GameStateManager from "./GameStateManager.js";
 import DamageManager from "./DamageManager.js";
 import RNGManager from "./RNGManager.js";
+import GlobalBuffManager from "./GlobalBuffManager.js"
 import EventManager from "./EventManager.js";
 
 class Doll extends Unit {
@@ -71,7 +72,7 @@ class Doll extends Unit {
         this.applyKeyData();
     }
 
-    getAttack() {return this.attack * (1 + this.attackBoost);}
+    getAttack() {return this.attack * (1 + this.attackBoost + GlobalBuffManager.getInstance().getGlobalAttack());}
     getCritRate() {return this.crit_chance;}
     getCritDamage() {return this.crit_damage;}
     // get any stats relevant to damage calculation
@@ -534,7 +535,7 @@ class Doll extends Unit {
         // get the temporary damage boost from skill conditionals when triggered
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt += skill[SkillJSONKeys.DAMAGE_BOOST];
-        let damage = DamageManager.getInstance().calculateDamage(this, target, this.attack * skill[SkillJSONKeys.MULTIPLIER], element, 
+        let damage = DamageManager.getInstance().calculateDamage(this, target, this.getAttack() * skill[SkillJSONKeys.MULTIPLIER], element, 
             skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore, skillName);
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt -= skill[SkillJSONKeys.DAMAGE_BOOST];
@@ -738,6 +739,7 @@ class Doll extends Unit {
     }
     // to enable turn rewinding, each move uses clones of the previous state and rewind just returns to that set of clones
     cloneUnit(newDoll = null) {
+        console.log(newDoll);
         if (!newDoll)
             newDoll = new Doll(this.name, this.defense, this.attack, this.crit_chance, this.crit_damage, this.fortification, this.keysEnabled);   
         newDoll.CIndex = this.CIndex;
@@ -776,6 +778,7 @@ class Doll extends Unit {
         newDoll.turnAvailable = this.turnAvailable;
 
         newDoll.finishCloning();
+        console.log(newDoll);
         return newDoll;
     }
     // to be filled by child classes

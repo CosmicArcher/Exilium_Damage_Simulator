@@ -1,5 +1,6 @@
 import { BuffJSONKeys, Elements } from "./Enums.js";
 import EventManager from "./EventManager.js";
+import GameStateManager from "./GameStateManager.js";
 import Unit from "./Unit.js";
 
 class Target extends Unit {
@@ -182,6 +183,14 @@ class Target extends Unit {
                     this.removeBuff(buff[0]);
                 }
                 EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, 1, buff[0]]);
+            }
+            // if the target has corrosive infusion and takes corrosion damage, add another stack
+            else if (buff[0].match("Corrosive Infusion") && element == Elements.CORROSION) {
+                let doll = GameStateManager.getInstance().getDoll(buff[6]);
+                if (doll.fortification < 2)
+                    this.addBuff("Corrosive Infusion", buff[6], 2, 1);
+                else
+                    this.addBuff("Corrosive Infusion V2", buff[6], 2, 1);
             }
         });
     }

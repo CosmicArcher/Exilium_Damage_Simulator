@@ -3,6 +3,7 @@ import Target from "./Target.js";
 import GameStateManager from "./GameStateManager.js";
 import EventManager from "./EventManager.js";
 import {AttackTypes, Elements, AmmoTypes} from "./Enums.js";
+import GlobalBuffManager from "./GlobalBuffManager.js";
 
 let DamageManagerSingleton;
 
@@ -59,13 +60,16 @@ class DamageManager {
         }
         totalBuffs += target.getDamageTaken();
         totalBuffs += attacker.getDamageDealt();
+        totalBuffs += GlobalBuffManager.getInstance().getGlobalDamage();
         if (damageType == AttackTypes.TARGETED) {
             totalBuffs += target.getTargetedDamageTaken();
             totalBuffs += attacker.getTargetedDamage();
+            totalBuffs += GlobalBuffManager.getInstance().getGlobalTargetedDamage();
         }
         else {
             totalBuffs += target.getAoEDamageTaken();
             totalBuffs += attacker.getAoEDamage();
+            totalBuffs += GlobalBuffManager.getInstance().getGlobalAoEDamage();
         }
         // damage increases that require a specific type of debuff
         if (target.hasBuffType("Movement", true))
@@ -76,10 +80,12 @@ class DamageManager {
             totalBuffs += attacker.getExposedDamage();
         if (element == Elements.PHYSICAL) {
             totalBuffs += attacker.getElementDamage(Elements.PHYSICAL);
+            totalBuffs += GlobalBuffManager.getInstance().getGlobalElementalDamage(Elements.PHYSICAL);
         }
         else {
             totalBuffs += attacker.getPhaseDamage();
             totalBuffs += attacker.getElementDamage(element);
+            totalBuffs += GlobalBuffManager.getInstance().getGlobalElementalDamage(element);
         }
         // make sure that totalbuffs doesn't become negative
         totalBuffs = Math.max(0, totalBuffs);

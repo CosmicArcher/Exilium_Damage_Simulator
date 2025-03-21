@@ -722,7 +722,7 @@
         "V1" : {
             "Skill3" : {
                 "Conditional" : [{
-                    "Condition_Text" : "Has Toxic Invasion",
+                    "Condition_Text" : "Has Toxic Infiltration",
                     "Damage_Boost" : 0.3
                 }]
             }
@@ -732,7 +732,7 @@
                 "Conditional" : {
                     "Condition_Text" : "No Kill",
                     "Post_Target_Buff" : [{
-                        "Name" : "Corrosive Pressure V2",
+                        "Name" : "Corrosive Infusion V2",
                         "Duration" : 2
                     }]
                 }
@@ -749,7 +749,7 @@
                         "Name" : "Defense Down 2",
                         "Duration" : 2
                     }, {
-                        "Name" : "Toxic Invasion",
+                        "Name" : "Toxic Infiltration",
                         "Duration" : 2
                     }]
                 }]
@@ -777,17 +777,17 @@
             "Skill3" : {
                 "Multiplier" : 1.1,
                 "Post_Target_Buff" : [{
-                    "Name" : "Toxic Invasion V5",
+                    "Name" : "Toxic Infiltration V5",
                     "Duration" : 2
                 }],
                 "Conditional" : [{
                     "Condition_Text" : "Corrosion Debuff",
                     "Pre_Target_Buff" : [{
-                        "Name" : "Toxic Invasion V5",
+                        "Name" : "Toxic Infiltration V5",
                         "Duration" : 2
                     }]
                 }, {
-                    "Condition_Text" : "Has Toxic Invasion",
+                    "Condition_Text" : "Has Toxic Infiltration",
                     "Damage_Boost" : 0.3
                 }]
             },
@@ -801,7 +801,7 @@
                         "Name" : "Defense Down 2",
                         "Duration" : 2
                     }, {
-                        "Name" : "Toxic Invasion V5",
+                        "Name" : "Toxic Infiltration V5",
                         "Duration" : 2
                     }]
                 }]

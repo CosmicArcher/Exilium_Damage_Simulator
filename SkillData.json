@@ -1343,7 +1343,7 @@
             "Conditional" : {
                 "Condition_Text" : "No Kill",
                 "Post_Target_Buff" : [{
-                    "Name" : "Corrosive Pressure",
+                    "Name" : "Corrosive Infusion",
                     "Duration" : 2
                 }]
             }
@@ -1356,11 +1356,11 @@
             "Ammo_Type" : "None",
             "Element" : "Corrosion",
             "Post_Target_Buff" : [{
-                "Name" : "Toxic Invasion",
+                "Name" : "Toxic Infiltration",
                 "Duration" : 2
             }],
             "Conditional" : [{
-                "Condition_Text" : "Has Toxic Invasion",
+                "Condition_Text" : "Has Toxic Infiltration",
                 "Damage_Boost" : 0.15
             }]
         },

@@ -69,31 +69,46 @@
         <a href="./index.html" class="pageTab">Simple Sim</a>
         <h1 style="text-align: center;">Damage Sim With Supports</h1>
         <div class="column" style="background-color: lightgray;">
-            <h2>Target Stats</h2>
-            <label for = "targetDef">Defense:</label>
-            <input type = "text" id = "targetDef"><br>
-            <label for = "ElementWeakness" id = "PhasesSelected">Phase Weaknesses: None</label>
-            <button id = "ElementWeakness">Select Element Weakness</button>
-            <button id = "AmmoWeakness">Select Ammo Weakness</button><br>
-            <label for = "targetCover">Cover Value (0.0x):</label>
-            <input type = "text" id = "targetCover"><br>
-            <label for = "targetStability">Stability:</label>
-            <input type = "text" id = "targetStability"><br>
-            <div style="height: 640px;" class="statScroll">
-                <label for = "targetDefBuffs">Defense Buffs/Debuffs Sum (+- 0.0x):</label>
-                <input type = "text" id = "targetDefBuffs"><br>
-                <label for = "targetDamageTaken">Damage Taken Sum (+- 0.0x):</label>
-                <input type = "text" id = "targetDamageTaken"><br>
-                <label for = "targetTargetedDamage">Targeted Damage Taken Sum (+- 0.0x):</label>
-                <input type = "text" id = "targetTargetedDamage"><br>
-                <label for = "targetAoEDamage">AoE Damage Sum (+- 0.0x):</label>
-                <input type = "text" id = "targetAoEDamage"><br>
-                <label for = "targetStabilityMod">Stability Damage Modifier (+-x):</label>
-                <input type = "text" id = "targetStabilityMod"><br>
-                <label for = "targetDRPerStab">Damage Reduction per Stability (0.0x):</label>
-                <input type = "text" id = "targetDRPerStab"><br>
-                <label for = "targetDRWithStab">Damage Reduction with Stability (0.0x):</label>
-                <input type = "text" id = "targetDRWithStab"><br>
+            <div id = "TargetColumn">
+                <h2>Target Stats</h2>
+                <label for = "targetDef">Defense:</label>
+                <input type = "text" id = "targetDef"><br>
+                <label for = "ElementWeakness" id = "PhasesSelected">Phase Weaknesses: None</label>
+                <button id = "ElementWeakness">Select Element Weakness</button>
+                <button id = "AmmoWeakness">Select Ammo Weakness</button><br>
+                <label for = "targetCover">Cover Value (0.0x):</label>
+                <input type = "text" id = "targetCover"><br>
+                <label for = "targetStability">Stability:</label>
+                <input type = "text" id = "targetStability"><br>
+                <div style="height: 200px;" class="statScroll">
+                    <label for = "targetDefBuffs">Defense Buffs/Debuffs Sum (+- 0.0x):</label>
+                    <input type = "text" id = "targetDefBuffs"><br>
+                    <label for = "targetDamageTaken">Damage Taken Sum (+- 0.0x):</label>
+                    <input type = "text" id = "targetDamageTaken"><br>
+                    <label for = "targetTargetedDamage">Targeted Damage Taken Sum (+- 0.0x):</label>
+                    <input type = "text" id = "targetTargetedDamage"><br>
+                    <label for = "targetAoEDamage">AoE Damage Sum (+- 0.0x):</label>
+                    <input type = "text" id = "targetAoEDamage"><br>
+                    <label for = "targetStabilityMod">Stability Damage Modifier (+-x):</label>
+                    <input type = "text" id = "targetStabilityMod"><br>
+                    <label for = "targetDRPerStab">Damage Reduction per Stability (0.0x):</label>
+                    <input type = "text" id = "targetDRPerStab"><br>
+                    <label for = "targetDRWithStab">Damage Reduction with Stability (0.0x):</label>
+                    <input type = "text" id = "targetDRWithStab">
+                </div>
+            </div>
+            <div id = "GlobalBuffs">
+                <h2>Global Buffs</h2>
+                <label for = "globalAttack">Global Attack Buff (0.0x):</label>
+                <input type = "text" id = "globalAttack"><br>
+                <label for = "globalDamage">Global Damage Buff (0.0x):</label>
+                <input type = "text" id = "globalDamage"><br>
+                <label for = "globalAoEDamage">Global AoE Damage (0.0x):</label>
+                <input type = "text" id = "globalAoEDamage"><br>
+                <label for = "globalTargetedDamage">Global Targeted Damage (0.0x):</label>
+                <input type = "text" id = "globalTargetedDamage"><br>
+                <label for = "globalFreezeDamage">Global Freeze Damage (Minus Dush) (0.0x):</label>
+                <input type = "text" id = "globalFreezeDamage">
             </div>
         </div>
         <div class= "column" id = "Dolls" style="background-color: lightslategray; white-space: normal; height: auto;">

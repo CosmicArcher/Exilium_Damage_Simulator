@@ -5,6 +5,7 @@ import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
 import EventManager from "./EventManager.js";
 import TurnManager from "./TurnManager.js";
+import GlobalBuffManager from "./GlobalBuffManager.js"
 import DollFactory from "./DollFactory.js";
 import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
@@ -135,14 +136,6 @@ function removeDoll(index) {
     }
 }
 
-function getValuefromInput(fieldID) {
-    // convert the string to a number
-    let res = +d3.select(fieldID).node().value;
-    if (res == "")
-        return 0;
-    return res;
-}
-
 function getNestedInput(arr, htmlElement) {
     htmlElement.childNodes.forEach(d => {
         if (d.type == "text")
@@ -154,7 +147,7 @@ function getNestedInput(arr, htmlElement) {
 
 function getTargetStats() {
     // def, weaknesses, cover, stability, def buffs, damage taken, targeted, aoe, stab damage modifier, dr per stab, dr with stab 
-    let targetStats = [0,[],0,  0,           0,          0,          0,       0,      0,                    0,           0];
+    /*let targetStats = [0,[],0,  0,           0,          0,          0,       0,      0,                    0,           0];
     targetStats[0] = getValuefromInput("#targetDef");
     targetStats[1] = selectedPhases;
     targetStats[2] = getValuefromInput("#targetCover");
@@ -165,9 +158,19 @@ function getTargetStats() {
     targetStats[7] = getValuefromInput("#targetAoEDamage");
     targetStats[8] = getValuefromInput("#targetStabilityMod");
     targetStats[9] = getValuefromInput("#targetDRPerStab");
-    targetStats[10] = getValuefromInput("#targetDRWithStab");
+    targetStats[10] = getValuefromInput("#targetDRWithStab");*/
+
+    let targetStats = [];
+    getNestedInput(targetStats, document.getElementById("TargetColumn"));
 
     return targetStats;
+}
+
+function getGlobalStats() {
+    let arr = [];
+    getNestedInput(arr, document.getElementById("GlobalBuffs"));
+
+    return arr;
 }
 
 function getDollStats(index) {
@@ -662,6 +665,7 @@ EventManager.getInstance();
 TurnManager.getInstance();
 ActionLog.getInstance();
 DollFactory.getInstance();
+GlobalBuffManager.getInstance();
 }
 
 // target stats dropdowns
@@ -722,22 +726,27 @@ d3.select("#calculateButton").on("click", () => {
     hideDropdowns();
     TurnManager.getInstance().resetLists();
     GameStateManager.getInstance().resetSimulation();
-    // get input values
+    // get input values and create target
     let targetStats = getTargetStats();
-    let dollStats = getDollStats(0);
-    let newTarget = new Target("6p62", targetStats[0], targetStats[3], 2, targetStats[1]);
+    let globalBuffs = getGlobalStats();
+    let newTarget = new Target("6p62", targetStats[0], targetStats[2], 2, selectedPhases);
     GameStateManager.getInstance().registerTarget(newTarget);
     newTarget.finishCloning();
-    // this webpage has all buffs manually input rather than automatic
     //newTarget.disableBuffs();
-    GameStateManager.getInstance().addCover(targetStats[2]);
-    newTarget.setDefenseBuffs(targetStats[4]);
-    newTarget.setDamageTaken(targetStats[5]);
-    newTarget.setTargetedDamageTaken(targetStats[6]);
-    newTarget.setAoEDamageTaken(targetStats[7]);
-    newTarget.setStabilityDamageModifier(targetStats[8]);
-    newTarget.applyDRPerStab(targetStats[9]);
-    newTarget.applyDRWithStab(targetStats[10]);
+    GameStateManager.getInstance().addCover(targetStats[1]);
+    newTarget.setDefenseBuffs(targetStats[3]);
+    newTarget.setDamageTaken(targetStats[4]);
+    newTarget.setTargetedDamageTaken(targetStats[5]);
+    newTarget.setAoEDamageTaken(targetStats[6]);
+    newTarget.setStabilityDamageModifier(targetStats[7]);
+    newTarget.applyDRPerStab(targetStats[8]);
+    newTarget.applyDRWithStab(targetStats[9]);
+    // apply global stat buffs
+    GlobalBuffManager.getInstance().setGlobalAttack(globalBuffs[0]);
+    GlobalBuffManager.getInstance().setGlobalDamage(globalBuffs[1]);
+    GlobalBuffManager.getInstance().setGlobalAoEDamage(globalBuffs[2]);
+    GlobalBuffManager.getInstance().setGlobalTargetedDamage(globalBuffs[3]);
+    GlobalBuffManager.getInstance().setGlobalElementalDamage(Elements.FREEZE, globalBuffs[4]);
 
     let newDolls = createDollsFromInput();
     GameStateManager.getInstance().startSimulation();
