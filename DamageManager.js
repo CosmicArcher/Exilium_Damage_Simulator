@@ -43,8 +43,22 @@ class DamageManager {
         // some dolls ignore a set amount of stability
         let effectiveStability = Math.max(target.getStability() - attacker.getStabilityIgnore(),0);
 
+        let totalDefIgnore = attacker.getDefenseIgnore();
+        // targeted and aoe def ignore buffs are not automatically added so add their specific buff effects here
+        if (damageType == AttackTypes.TARGETED) {
+            if (attacker.hasBuff("Piercing 1"))
+                totalDefIgnore += 0.2;
+            else if (attacker.hasBuff("Piercing 2"))
+                totalDefIgnore += 0.3;
+        }
+        else {
+            if (attacker.hasBuff("Domain Penetration 1"))
+                totalDefIgnore += 0.2;
+            else if (attacker.hasBuff("Domain Penetration 2"))
+                totalDefIgnore += 0.3;
+        }
         let defenseBuffs = Math.max(0, 1 + target.getDefenseBuffs() - attacker.getDefenseIgnore());
-        let defModifier = attacker.getAttack() / (attacker.getAttack() + target.getDefense() * defenseBuffs);
+        let defModifier = attacker.getAttack() / (attacker.getAttack() + target.getBaseDefense() * defenseBuffs);
 
         let coverValue = GameStateManager.getInstance().getCover();
         let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - (effectiveStability > 0 && 

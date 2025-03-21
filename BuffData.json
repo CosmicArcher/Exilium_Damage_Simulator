@@ -642,15 +642,13 @@
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
-        "Cleanseable" : 1,
-        "Defense_Ignore" : 0.3
+        "Cleanseable" : 1
     },
     "Piercing 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
-        "Cleanseable" : 1,
-        "Defense_Ignore" : 0.2
+        "Cleanseable" : 1
     },
     "Paralysis" : {
         "Buff_Type" : "Debuff",
@@ -658,5 +656,17 @@
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Electric"
+    },
+    "Domain Penetration 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1
+    },
+    "Domain Penetration 2" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1
     }
 } 
