@@ -1,6 +1,6 @@
 import Unit from "./Unit.js";
 import ResourceLoader from "./ResourceLoader.js";
-import { SkillNames, CalculationTypes, SkillJSONKeys, Elements } from "./Enums.js";
+import { SkillNames, CalculationTypes, SkillJSONKeys, Elements, BuffJSONKeys } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 import DamageManager from "./DamageManager.js";
 import RNGManager from "./RNGManager.js";
@@ -393,37 +393,42 @@ class Doll extends Unit {
 
                 this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 0);
             }
-            // end turn and decrease counters on buffs if extra command or movement is not triggered
-            if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
-                this.endTurn();
-            else {
-                if (this.hasBuff("Extra Command"))
-                    this.removeBuff("Extra Command");
-                if (this.hasBuff("Extra Movement"))
-                    this.removeBuff("Extra Movement");
-            }
-            // extra action counts down on buff duration but enables another turn
-            if (this.hasBuff("Extra Action")) {
-                this.turnAvailable = true;
-                this.removeBuff("Extra Action");
+            // check if skill was used during turn or out of turn
+            if (!(skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)) {
+                // end turn and decrease counters on buffs if extra command or movement is not triggered
+                if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
+                    this.endTurn();
+                else {
+                    if (this.hasBuff("Extra Command"))
+                        this.removeBuff("Extra Command");
+                    if (this.hasBuff("Extra Movement"))
+                        this.removeBuff("Extra Movement");
+                }
+                // extra action counts down on buff duration but enables another turn
+                if (this.hasBuff("Extra Action")) {
+                    this.turnAvailable = true;
+                    this.removeBuff("Extra Action");
+                }
             }
         }
         // if a buffing skill rather than attack, process buff data with supportTarget in the target parameter
         else {
             this.processPrePostBuffs(skill, supportTarget, null, 1);
-            // end turn and decrease counters on buffs if extra command or movement is not triggered
-            if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
-                this.endTurn();
-            else {
-                if (this.hasBuff("Extra Command"))
-                    this.removeBuff("Extra Command");
-                if (this.hasBuff("Extra Movement"))
-                    this.removeBuff("Extra Movement");
-            }
-            // extra action counts down on buff duration but enables another turn
-            if (this.hasBuff("Extra Action")) {
-                this.turnAvailable = true;
-                this.removeBuff("Extra Action");
+            if (!(skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)) {
+                // end turn and decrease counters on buffs if extra command or movement is not triggered
+                if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
+                    this.endTurn();
+                else {
+                    if (this.hasBuff("Extra Command"))
+                        this.removeBuff("Extra Command");
+                    if (this.hasBuff("Extra Movement"))
+                        this.removeBuff("Extra Movement");
+                }
+                // extra action counts down on buff duration but enables another turn
+                if (this.hasBuff("Extra Action")) {
+                    this.turnAvailable = true;
+                    this.removeBuff("Extra Action");
+                }
             }
 
             if (skill[SkillJSONKeys.BUFF_TARGET] == "All") {
