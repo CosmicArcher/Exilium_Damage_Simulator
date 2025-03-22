@@ -306,6 +306,7 @@ function createDollsFromInput() {
             numSummons++;
             selectedDolls.push("Papasha Summon");
             selectedFortifications.push(selectedFortifications[i]);
+            selectedKeys.push(selectedKeys[i]);
 
             addCalcOption();
             addConditionalToggle();
@@ -411,7 +412,7 @@ function getConditionalOverrides() {
     let overrides = [];
     // number of conditionals is 1/3 of the number of elements 
     for (let i = 0; i < numDolls + numSummons; i++) {
-        conditionalDiv = document.getElementById("Conditional_" + (i + 1));
+        let conditionalDiv = document.getElementById("Conditional_" + (i + 1));
         overrides.push([]);
         for (let j = 0; j < conditionalDiv.children.length / 3; j++) {
             overrides[i].push(conditionalDiv.children[j*3 + 1].checked);
@@ -662,8 +663,41 @@ function startSimulation() {
     col2.style("height", "");
     col2.style("white-space", "pre-line");
     col1.style("white-space", "normal");
-    // rename the button, for now make it reload the page
-    d3.select("#startButton").text("Perform Action").on("click", () => {location.reload()});
+    col1.style("height", "auto");
+    // rename the button and disable it, change the onclick function to add the doll into the turn manager
+    d3.select("#startButton").text("Perform Action")
+                            .on("click", () => {
+                                let conditionalOverrides = getConditionalOverrides();
+                                // tbh there is no support that has a conditional to my knowledge
+                                TurnManager.getInstance().useDollSkill(actingDoll, selectedSkill, conditionalOverrides[0]);
+                                // refresh doll stat displays
+                                for (let i = 0; i < numDolls + numSummons; i++) {
+                                    refreshDollDisplay(i);
+                                    refreshStatDisplay(i);
+                                }
+                                // disable start and skill buttons again until new doll and skill are chosen
+                                document.getElementById("startButton").disabled = true;
+                                selectedSkill = "";
+                                document.getElementById("Skill").lastElementChild.disabled = true;
+                                document.getElementById("Skill").children[1].textContent = "Doll: ";
+                                document.getElementById("Skill").children[4].textContent = "Skill: ";
+                                // allow the rewind button to be pressed because there is now an action that we can rewind
+                                document.getElementById("rewindButton").disabled = false;
+                            });
+    document.getElementById("startButton").disabled = true;
+    // initialize start button
+    d3.select("#rewindButton").on("click", event => {
+        // undo the previous action
+        GameStateManager.getInstance().rewindToAction(GameStateManager.getInstance().getActionCount() - 1);
+        // refresh doll stat displays
+        for (let i = 0; i < numDolls + numSummons; i++) {
+            refreshDollDisplay(i);
+            refreshStatDisplay(i);
+        }
+        // if there are no more actions to rewind, disable the button
+        if (GameStateManager.getInstance().getActionCount() == 0)
+            event.target.disabled = true;
+    });
     // move the hidden ui to the middle column and reveal them
     document.getElementById("Dolls").appendChild(document.getElementById("CalcSettings"));
     document.getElementById("Dolls").appendChild(document.getElementById("Skill"));
@@ -673,7 +707,6 @@ function startSimulation() {
     d3.select("#ConditionalHolder").style("display", "block");
     initializeActionButtons();
     initializeDollCards();
-
 }
 
 function initializeActionButtons() {
@@ -686,8 +719,11 @@ function initializeActionButtons() {
         }
         else {
             dollOptions = d3.select(actionDiv[2]).append("div").attr("class", "dropdownBox").style("display", "none");
+            // filter out dolls that are either summons or have already used their turn
             let availableDolls = selectedDolls.filter(doll => {
                 if (doll == "Papasha Summon")
+                    return false;
+                if (!GameStateManager.getInstance().getDoll(doll).getTurnAvailable())
                     return false;
                 return true;
             });
@@ -881,15 +917,17 @@ function initializeDollCards() {
         dollCard.insert("div", "h4").style("float", "right")
                                     .style("margin-right", "15px")
                                     .style("margin-top", "10px")
+                                    .attr("id", "CIndex_" + (i + 1))
                                     .text(`Index ${doll.getCIndex()} / 6`);
         let cooldownText = "Cooldowns:";
         // internally negative cooldown is possible but to avoid confusion just show a lowerbound of 0
         for (let j = 0; j < 4; j++) {
             cooldownText += " " + Math.max(doll.getCooldowns()[j], 0);
         }
-        dollCard.append("div").text(cooldownText)
-                            .style("margin-bottom", "-10px")
-                            .style("margin-top", "-10px");
+        dollCard.append("div").style("margin-bottom", "-10px")
+                            .style("margin-top", "-10px")
+                            .attr("id", "Cooldowns_" + (i + 1))
+                            .text(cooldownText);
         dollCard.style("background-color", slotColors[i]);
         // create button that can display current buffs and an add buff option
         {
@@ -1262,4 +1300,15 @@ function disableBuffEditButtons() {
         document.getElementById("AddBuff_" + (i + 1)).disabled = true;
         document.getElementById("RemoveBuff_" + (i + 1)).disabled = true;
     }
+}
+
+function refreshDollDisplay(dollIndex) {
+    let doll = GameStateManager.getInstance().getDoll(selectedDolls[dollIndex]);
+    d3.select("#CIndex_" + (dollIndex + 1)).text(`Index ${doll.getCIndex()} / 6`);
+    let cooldownText = "Cooldowns:";
+    // internally negative cooldown is possible but to avoid confusion just show a lowerbound of 0
+    for (let j = 0; j < 4; j++) {
+        cooldownText += " " + Math.max(doll.getCooldowns()[j], 0);
+    }
+    d3.select("#Cooldowns_" + (dollIndex + 1)).text(cooldownText);
 }
