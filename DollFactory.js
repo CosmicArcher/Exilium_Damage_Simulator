@@ -1,3 +1,4 @@
+import Doll from "./Doll.js";
 import {Cheeta, Daiyan, Ksenia, Makiatto, MosinNagant, Papasha, PapashaSummon, Peritya, Qiongjiu, Sharkry, Suomi, Tololo, Vepley} from "./DollClasses.js";
 import { AttackTypes, Elements } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
@@ -77,6 +78,7 @@ class DollFactory {
                     TurnManager.getInstance().registerTargetedSupporter(name, true);
                     break;
                 default:
+                    newDoll = new Doll(name, attack, crit_chance, crit_damage, fortification, keys);
                     console.log(`${name} doll class does not exist`);
             }
             GameStateManager.getInstance().registerDoll(newDoll);
