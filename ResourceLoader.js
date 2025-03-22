@@ -40,6 +40,12 @@ class ResourceLoader {
         else
             console.error("Singleton not yet initialized");
     }
+    getAllBuffs() {
+        if (ResourceLoaderSingleton)
+            return Object.keys(ResourceLoaderSingleton.buffJSON);
+        else
+            console.error("Singleton not yet initialized");
+    }
     getSkillData(dollName) {
         if (ResourceLoaderSingleton) {
             if (ResourceLoaderSingleton.skillJSON.hasOwnProperty(dollName))

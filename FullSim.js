@@ -308,6 +308,7 @@ function createDollsFromInput() {
             selectedFortifications.push(selectedFortifications[i]);
 
             addCalcOption();
+            addConditionalToggle();
             document.getElementById("Settings_" + (numDolls + 1)).firstChild.textContent = selectedDolls[numDolls];
         }
     }
@@ -372,6 +373,8 @@ function hideDropdowns() {
     }
     if (statDropdown)
         statDropdown.style("display", "none");
+    if (allBuffDropdown)
+        allBuffDropdown.style("display", "none");
 }
 
 function getNestedInput(arr, htmlElement) {
@@ -610,6 +613,7 @@ var actingDoll = "";
 var selectedSkill = "";
 var skillOptions;
 var currentBuffs;
+var selectedBuff = "";
 // options for stat display/editing
 var statOptions = ["Attack",
                     "Crit Rate",
@@ -636,6 +640,8 @@ var statOptions = ["Attack",
                     "Electric Damage"];
 var selectedStatIndex = [];
 var statDropdown;
+
+var allBuffDropdown;
 // after starting the simulation, change the layout of the page
 function startSimulation() {
     // delete both of the first two columns' contents
@@ -693,6 +699,8 @@ function initializeActionButtons() {
                                 actionDiv[1].textContent = "Doll: " + doll;
                                 // activate the skill dropdown button
                                 actionDiv[5].disabled = false;
+                                // disable the perform action button
+                                document.getElementById("startButton").disabled = true;
                                 // changing doll deselects the previously chosen skill
                                 selectedSkill = "";
                                 updateConditionalToggles();
@@ -736,6 +744,8 @@ function initializeActionButtons() {
                             .on("click", () => {
                                 selectedSkill = skillName;
                                 actionDiv[4].textContent = "Skill: " + skillName;
+                                // activate the perform action button
+                                document.getElementById("startButton").disabled = false;
                                 updateConditionalToggles();
                             });
             });
@@ -877,9 +887,12 @@ function initializeDollCards() {
         for (let j = 0; j < 4; j++) {
             cooldownText += " " + Math.max(doll.getCooldowns()[j], 0);
         }
-        dollCard.append("div").text(cooldownText);
+        dollCard.append("div").text(cooldownText)
+                            .style("margin-bottom", "-10px")
+                            .style("margin-top", "-10px");
         dollCard.style("background-color", slotColors[i]);
         // create button that can display current buffs and an add buff option
+        {
         dollCard.append("br");
         let buffDisplay = dollCard.append("button").style("float", "right").text("Show Current Buffs");
         buffDisplay.on("click", () => {
@@ -892,19 +905,67 @@ function initializeDollCards() {
                 buffDisplay.text("Hide Current Buffs");
                 currentBuffs = buffDisplay.append("div").attr("class", "dropdownBox");
                 let buffs = doll.getBuffs();
-                // selecting buffs does not do anything, just intended for display
+                // selecting buffs allows the user to remove it from the unit
                 buffs.forEach(buff => {
-                    currentBuffs.append("a").text(buff[0]);
+                    currentBuffs.append("a")
+                                .text(buff[0])
+                                .on("click", event => {
+                                    let dollNum = +event.target.parentNode.parentNode.parentNode.id.slice(5);
+                                    // only allow the remove button to be clicked and disable all the other buff edit buttons on other doll cards 
+                                    disableBuffEditButtons();
+                                    document.getElementById("RemoveBuff_" + dollNum).disabled = false;
+                                    selectedBuff = buff[0];
+                                    d3.select("#SelectedBuff_" + dollNum).text("Selected Buff: " + buff[0]);
+                                });
                 });
             }
         });
         // for adding or removing buffs
-        dollCard.append("button").text("Select Buff");
+        dollCard.append("button").text("Select Buff")
+                                .on("click", event => {
+                                    if (allBuffDropdown.style("display") == "block") {
+                                        hideDropdowns();
+                                    }
+                                    else {
+                                        hideDropdowns();
+                                        event.target.appendChild(document.getElementById("AllBuffDropdown"));
+                                        allBuffDropdown.style("display", "block");
+                                    }
+                                });
+        dollCard.append("div").attr("id", "SelectedBuff_" + (i + 1))
+                            .style("padding-top", "10px")
+                            .style("margin-bottom", "-10px")
+                            .text("Selected Buff: ");
         dollCard.append("br");
-        dollCard.append("button").text("Add Buff");
-        dollCard.append("br"); 
+        dollCard.append("button").text("Add Buff")
+                                .attr("id", "AddBuff_" + (i + 1))
+                                .attr("disabled", "true")
+                                .on("click", event => {
+                                    let dollNum = +event.target.parentNode.id.slice(5) - 1;
+                                    let doll = GameStateManager.getInstance().getDoll(selectedDolls[dollNum]);
+                                    // only add 1 stack and 1 turn of the buff
+                                    doll.addBuff(selectedBuff, selectedDolls[dollNum], 1, 1);
+                                    // after removing the buff, disable the button until another buff is selected
+                                    event.target.disabled = true;
+                                    d3.select("#SelectedBuff_" + (dollNum + 1)).text("Selected Buff: ");
+                                });
+        dollCard.append("button").text("Remove Buff")
+                                .attr("id", "RemoveBuff_" + (i + 1))
+                                .style("float", "right")
+                                .attr("disabled", "true")
+                                .on("click", event => {
+                                    let dollNum = +event.target.parentNode.id.slice(5) - 1;
+                                    let doll = GameStateManager.getInstance().getDoll(selectedDolls[dollNum]);
+                                    doll.removeBuff(selectedBuff);
+                                    // after removing the buff, disable the button until another buff is selected
+                                    event.target.disabled = true;
+                                    d3.select("#SelectedBuff_" + (dollNum + 1)).text("Selected Buff: ");
+                                });
         dollCard.append("br");
+        dollCard.append("br");
+        }
         // doll stat display and editing
+        {
         dollCard.append("label").text("View/Edit Stats");
         dollCard.append("br");
         dollCard.append("button").text("Select Stat").on("click", event => {
@@ -946,7 +1007,7 @@ function initializeDollCards() {
             changeDollStat(dollNum);
             refreshStatDisplay(dollNum);
         });
-        
+        }        
     }
     // create the stat dropdown that will be shared among all doll cards
     statDropdown = d3.select("div").append("div").attr("class", "dropdownBox").attr("id", "StatDropdown").style("display", "none");
@@ -960,6 +1021,22 @@ function initializeDollCards() {
                         document.getElementById("StatChange_" + (dollNum + 1)).disabled = false;
                     });
     });
+    let allBuffs = ResourceLoader.getInstance().getAllBuffs();
+    // create buff dropdown for adding buffs that will be shared among all unit cards
+    allBuffDropdown = d3.select("div").append("div").attr("class", "dropdownBox").attr("id", "AllBuffDropdown").style("display", "none");
+    allBuffs.forEach(buffNames => {
+        allBuffDropdown.append("a")
+                        .text(buffNames)
+                        .on("click", event => {
+                            let dollNum = +event.target.parentNode.parentNode.parentNode.id.slice(5);
+                            disableBuffEditButtons();
+                            // activate the add buff button of the card the dropdown was clicked in
+                            document.getElementById("AddBuff_" + dollNum).disabled = false;
+                            selectedBuff = buffNames;
+                            d3.select("#SelectedBuff_" + dollNum).text("Selected Buff: " + buffNames);
+                        });
+    });
+
 }
 
 function updateStatDisplay(dollIndex, statIndex) {
@@ -1177,5 +1254,12 @@ function changeDollStat(dollIndex) {
             break;
         default :
             console.error(`${statIndex} out of range of stat array`);
+    }
+}
+
+function disableBuffEditButtons() {
+    for (let i = 0; i < numDolls + numSummons; i++) {
+        document.getElementById("AddBuff_" + (i + 1)).disabled = true;
+        document.getElementById("RemoveBuff_" + (i + 1)).disabled = true;
     }
 }
