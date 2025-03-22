@@ -258,14 +258,9 @@ class Doll extends Unit {
                 let fortification = this.fortData["V" + i];
                 // some fortifications modify multiple skills at once, typically by modifying a unique buff that multiple skills apply
                 let fortificationSkills = Object.keys(fortification);
-                if (fortificationSkills.length > 1) {
-                    fortificationSkills.forEach(skill_name => {
-                        this.mergeData(this.skillData[skill_name], fortification[skill_name]);
-                    });
-                }
-                else {
-                    this.mergeData(this.skillData[fortificationSkills[0]], fortification[fortificationSkills[0]]);
-                }
+                fortificationSkills.forEach(skill_name => {
+                    this.mergeData(this.skillData[skill_name], fortification[skill_name]);
+                });
             }
         }
     }
@@ -751,8 +746,12 @@ class Doll extends Unit {
                 }
                 else {
                     // if damage boost, add up the damage instead of replacing
-                    if (key != SkillJSONKeys.DAMAGE_BOOST || !skillData.hasOwnProperty(key))
-                        skillData[key] = modification[key];
+                    if (key != SkillJSONKeys.DAMAGE_BOOST || !skillData.hasOwnProperty(key)) {
+                        if (modification[key].constructor == Array)
+                            skillData[key] = this.copyBuffArray(modification[key])
+                        else
+                            skillData[key] = modification[key];
+                    }
                     else 
                         skillData[key] += modification[key];
                 }

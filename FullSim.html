@@ -124,10 +124,6 @@
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label><br>
-                <div style="display: none;">
-                    <input type="checkbox" >
-                    <label></label><br>
-                </div>
                 <label >Attack:</label>
                 <input type = "text"><br>
                 <label >Crit Rate (0.0x):</label>
@@ -193,11 +189,14 @@
                 <label>Doll:</label>
                 <button>Select Doll</button><br>
                 <label>Skill:</label>
-                <button>Select Skill</button>
+                <button disabled>Select Skill</button>
             </div>
-            <div id = "Conditional_1" style="display: none; white-space: normal;">
-                <br><input type="checkbox" >
-                <label>Condition</label>
+            <div style="display: none;" id = "ConditionalHolder">
+                <div id = "Conditional_1" style="display: none; white-space: normal;">
+                    <p>Doll</p>
+                    <input type="checkbox" >
+                    <label>Condition</label>
+                </div>
             </div>
         </div>
     </div>
