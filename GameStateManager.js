@@ -158,6 +158,9 @@ class GameStateManager {
         if (GameStateManagerSingleton) {
             GameStateManagerSingleton.target[GameStateManagerSingleton.actionCount+1].endTurn();
             GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1].forEach(doll => {
+                // if the doll still has turn available, consider their turn skipped and end turn to tick down buffs
+                if (doll.hasTurnAvailable())
+                    doll.endTurn();
                 doll.refreshSupportUses();
             });
             GameStateManagerSingleton.lockAction();
