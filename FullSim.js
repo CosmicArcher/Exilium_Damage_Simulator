@@ -868,7 +868,10 @@ function initializeDollCards() {
         dollCard.append("h4").text(selectedDolls[i]);
         // create the remaining index display
         let doll = GameStateManager.getInstance().getDoll(selectedDolls[i]);
-        dollCard.insert("div", "h4").style("float", "right").style("margin-right", "15px").style("margin-top", "10px").text(`Index ${doll.getCIndex()} / 6`);
+        dollCard.insert("div", "h4").style("float", "right")
+                                    .style("margin-right", "15px")
+                                    .style("margin-top", "10px")
+                                    .text(`Index ${doll.getCIndex()} / 6`);
         let cooldownText = "Cooldowns:";
         // internally negative cooldown is possible but to avoid confusion just show a lowerbound of 0
         for (let j = 0; j < 4; j++) {
@@ -903,7 +906,8 @@ function initializeDollCards() {
         dollCard.append("br");
         // doll stat display and editing
         dollCard.append("label").text("View/Edit Stats");
-        dollCard.append("button").style("margin-left", "20px").text("Select Stat").on("click", event => {
+        dollCard.append("br");
+        dollCard.append("button").text("Select Stat").on("click", event => {
             if (statDropdown.style("display") == "block")
                 hideDropdowns();
             else {
@@ -912,20 +916,37 @@ function initializeDollCards() {
                 statDropdown.style("display", "block");
             }
         });
-        dollCard.append("br");
-        dollCard.append("input").attr("type", "text").attr("id", "StatEdit_" + (i + 1)).attr("disabled", "true");
-        dollCard.append("button").text("Change Stat").style("float", "right").on("click", event => {
-            let dollNum = +event.target.parentNode.id.slice(5) - 1;
-            changeDollStat(dollNum);
-        });
-        dollCard.append("br");
-        dollCard.append("label").text("Final Stat");
-        dollCard.append("br");
-        dollCard.append("input").attr("type", "text").attr("id", "StatTotal_" + (i + 1)).attr("disabled", "true");
-        dollCard.append("button").text("Review Base").style("float", "right").on("click", event => {
+        dollCard.append("label").style("margin-left", "10px")
+                                .attr("id", "Stat_" + (i + 1));
+        dollCard.append("button").text("Refresh View")
+                                .attr("id", "StatRefresh_" + (i + 1))
+                                .attr("disabled", "true")
+                                .style("float", "right")
+                                .on("click", event => {
             let dollNum = +event.target.parentNode.id.slice(5) - 1;
             refreshStatDisplay(dollNum);
         });
+        dollCard.append("label").text("Final Stat")
+                                .style("float", "right")
+                                .style("margin-right", "10px");
+        dollCard.append("br");
+        dollCard.append("input").attr("type", "text")
+                                .attr("id", "StatEdit_" + (i + 1))
+                                .attr("disabled", "true");
+        dollCard.append("input").attr("type", "text")
+                                .attr("id", "StatTotal_" + (i + 1))
+                                .style("float", "right")
+                                .attr("disabled", "true");
+        dollCard.append("br");
+        dollCard.append("button").text("Change Stat")
+                                .attr("id", "StatChange_" + (i + 1))
+                                .attr("disabled", "true")
+                                .on("click", event => {
+            let dollNum = +event.target.parentNode.id.slice(5) - 1;
+            changeDollStat(dollNum);
+            refreshStatDisplay(dollNum);
+        });
+        
     }
     // create the stat dropdown that will be shared among all doll cards
     statDropdown = d3.select("div").append("div").attr("class", "dropdownBox").attr("id", "StatDropdown").style("display", "none");
@@ -935,6 +956,8 @@ function initializeDollCards() {
                     .on("click", event => {
                         let dollNum = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
                         updateStatDisplay(dollNum, index);
+                        document.getElementById("StatRefresh_" + (dollNum + 1)).disabled = false;
+                        document.getElementById("StatChange_" + (dollNum + 1)).disabled = false;
                     });
     });
 }
@@ -945,98 +968,122 @@ function updateStatDisplay(dollIndex, statIndex) {
     // the base stat is editable, the final stat after all buffs is not
     let baseStat = 0;
     let finalStat = 0;
+    let statName;
     switch(statIndex) {
         case 0:
             baseStat = doll.getBaseAttack();
             finalStat = doll.getAttack();
+            statName = "Attack";
             break;
         case 1:
             baseStat = doll.getBaseCrit();
             finalStat = doll.getCritRate();
+            statName = "Crit Rate";
             break;
         case 2:
             baseStat = doll.getBaseCritDamage();
             finalStat = doll.getCritDamage();
+            statName = "Crit Damage";
             break;
         case 3:
             baseStat = doll.getBaseDefenseIgnore();
             finalStat = doll.getDefenseIgnore();
+            statName = "Defense Ignore";
             break;
         case 4:
             baseStat = doll.getBaseDamageDealt();
             finalStat = doll.getDamageDealt();
+            statName = "Damage Dealt";
             break;
         case 5:
             baseStat = doll.getBaseTargetedDamage();
             finalStat = doll.getTargetedDamage();
+            statName = "Targeted Damage";
             break;
         case 6:
             baseStat = doll.getBaseAoEDamage();
             finalStat = doll.getAoEDamage();
+            statName = "AoE Damage";
             break;
         case 7:
             baseStat = doll.getBaseSlowedDamage();
             finalStat = doll.getSlowedDamage();
+            statName = "Slowed Damage";
             break;
         case 8:
             baseStat = doll.getBaseDefDownDamage();
             finalStat = doll.getDefDownDamage();
+            statName = "Def Down Damage";
             break;
         case 9:
             baseStat = doll.getBaseSupportDamage();
             finalStat = doll.getSupportDamage();
+            statName = "Out of Turn Damage";
             break;
         case 10:
             baseStat = doll.getBaseCoverIgnore();
             finalStat = doll.getCoverIgnore();
+            statName = "Cover Ignore";
             break;
         case 11:
             baseStat = doll.getBaseStabilityDamageModifier();
             finalStat = doll.getStabilityDamageModifier();
+            statName = "Stability Damage";
             break;
         case 12:
             baseStat = doll.getBaseStabilityIgnore();
             finalStat = doll.getStabilityIgnore();
+            statName = "Stability Ignore";
             break;
         case 13:
             baseStat = doll.getBaseAttackBoost();
             finalStat = doll.getAttackBoost();
+            statName = "Attack Boost";
             break;
         case 14:
             baseStat = doll.getBaseDefense();
             finalStat = doll.getDefense();
+            statName = "Defense";
             break;
         case 15:
             baseStat = doll.getBaseDefenseBuffs();
             finalStat = doll.getDefenseBuffs();
+            statName = "Defense Boost";
             break;
         case 16:
             baseStat = doll.getBasePhaseDamage();
             finalStat = doll.getPhaseDamage();
+            statName = "Phase Damage";
             break;
         case 17:
             baseStat = doll.getBaseElementDamage(Elements.PHYSICAL);
             finalStat = doll.getElementDamage(Elements.PHYSICAL);
+            statName = "Physical Damage";
             break;
         case 18:
             baseStat = doll.getBaseElementDamage(Elements.FREEZE);
             finalStat = doll.getElementDamage(Elements.FREEZE);
+            statName = "Freeze Damage";
             break;
         case 19:
             baseStat = doll.getBaseElementDamage(Elements.BURN);
             finalStat = doll.getElementDamage(Elements.BURN);
+            statName = "Burn Damage";
             break;
         case 20:
             baseStat = doll.getBaseElementDamage(Elements.CORROSION);
             finalStat = doll.getElementDamage(Elements.CORROSION);
+            statName = "Corrosion Damage";
             break;
         case 21:
             baseStat = doll.getBaseElementDamage(Elements.HYDRO);
             finalStat = doll.getElementDamage(Elements.HYDRO);
+            statName = "Hydro Damage";
             break;
         case 22:
             baseStat = doll.getBaseElementDamage(Elements.ELECTRIC);
             finalStat = doll.getElementDamage(Elements.ELECTRIC);
+            statName = "Electric Damage";
             break;
         default :
             console.error(`${statIndex} out of range of stat array`);
@@ -1046,6 +1093,8 @@ function updateStatDisplay(dollIndex, statIndex) {
     document.getElementById("StatEdit_" + (dollIndex + 1)).disabled = false;
     // display the total with buffs but before edits are made
     document.getElementById("StatTotal_" + (dollIndex + 1)).value = finalStat;
+    // show which stat was selected as a reminder
+    document.getElementById("Stat_" + (dollIndex + 1)).textContent = statName;
 }
 
 function refreshStatDisplay(dollIndex) {
@@ -1054,5 +1103,79 @@ function refreshStatDisplay(dollIndex) {
 }
 
 function changeDollStat(dollIndex) {
-
+    let doll = GameStateManager.getInstance().getDoll(selectedDolls[dollIndex]);
+    let newStat = document.getElementById("StatEdit_" + (dollIndex + 1)).value;
+    switch(selectedStatIndex[dollIndex]) {
+        case 0:
+            doll.setAttack(newStat);
+            break;
+        case 1:
+            doll.setCritRate(newStat);
+            break;
+        case 2:
+            doll.setCritDamage(newStat);
+            break;
+        case 3:
+            doll.setDefenseIgnore(newStat);
+            break;
+        case 4:
+            doll.setDamageDealt(newStat);
+            break;
+        case 5:
+            doll.setTargetedDamage(newStat);
+            break;
+        case 6:
+            doll.setAoEDamage(newStat);
+            break;
+        case 7:
+            doll.setSlowedDamage(newStat);
+            break;
+        case 8:
+            doll.setDefDownDamage(newStat);
+            break;
+        case 9:
+            doll.setSupportDamage(newStat);
+            break;
+        case 10:
+            doll.setCoverIgnore(newStat);
+            break;
+        case 11:
+            doll.setStabilityDamageModifier(newStat);
+            break;
+        case 12:
+            doll.setStabilityIgnore(newStat);
+            break;
+        case 13:
+            doll.setAttackBoost(newStat);
+            break;
+        case 14:
+            doll.setDefense(newStat);
+            break;
+        case 15:
+            doll.setDefenseBuffs(newStat);
+            break;
+        case 16:
+            doll.setPhaseDamage(newStat);
+            break;
+        case 17:
+            doll.setElementDamage(Elements.PHYSICAL, newStat);
+            break;
+        case 18:
+            doll.setElementDamage(Elements.FREEZE, newStat);
+            break;
+        case 19:
+            doll.setElementDamage(Elements.BURN, newStat);
+            break;
+        case 20:
+            doll.setElementDamage(Elements.CORROSION, newStat);
+            break;
+        case 21:
+            doll.setElementDamage(Elements.HYDRO, newStat);
+            break;
+        case 22:
+            doll.setElementDamage(Elements.ELECTRIC, newStat);
+            break;
+        default :
+            console.error(`${statIndex} out of range of stat array`);
+    }
 }
