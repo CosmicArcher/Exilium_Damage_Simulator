@@ -84,6 +84,7 @@ class Doll extends Unit {
     getCritDamage() {return this.critDamage;}
     getBaseCrit() {return this.baseCritChance;}
     getBaseCritDamage() {return this.baseCritDamage;}
+    getBaseAttack() {return this.attack;}
     // get any stats relevant to damage calculation
     getDefenseIgnore() {return this.defenseIgnore;}
     getDamageDealt() {return this.damageDealt;}
@@ -185,6 +186,17 @@ class Doll extends Unit {
         this.baseAttackBoost = x;
         this.attackBoost += x;
     }
+    setAttack(x) {this.attack = x;}
+    setCritRate(x) {
+        this.resetCrit();
+        this.baseCritChance = x;
+        this.critChance += x;
+    }
+    setCritDamage(x) {
+        this.resetCritDamage();
+        this.baseCritDamage = x;
+        this.critDamage += x;
+    }
     // when using the setters, undo the addition of the previous base multipliers
     resetDefenseIgnore() {
         this.defenseIgnore -= this.baseDefenseIgnore;
@@ -241,6 +253,14 @@ class Doll extends Unit {
     resetAttackBoost() {
         this.attackBoost -= this.baseAttackBoost;
         this.baseAttackBoost = 0;
+    }
+    resetCrit() {
+        this.critChance -= this.baseCritChance;
+        this.baseCritChance = 0;
+    }
+    resetCritDamage() {
+        this.critDamage -= this.baseCritDamage;
+        this.baseCritDamage = 0;
     }
     // get the data belonging to the doll from the loaded jsons
     initializeSkillData() {
@@ -779,7 +799,7 @@ class Doll extends Unit {
         newDoll.setStabilityDamageModifier(this.baseStabilityDamageModifier);
         newDoll.setStabilityIgnore(this.baseStabilityIgnore);
         newDoll.setAttackBoost(this.baseAttackBoost);
-        newDoll.setDefenseBuffs(this.defenseBuffs);
+        newDoll.setDefenseBuffs(this.baseDefenseBuffs);
 
         if (!this.buffsEnabled)
             newDoll.disableBuffs();

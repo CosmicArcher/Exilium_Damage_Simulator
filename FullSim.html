@@ -27,6 +27,8 @@
             position: absolute;
             min-width: 150px;
             box-shadow: 3px 3px 10px;
+            max-height: 150px;
+            overflow-y: auto;
             z-index: 1;
             background-color: lightgray;
         }
@@ -61,6 +63,13 @@
             overflow-y: auto;
             border-top: 1px solid black;
             border-bottom: 1px solid black;
+        }
+        .dollCard {
+            padding-left: 10px;
+            padding-right: 5px;
+            margin-left: -10px;
+            height: 250px;
+            white-space: pre-line;
         }
     </style>
 </head>
@@ -124,11 +133,11 @@
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label><br>
-                <label >Attack:</label>
+                <label >Base Attack:</label>
                 <input type = "text"><br>
-                <label >Crit Rate (0.0x):</label>
+                <label >Base Crit Rate (0.0x):</label>
                 <input type = "text"><br>
-                <label >Crit Damage (1.0x):</label>
+                <label >Base Crit Damage (1.0x):</label>
                 <input type = "text"><br>
                 <div style="height: 280px;" class="statScroll">
                     <label >Defense Ignore (0.0x):</label>
@@ -151,7 +160,7 @@
                     <input type = "text"><br>
                     <label >Stability Ignore (+- x):</label>
                     <input type = "text"><br>
-                    <label >Defense:</label>
+                    <label >Base Defense:</label>
                     <input type = "text"><br>
                     <button>Element Damage (0.0x):
                     </button>

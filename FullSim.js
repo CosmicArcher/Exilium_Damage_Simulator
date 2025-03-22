@@ -110,7 +110,7 @@ function addDoll() {
 function addConditionalToggle() {
     let newToggle = document.getElementById("Conditional_1").cloneNode(true);
     newToggle.id = "Conditional_" + (numDolls + numSummons);
-    document.getElementById("Conditionals").appendChild(newToggle);
+    document.getElementById("ConditionalHolder").appendChild(newToggle);
 }
 
 function addCalcOption() {
@@ -269,17 +269,6 @@ function initializeDollButtons(index) {
             phaseDiv[index].style("display", "block");
         }
     });
-    // if skill button is clicked, show a dropdown of the possible actions of doll 1
-    if (index == 0) {
-        d3.select(dollStats[13]).on("click", () => {
-            if (skillOptions.style("display") == "none") {
-                hideDropdowns();
-                skillOptions.style("display", "block");
-            }
-            else
-                hideDropdowns();
-        });
-    }
 }
 
 function createDollsFromInput() {
@@ -310,7 +299,7 @@ function createDollsFromInput() {
         dolls.push(newDoll);
         // papasha summon inherits the same atk, def, hp but not damage buffs or crit
         if (selectedDolls[i] == "Papasha") {
-            let newDoll = DollFactory.getInstance().createDoll(selectedDolls[i], dollStats[13], dollStats[0], dollStats[1], dollStats[2], 
+            let newDoll = DollFactory.getInstance().createDoll("Papasha Summon", dollStats[13], dollStats[0], dollStats[1], dollStats[2], 
                 selectedFortifications[i], selectedKeys[i]);
             newDoll.finishCloning();
             dolls.push(newDoll);
@@ -376,6 +365,13 @@ function hideDropdowns() {
     });
     if (calcOptions)
         calcOptions.style("display", "none");
+    // just delete the current buff display if it exists since the list always changes
+    if (currentBuffs) {
+        currentBuffs.remove();
+        currentBuffs = null;
+    }
+    if (statDropdown)
+        statDropdown.style("display", "none");
 }
 
 function getNestedInput(arr, htmlElement) {
@@ -410,18 +406,12 @@ function getDollStats(index) {
 
 function getConditionalOverrides() {
     let overrides = [];
-    let conditionalDiv = document.getElementById("Skill").nextElementSibling;
-    overrides.push([]);
     // number of conditionals is 1/3 of the number of elements 
-    for (let i = 0; i < conditionalDiv.children.length / 3; i++) {
-        overrides[0].push(conditionalDiv.children[i*3].checked);
-    }
-
-    for (let i = 1; i < numDolls; i++) {
-        conditionalDiv = document.getElementById("Doll_" + (i + 1)).children[13];
+    for (let i = 0; i < numDolls + numSummons; i++) {
+        conditionalDiv = document.getElementById("Conditional_" + (i + 1));
         overrides.push([]);
         for (let j = 0; j < conditionalDiv.children.length / 3; j++) {
-            overrides[0].push(conditionalDiv.children[j*3].checked);
+            overrides[i].push(conditionalDiv.children[j*3 + 1].checked);
         }
     }
     return overrides;
@@ -546,7 +536,7 @@ GlobalBuffManager.getInstance();
 d3.select("#AddSupport").on("click", () => {
     hideDropdowns();
     minimizeSlots();
-    if (numDolls - numSummons < 5)
+    if (numDolls < 5)
         addDoll();
 });
 
@@ -616,10 +606,36 @@ d3.select("#startButton").on("click", () => {
 });
 
 d3.select("#Doll_1").style("background-color", slotColors[0]);
-
 var actingDoll = "";
 var selectedSkill = "";
 var skillOptions;
+var currentBuffs;
+// options for stat display/editing
+var statOptions = ["Attack",
+                    "Crit Rate",
+                    "Crit Damage",
+                    "Def Ignore",
+                    "Damage Dealt",
+                    "Targeted Damage",
+                    "AoE Damage",
+                    "Slowed Damage",
+                    "Def Down Damage",
+                    "Out of Turn Damage",
+                    "Cover Ignore",
+                    "Stability Damage",
+                    "Stability Ignore",
+                    "Attack Boost",
+                    "Defense",
+                    "Defense Boost",
+                    "Phase Damage",
+                    "Physical Damage",
+                    "Freeze Damage",
+                    "Burn Damage",
+                    "Corrosion Damage",
+                    "Hydro Damage",
+                    "Electric Damage"];
+var selectedStatIndex = [];
+var statDropdown;
 // after starting the simulation, change the layout of the page
 function startSimulation() {
     // delete both of the first two columns' contents
@@ -639,6 +655,7 @@ function startSimulation() {
     // change the style so that the column height and layout is similar to the first column's
     col2.style("height", "");
     col2.style("white-space", "pre-line");
+    col1.style("white-space", "normal");
     // rename the button, for now make it reload the page
     d3.select("#startButton").text("Perform Action").on("click", () => {location.reload()});
     // move the hidden ui to the middle column and reveal them
@@ -649,8 +666,7 @@ function startSimulation() {
     document.getElementById("Dolls").appendChild(document.getElementById("ConditionalHolder"));
     d3.select("#ConditionalHolder").style("display", "block");
     initializeActionButtons();
-    //col2.append("div").attr("id", "conditionalHolder").append("input").attr("type", "checkbox");
-    //d3.select("#conditionalHolder").append("label").text("aaaaaaa");
+    initializeDollCards();
 
 }
 
@@ -736,7 +752,6 @@ function initializeActionButtons() {
 
 function getSkillConditionals(skillName, index) {
     let conditionals = [];
-    console.log(ResourceLoader.getInstance().getKeyData(selectedDolls[index]))
     // get the doll's inherent skill conditionals
     let baseSkill = ResourceLoader.getInstance().getSkillData(selectedDolls[index])[skillName];
     if (baseSkill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
@@ -840,4 +855,204 @@ function updateConditionalToggles() {
                 spliceNodeList(conditionalDiv.children, 3, conditionalDiv.children.length - 3);
         }
     });
+}
+// create cards that show a Doll's stats, index, and cooldowns
+function initializeDollCards() {
+    for (let i = 0; i < numDolls + numSummons; i++)
+        selectedStatIndex.push(-1);
+    let col1 = d3.select("div").select("div");
+    for (let i = 0; i < numDolls + numSummons; i++) {
+        let dollCard = col1.append("div");
+        dollCard.attr("id", "Doll_" + (i + 1)).attr("class", "dollCard");
+        // show doll name
+        dollCard.append("h4").text(selectedDolls[i]);
+        // create the remaining index display
+        let doll = GameStateManager.getInstance().getDoll(selectedDolls[i]);
+        dollCard.insert("div", "h4").style("float", "right").style("margin-right", "15px").style("margin-top", "10px").text(`Index ${doll.getCIndex()} / 6`);
+        let cooldownText = "Cooldowns:";
+        // internally negative cooldown is possible but to avoid confusion just show a lowerbound of 0
+        for (let j = 0; j < 4; j++) {
+            cooldownText += " " + Math.max(doll.getCooldowns()[j], 0);
+        }
+        dollCard.append("div").text(cooldownText);
+        dollCard.style("background-color", slotColors[i]);
+        // create button that can display current buffs and an add buff option
+        dollCard.append("br");
+        let buffDisplay = dollCard.append("button").style("float", "right").text("Show Current Buffs");
+        buffDisplay.on("click", () => {
+            if (currentBuffs) {
+                hideDropdowns();
+                buffDisplay.text("Show Current Buffs");
+            }
+            else {
+                hideDropdowns();
+                buffDisplay.text("Hide Current Buffs");
+                currentBuffs = buffDisplay.append("div").attr("class", "dropdownBox");
+                let buffs = doll.getBuffs();
+                // selecting buffs does not do anything, just intended for display
+                buffs.forEach(buff => {
+                    currentBuffs.append("a").text(buff[0]);
+                });
+            }
+        });
+        // for adding or removing buffs
+        dollCard.append("button").text("Select Buff");
+        dollCard.append("br");
+        dollCard.append("button").text("Add Buff");
+        dollCard.append("br"); 
+        dollCard.append("br");
+        // doll stat display and editing
+        dollCard.append("label").text("View/Edit Stats");
+        dollCard.append("button").style("margin-left", "20px").text("Select Stat").on("click", event => {
+            if (statDropdown.style("display") == "block")
+                hideDropdowns();
+            else {
+                hideDropdowns();
+                event.target.appendChild(document.getElementById("StatDropdown"));
+                statDropdown.style("display", "block");
+            }
+        });
+        dollCard.append("br");
+        dollCard.append("input").attr("type", "text").attr("id", "StatEdit_" + (i + 1)).attr("disabled", "true");
+        dollCard.append("button").text("Change Stat").style("float", "right").on("click", event => {
+            let dollNum = +event.target.parentNode.id.slice(5) - 1;
+            changeDollStat(dollNum);
+        });
+        dollCard.append("br");
+        dollCard.append("label").text("Final Stat");
+        dollCard.append("br");
+        dollCard.append("input").attr("type", "text").attr("id", "StatTotal_" + (i + 1)).attr("disabled", "true");
+        dollCard.append("button").text("Review Base").style("float", "right").on("click", event => {
+            let dollNum = +event.target.parentNode.id.slice(5) - 1;
+            refreshStatDisplay(dollNum);
+        });
+    }
+    // create the stat dropdown that will be shared among all doll cards
+    statDropdown = d3.select("div").append("div").attr("class", "dropdownBox").attr("id", "StatDropdown").style("display", "none");
+    statOptions.forEach((stat, index) => {
+        statDropdown.append("a")
+                    .text(stat)
+                    .on("click", event => {
+                        let dollNum = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
+                        updateStatDisplay(dollNum, index);
+                    });
+    });
+}
+
+function updateStatDisplay(dollIndex, statIndex) {
+    let doll = GameStateManager.getInstance().getDoll(selectedDolls[dollIndex]);
+    selectedStatIndex[dollIndex] = statIndex;
+    // the base stat is editable, the final stat after all buffs is not
+    let baseStat = 0;
+    let finalStat = 0;
+    switch(statIndex) {
+        case 0:
+            baseStat = doll.getBaseAttack();
+            finalStat = doll.getAttack();
+            break;
+        case 1:
+            baseStat = doll.getBaseCrit();
+            finalStat = doll.getCritRate();
+            break;
+        case 2:
+            baseStat = doll.getBaseCritDamage();
+            finalStat = doll.getCritDamage();
+            break;
+        case 3:
+            baseStat = doll.getBaseDefenseIgnore();
+            finalStat = doll.getDefenseIgnore();
+            break;
+        case 4:
+            baseStat = doll.getBaseDamageDealt();
+            finalStat = doll.getDamageDealt();
+            break;
+        case 5:
+            baseStat = doll.getBaseTargetedDamage();
+            finalStat = doll.getTargetedDamage();
+            break;
+        case 6:
+            baseStat = doll.getBaseAoEDamage();
+            finalStat = doll.getAoEDamage();
+            break;
+        case 7:
+            baseStat = doll.getBaseSlowedDamage();
+            finalStat = doll.getSlowedDamage();
+            break;
+        case 8:
+            baseStat = doll.getBaseDefDownDamage();
+            finalStat = doll.getDefDownDamage();
+            break;
+        case 9:
+            baseStat = doll.getBaseSupportDamage();
+            finalStat = doll.getSupportDamage();
+            break;
+        case 10:
+            baseStat = doll.getBaseCoverIgnore();
+            finalStat = doll.getCoverIgnore();
+            break;
+        case 11:
+            baseStat = doll.getBaseStabilityDamageModifier();
+            finalStat = doll.getStabilityDamageModifier();
+            break;
+        case 12:
+            baseStat = doll.getBaseStabilityIgnore();
+            finalStat = doll.getStabilityIgnore();
+            break;
+        case 13:
+            baseStat = doll.getBaseAttackBoost();
+            finalStat = doll.getAttackBoost();
+            break;
+        case 14:
+            baseStat = doll.getBaseDefense();
+            finalStat = doll.getDefense();
+            break;
+        case 15:
+            baseStat = doll.getBaseDefenseBuffs();
+            finalStat = doll.getDefenseBuffs();
+            break;
+        case 16:
+            baseStat = doll.getBasePhaseDamage();
+            finalStat = doll.getPhaseDamage();
+            break;
+        case 17:
+            baseStat = doll.getBaseElementDamage(Elements.PHYSICAL);
+            finalStat = doll.getElementDamage(Elements.PHYSICAL);
+            break;
+        case 18:
+            baseStat = doll.getBaseElementDamage(Elements.FREEZE);
+            finalStat = doll.getElementDamage(Elements.FREEZE);
+            break;
+        case 19:
+            baseStat = doll.getBaseElementDamage(Elements.BURN);
+            finalStat = doll.getElementDamage(Elements.BURN);
+            break;
+        case 20:
+            baseStat = doll.getBaseElementDamage(Elements.CORROSION);
+            finalStat = doll.getElementDamage(Elements.CORROSION);
+            break;
+        case 21:
+            baseStat = doll.getBaseElementDamage(Elements.HYDRO);
+            finalStat = doll.getElementDamage(Elements.HYDRO);
+            break;
+        case 22:
+            baseStat = doll.getBaseElementDamage(Elements.ELECTRIC);
+            finalStat = doll.getElementDamage(Elements.ELECTRIC);
+            break;
+        default :
+            console.error(`${statIndex} out of range of stat array`);
+    }
+    document.getElementById("StatEdit_" + (dollIndex + 1)).value = baseStat;
+    // activate the text input for editing
+    document.getElementById("StatEdit_" + (dollIndex + 1)).disabled = false;
+    // display the total with buffs but before edits are made
+    document.getElementById("StatTotal_" + (dollIndex + 1)).value = finalStat;
+}
+
+function refreshStatDisplay(dollIndex) {
+    if (selectedStatIndex[dollIndex] != -1)
+        updateStatDisplay(dollIndex, selectedStatIndex[dollIndex]);
+}
+
+function changeDollStat(dollIndex) {
+
 }

@@ -10,6 +10,7 @@ class Unit {
         this.defense = defense;
         // stat buffs that are important for both target and attacker
         this.defenseBuffs = 0;
+        this.baseDefenseBuffs = 0;
         // track buff name, buff data, turns left, stacks left, isTurnBased, consumption mode, sourceName (for overburn damage)
         this.currentBuffs = [];
         // some modes of the calculator will be purely manual input of buff effects while others will be automatic from the addBuff() function
@@ -23,6 +24,7 @@ class Unit {
     setDefense(x) {this.defense = x;}
     getDefense() {return this.defense * (1 + this.defenseBuffs);}
     getBaseDefense() {return this.defense;}
+    getBaseDefenseBuffs() {return this.baseDefenseBuffs;}
     getName() {return this.name;}
     // process buffs using json data
     applyBuffEffects(buffData, stacks = 1, stackable = false) {
@@ -222,7 +224,15 @@ class Unit {
     }
     // target defense buffs are added to attacker's defense ignore so we need to be able to get it
     getDefenseBuffs() {return this.defenseBuffs;}
-    setDefenseBuffs(x) {this.defenseBuffs = x;} // only use for quick calcs, direct buff input
+    setDefenseBuffs(x) {
+        this.resetDefenseBuffs();
+        this.defenseBuffs += x;
+        this.baseDefenseBuffs = 0;
+    }
+    resetDefenseBuffs() {
+        this.defenseBuffs -= this.baseDefenseBuffs;
+        this.baseDefenseBuffs = 0;
+    }
     
     endTurn() {
         this.currentBuffs.forEach(buff => {

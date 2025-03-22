@@ -245,7 +245,7 @@ class Target extends Unit {
         targetClone.setStabilityDamageModifier(this.baseStabilityDamageModifier);
         targetClone.applyDRPerStab(this.drPerStab);
         targetClone.applyDRWithStab(this.drWithStab);
-        targetClone.setDefenseBuffs(this.defenseBuffs);
+        targetClone.setDefenseBuffs(this.baseDefenseBuffs);
         targetClone.setBrokenTurns(this.stabilityBrokenTurns);
         targetClone.setStability(this.stability);
         targetClone.setIsLarge(this.isLarge);
