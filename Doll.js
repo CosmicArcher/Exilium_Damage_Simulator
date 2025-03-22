@@ -74,7 +74,7 @@ class Doll extends Unit {
         this.applyKeyData();
     }
     // for tracking which dolls have turns available
-    getTurnAvailable() {return this.turnAvailable;}
+    hasTurnAvailable() {return this.turnAvailable;}
     getCIndex() {return this.CIndex;}
     getCooldowns() {return this.cooldowns;}
     getFinalSkillData() {return this.skillData;}
@@ -810,7 +810,7 @@ class Doll extends Unit {
             newDoll.disableBuffs();
         else {
             this.currentBuffs.forEach(buff => {
-                newDoll.addBuff(buff[0], buff[2], buff[3], buff[6]);
+                newDoll.addBuff(buff[0], buff[6], buff[2], buff[3]);
             });
             this.buffImmunity.forEach(immunity => {
                 newDoll.buffImmunity.push(immunity);
@@ -828,7 +828,7 @@ class Doll extends Unit {
     }
     // to be filled by child classes
     refreshSupportUses() {
-
+        this.turnAvailable = true;
     }
     // to ensure index consumption/gain does not exceed the bounds of 0-6
     adjustIndex(gain) {

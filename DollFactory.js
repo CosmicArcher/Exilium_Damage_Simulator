@@ -34,6 +34,7 @@ class DollFactory {
                     break;
                 case "Makiatto":
                     newDoll = new Makiatto(defense, attack, crit_chance, crit_damage, fortification, keys);
+                    TurnManager.getInstance().registerInterceptor(name);
                     break;
                 case "Suomi":
                     newDoll = new Suomi(defense, attack, crit_chance, crit_damage, fortification, keys);
@@ -48,6 +49,7 @@ class DollFactory {
                     break;
                 case "Daiyan":
                     newDoll = new Daiyan(defense, attack, crit_chance, crit_damage, fortification, keys);
+                    TurnManager.getInstance().registerInterceptor(name);
                     break;
                 case "Tololo":
                     newDoll = new Tololo(defense, attack, crit_chance, crit_damage, fortification, keys);                   

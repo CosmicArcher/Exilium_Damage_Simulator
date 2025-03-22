@@ -25,6 +25,7 @@ class Supporter extends Doll {
     }
 
     refreshSupportUses() {
+        super.refreshSupportUses();
         this.supportsUsed = 0;
     }
 
@@ -54,7 +55,12 @@ class Interceptor extends Doll {
         return 0;
     }
 
+    canIntercept() {
+        return this.interceptsUsed < this.interceptLimit && this.interceptEnabled;
+    }
+
     refreshSupportUses() {
+        super.refreshSupportUses();
         this.interceptsUsed = 0;
     }
 

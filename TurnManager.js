@@ -18,6 +18,7 @@ class TurnManager {
             EventManager.getInstance().addListener("allyAction", TurnManagerSingleton.activateActionListeners);
             EventManager.getInstance().addListener("damageDealtTypes", TurnManagerSingleton.activateDamageListeners);
             EventManager.getInstance().addListener("statusApplied", TurnManagerSingleton.activateBuffListeners);
+            EventManager.getInstance().addListener("enemyAttack", TurnManagerSingleton.alertEnemyAttack);
         }
     }
 
@@ -44,6 +45,9 @@ class TurnManager {
             TurnManagerSingleton.actionsRunning = false;
             // for groza and suomi passives listening for other doll end turn
             TurnManagerSingleton.actionListeners = [];
+            // interceptors and counterattackers can trigger supports but require the enemy to attack first, interceptors happen before and counterattackers happen after
+            TurnManagerSingleton.interceptors = [];
+            TurnManagerSingleton.counterAttackers = [];
         }
         else
             console.error("Singleton not yet initialized");
@@ -104,7 +108,7 @@ class TurnManager {
                 let currentAction = TurnManagerSingleton.actionSequence.pop();
                 let doll = GameStateManager.getInstance().getDoll(currentAction[0]);
                 // actions are an array consisting of [dollName, target/[target, supported doll], skillName, calculationType, conditionalOverride]
-                if (currentAction[2] != SkillNames.SUPPORT) {
+                if (![SkillNames.SUPPORT, SkillNames.INTERCEPT, SkillNames.COUNTERATTACK].includes(currentAction[2])) {
                     doll.getSkillDamage(currentAction[2], currentAction[1], currentAction[3], currentAction[4]);
                 }
                 else
@@ -252,6 +256,37 @@ class TurnManager {
     alertPendingSupport(dollName) {
         if (TurnManagerSingleton) {
             TurnManagerSingleton.actionSequence.push([dollName, GameStateManager.getInstance().getTarget(), SkillNames.SUPPORT, CalculationTypes.EXPECTED, [false]]);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // triggered by enemy attacks
+    registerInterceptor(dollName) {
+        if (TurnManagerSingleton) {
+            TurnManagerSingleton.interceptors.push(dollName);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    registerCounterAttacker(dollName) {
+        if (TurnManagerSingleton) {
+            TurnManagerSingleton.counterAttackers.push(dollName);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // alert interceptors and counterattackers and schedule them appropriately
+    alertEnemyAttack() {
+        if (TurnManagerSingleton) {
+            // because the turns are scheduled as a stack, counterattacker should be input first and interceptor last so that the correct order is observed
+            TurnManagerSingleton.counterAttackers.forEach(doll => {
+                if (GameStateManager.getInstance().getDoll(doll).canIntercept())
+                    TurnManagerSingleton.useDollSkill(doll, SkillNames.COUNTERATTACK);
+            });
+            TurnManagerSingleton.interceptors.forEach(doll => {
+                if (GameStateManager.getInstance().getDoll(doll).canIntercept())
+                    TurnManagerSingleton.useDollSkill(doll, SkillNames.INTERCEPT);
+            });
         }
         else
             console.error("Singleton not yet initialized");
