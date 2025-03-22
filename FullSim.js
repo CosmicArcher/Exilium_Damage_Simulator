@@ -685,7 +685,7 @@ function startSimulation() {
                                 document.getElementById("rewindButton").disabled = false;
                             });
     document.getElementById("startButton").disabled = true;
-    // initialize start button
+    // initialize rewind, enemy attack, and end round buttons
     d3.select("#rewindButton").on("click", event => {
         // undo the previous action
         GameStateManager.getInstance().rewindToAction(GameStateManager.getInstance().getActionCount() - 1);
@@ -698,6 +698,38 @@ function startSimulation() {
         if (GameStateManager.getInstance().getActionCount() == 0)
             event.target.disabled = true;
     });
+    d3.select("#enemyAttack").on("click", event => {
+        EventManager.getInstance().broadcastEvent("enemyAttack", null);
+        // temporarily disable button to prevent spam clicking
+        event.target.disabled = true;
+        let timer = d3.timer((elapsed) => {
+            if (elapsed > 150) { 
+                event.target.disabled = false;
+                timer.stop();
+            }
+        });
+        for (let i = 0; i < numDolls + numSummons; i++) {
+            refreshDollDisplay(i);
+            refreshStatDisplay(i);
+        }
+    });
+    d3.select("#startRound").on("click", event => {
+        GameStateManager.getInstance().endRound();
+        // temporarily disable button to prevent spam clicking
+        event.target.disabled = true;
+        let timer = d3.timer((elapsed) => {
+            if (elapsed > 150) { 
+                event.target.disabled = false;
+                timer.stop();
+            }
+        });
+        for (let i = 0; i < numDolls + numSummons; i++) {
+            refreshDollDisplay(i);
+            refreshStatDisplay(i);
+        }
+    });
+    document.getElementById("enemyAttack").disabled = false;
+    document.getElementById("startRound").disabled = false;
     // move the hidden ui to the middle column and reveal them
     document.getElementById("Dolls").appendChild(document.getElementById("CalcSettings"));
     document.getElementById("Dolls").appendChild(document.getElementById("Skill"));
@@ -723,7 +755,7 @@ function initializeActionButtons() {
             let availableDolls = selectedDolls.filter(doll => {
                 if (doll == "Papasha Summon")
                     return false;
-                if (!GameStateManager.getInstance().getDoll(doll).getTurnAvailable())
+                if (!GameStateManager.getInstance().getDoll(doll).hasTurnAvailable())
                     return false;
                 return true;
             });
