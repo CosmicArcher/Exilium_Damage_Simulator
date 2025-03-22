@@ -188,9 +188,9 @@ class Target extends Unit {
             else if (buff[0].match("Corrosive Infusion") && element == Elements.CORROSION) {
                 let doll = GameStateManager.getInstance().getDoll(buff[6]);
                 if (doll.fortification < 2)
-                    this.addBuff("Corrosive Infusion", buff[6], 2, 1);
+                    this.addBuff("Corrosive Infusion", "Klukai", 2, 1);
                 else
-                    this.addBuff("Corrosive Infusion V2", buff[6], 2, 1);
+                    this.addBuff("Corrosive Infusion V2", "Klukai", 2, 1);
             }
         });
     }
@@ -254,7 +254,7 @@ class Target extends Unit {
             targetClone.disableBuffs();
         else {
             this.currentBuffs.forEach(buff => {
-                targetClone.addBuff(buff[0], buff[2], buff[3], buff[6]);
+                targetClone.addBuff(buff[0], buff[6], buff[2], buff[3]);
             });
             this.buffImmunity.forEach(immunity => {
                 targetClone.buffImmunity.push(immunity);
