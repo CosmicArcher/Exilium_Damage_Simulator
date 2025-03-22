@@ -75,7 +75,9 @@ class Doll extends Unit {
     }
     // for tracking which dolls have turns available
     getTurnAvailable() {return this.turnAvailable;}
-    getIndex() {return this.CIndex;}
+    getCIndex() {return this.CIndex;}
+    getCooldowns() {return this.cooldowns;}
+    getFinalSkillData() {return this.skillData;}
 
     getAttack() {return this.attack * (1 + this.attackBoost + GlobalBuffManager.getInstance().getGlobalAttack());}
     getCritRate() {return this.critChance;}

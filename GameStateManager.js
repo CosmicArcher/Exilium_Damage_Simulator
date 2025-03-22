@@ -201,9 +201,12 @@ class GameStateManager {
             console.error("Singleton not yet initialized");
     }
 
-    setDollCalcType(calculationType, index) {
+    setDollCalcType(calculationType, dollName) {
         if (GameStateManagerSingleton) {
-            GameStateManagerSingleton.calcTypes[index] = calculationType;
+            for (let i = 0; i < GameStateManagerSingleton.dolls[0].length; i++) {
+                if (GameStateManagerSingleton.dolls[0][i].getName() == dollName)
+                    GameStateManagerSingleton.calcTypes[i] = calculationType;
+            }
         }
         else
             console.error("Singleton not yet initialized");

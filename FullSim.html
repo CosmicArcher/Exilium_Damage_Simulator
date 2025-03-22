@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>Exilium Damage Sim With Supports</title>
+    <title>Exilium Turn by Turn Damage Sim</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="jquery-3.6.0.min.js"></script>
     <style id="jsbin-css">
@@ -67,7 +67,7 @@
 <body style="white-space: pre-line; background-color: beige;">
     <div style="width: 100%; display: table;">
         <a href="./index.html" class="pageTab">Simple Sim</a>
-        <h1 style="text-align: center;">Damage Sim With Supports</h1>
+        <h1 style="text-align: center;">Turn-by-Turn Combat Sim</h1>
         <div class="column" style="background-color: lightgray;">
             <div id = "TargetColumn">
                 <h2>Target Stats</h2>
@@ -114,7 +114,7 @@
         <div class= "column" id = "Dolls" style="background-color: lightslategray; white-space: normal; height: auto;">
             <div style="height: 50px;">
                 <h2 style="float: left;">Dolls</h2>
-                <button style="float: right; margin-right: 50px; margin-top: 20px;" id = "AddSupport">Add Support 0/4</button>
+                <button style="float: right; margin-right: 50px; margin-top: 20px;" id = "AddSupport">Add Doll 0/4</button>
             </div><br>
             <div id = "Doll_1" style="white-space: pre-line; margin-left: -10px; padding-left: 10px;" class="slotMaximized">
                 <button style="float: right; margin-right: 10px;">-</button>
@@ -124,8 +124,6 @@
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label><br>
-                <label for = "Skill" id = "SkillSelected">Skill:</label>
-                <button id = "Skill" disabled>Select Skill</button>
                 <div style="display: none;">
                     <input type="checkbox" >
                     <label></label><br>
@@ -182,18 +180,29 @@
         </div>
         <div class="column" style="background-color: lightgoldenrodyellow;">
             <div style="overflow-y: auto; overflow-x: hidden; height: 300px;" id = "ActionLog"></div>
-            <button type = "button" id = "calculateButton" disabled>Calculate Damage</button>
-            <div id = "CalcSettings" style="white-space: initial;">
+            <button type = "button" id = "startButton" disabled>Begin Simulation</button>
+            <div id = "CalcSettings" style="white-space: initial; display: none;">
                 <h4>Damage Calculation Setting</h4>
                 <div id = "Settings_1">
                     <td>Doll:</td>
                     <button style="margin-left: 5px;">Calculation</button>
                 </div>
             </div>
+            <div id = "Skill" style="display: none;">
+                <h4>Acting Doll</h4>
+                <label>Doll:</label>
+                <button>Select Doll</button><br>
+                <label>Skill:</label>
+                <button>Select Skill</button>
+            </div>
+            <div id = "Conditional_1" style="display: none; white-space: normal;">
+                <br><input type="checkbox" >
+                <label>Condition</label>
+            </div>
         </div>
     </div>
 
-    <script type="module" src="SupportCalc.js">
+    <script type="module" src="FullSim.js">
     </script>
 </body>
 </html>

@@ -14,13 +14,11 @@ var selectedPhases = [];
 var selectedDolls = [""];
 var selectedFortifications = [0];
 var selectedKeys = [[0,0,0,0,0,0]];
-var selectedSkill = "";
 var calcSettings = [CalculationTypes.EXPECTED];
 var numDolls = 1;
 // papasha summon does not count towards the limit of 4 supports
 var numSummons = 0;
 
-var skillOptions;
 var dollOptions;
 var keyOptions;
 var phaseDiv = [null];
@@ -40,7 +38,7 @@ function spliceNodeList(nodeList, startIndex, numElements) {
 }
 // to track whether more supports are allowed to be added or not
 function updateSupportCounter() {
-    d3.select("#AddSupport").text(`Add Support ${numDolls-1-numSummons}/4`);
+    d3.select("#AddSupport").text(`Add Doll ${numDolls-1}/4`);
 }
 
 function toggleSlotSize(dollNum) {
@@ -75,7 +73,6 @@ function addDoll() {
     newNode.id = "Doll_" + numDolls;
     newNode.children[1].innerHTML = "Doll: ";
     d3.select(newNode).style("background-color", slotColors[numDolls-1]);
-    spliceNodeList(newNode.children, 12, 2);
 
     let removeButton = d3.select(newNode).insert("button", "label");
     removeButton.text("Remove Doll")
@@ -101,16 +98,19 @@ function addDoll() {
     newNode.children[11].textContent = "None";
     // if the phase buffs are open in the original div, close it
     d3.select(newNode.lastElementChild.lastElementChild).style("display", "none");
-    // if the conditional toggles were open in the original, hide them
-    updateConditionalToggles(numDolls - 1);
 
     initializeDollButtons(numDolls - 1);
 
     // add a row under the calculation settings section
+    addCalcOption();
+}
+
+function addCalcOption() {
+    // add a row under the calculation settings section
     let newSetting = document.getElementById("CalcSettings").children[1].cloneNode(true);
     newSetting.firstChild.textContent = "Doll: ";
     newSetting.firstElementChild.textContent = "Calculation";
-    newSetting.id = "Settings_" + numDolls;
+    newSetting.id = "Settings_" + (numDolls + numSummons);
     d3.select(newSetting.lastElementChild).on("click", () => {
         // reuse the dropdown among all buttons for this setting
         newSetting.lastElementChild.appendChild(calcOptions.node());
@@ -136,8 +136,6 @@ function removeDoll(index) {
     phaseDiv.splice(index, 1);
     // if summon is deleted, do not reduce the support counter
     let doll = selectedDolls[index];
-    if (doll == "Papasha Summon")
-        numSummons--;
     selectedDolls.splice(index, 1);
     numDolls--;
     updateSupportCounter();
@@ -152,13 +150,6 @@ function removeDoll(index) {
     // remove the doll's entry in the calculation settings section too
     calcSettings.splice(index, 1);
     spliceNodeList(document.getElementById("CalcSettings").children, 2 * index + 1, 2);
-    // if papasha is deleted, remove her summon as well if it is not on the first slot
-    if (doll == "Papasha") {
-        for (let i = 1; i < numDolls; i++) {
-            if (selectedDolls[i] == "Papasha Summon")
-                removeDoll(i);
-        }
-    }
 }
 // because initializing doll buttons will be repeated each time a new doll is added
 function initializeDollButtons(index) {
@@ -181,10 +172,8 @@ function initializeDollButtons(index) {
             hideDropdowns();
             // create the dropdown list 
             dollOptions = d3.select(dollStats[index == 0 ? 2 : 3]).append("div").attr("class", "dropdownBox");
-            // get all dolls excluding any already selected dolls, and Papasha summon if support slot
+            // get all dolls excluding any already selected dolls, and Papasha summon
             let dollList = getDolls().filter(doll => {
-                if (index == 0)
-                    return !selectedDolls.includes(doll);
                 return !selectedDolls.includes(doll) && doll != "Papasha Summon";
             });
             dollList.forEach(d => {
@@ -192,18 +181,9 @@ function initializeDollButtons(index) {
                             .text(d)
                             .on("click", (event) => {
                                 let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
-                                // if papasha was originally in this slot, remove her summon if it is not in slot 1
-                                if (selectedDolls[dollIndex] == "Papasha") {
-                                    for (let i = 1; i < numDolls; i++) {
-                                        if (selectedDolls[i] == "Papasha Summon")
-                                            removeDoll(i);
-                                    }
-                                }
                                 selectedDolls[dollIndex] = d;
                                 updateSelectedDoll(dollIndex);
-                                // enable the skill and fortification dropdown buttons since a doll is now selected
-                                if (dollIndex == 0) // only slot 1 can choose a skill, all others can only use support attacks
-                                    dollStats[13].disabled = false;
+                                // enable the fortification dropdown button since a doll is now selected
                                 dollStats[index == 0 ? 3 : 4].disabled = false;
                                 dollStats[index == 0 ? 5 : 6].disabled = false;
                                 dollStats[index == 0 ? 7 : 8].disabled = false;
@@ -213,32 +193,9 @@ function initializeDollButtons(index) {
                                 dollStats[index == 0 ? 8 : 9].textContent = "None";
                                 dollStats[index == 0 ? 10 : 11].textContent = "None";
                                 selectedKeys[dollIndex] = [0,0,0,0,0,0];
-                                // disable the calculate damage button because a skill for the new doll 1 has not yet been selected
+                                // selecting doll 1 enables the start button
                                 if (dollIndex == 0) {
-                                    d3.select("#calculateButton").node().disabled = true;
-                                    createSkillDropdown();
-                                }
-                                else {
-                                    // check if the support skills have conditionals
-                                    if (getDollSkills(dollIndex).hasOwnProperty(SkillNames.SUPPORT)) {
-                                        updateConditionalToggles(dollIndex-1);
-                                    }
-                                }
-                                // if papasha was selected, automatically create a new slot and lock it to her summon            
-                                if (d == "Papasha" && !selectedDolls.includes("Papasha Summon")) {
-                                    dollOptions.style("display", "none");
-                                    numSummons++;
-                                    // create papasha summon doll slot but minimize it and keep the papasha slot maximized
-                                    addDoll();
-                                    minimizeSlots();
-                                    maximizeSlot(dollIndex + 1);
-                                    // create papasha summon on the last doll slot
-                                    selectedDolls[numDolls-1] = "Papasha Summon";
-                                    selectedFortifications[numDolls-1] = selectedFortifications[dollIndex];
-                                    // update the text to show the summon name and fortification matching papasha
-                                    updateSelectedDoll(numDolls-1);
-                                    // delete the doll and fortification buttons of the summon to prevent changing it
-                                    spliceNodeList(document.getElementById("Doll_" + numDolls).childNodes,5,17);
+                                    d3.select("#startButton").node().disabled = false;
                                 }
                             });
             });
@@ -256,28 +213,9 @@ function initializeDollButtons(index) {
                                 let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
                                 selectedFortifications[dollIndex] = i;
                                 updateSelectedDoll(dollIndex);
-                                // if the doll is papasha, also update her summon's fortification
-                                if (selectedDolls[dollIndex] == "Papasha") {
-                                    selectedDolls.forEach((d, index) => {
-                                        if (d == "Papasha Summon") {
-                                            selectedFortifications[index] = i;
-                                            updateSelectedDoll(index);
-                                        }
-                                    });
-                                }
                                 // if a skill is already selected and gains a conditional because of the fortification, 
                                 // show the override tickbox, otherwise hide and deselect it
-                                if (dollIndex == 0) {
-                                    if (selectedSkill != "") {
-                                        updateConditionalToggles(0);
-                                    }
-                                }
-                                else {
-                                    // if not in slot 1, only check if support with current fortification has conditional
-                                    if (getDollSkills(dollIndex).hasOwnProperty(SkillNames.SUPPORT)) {
-                                        updateConditionalToggles(dollIndex-1);
-                                    }
-                                }
+                                updateConditionalToggles(dollIndex-1);
                             });
             }
         } // if dropdown has already been created, reuse it by transferring it as a child of a new fortification button
@@ -360,6 +298,19 @@ function createDollsFromInput() {
         newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
         newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
         dolls.push(newDoll);
+        // papasha summon inherits the same atk, def, hp but not damage buffs or crit
+        if (selectedDolls[i] == "Papasha") {
+            let newDoll = DollFactory.getInstance().createDoll(selectedDolls[i], dollStats[13], dollStats[0], dollStats[1], dollStats[2], 
+                selectedFortifications[i], selectedKeys[i]);
+            newDoll.finishCloning();
+            dolls.push(newDoll);
+            numSummons++;
+            selectedDolls.push("Papasha Summon");
+            selectedFortifications.push(selectedFortifications[i]);
+
+            addCalcOption();
+            document.getElementById("Settings_" + (numDolls + 1)).firstChild.textContent = selectedDolls[numDolls];
+        }
     }
     return dolls;
 }
@@ -371,7 +322,7 @@ function createSkillDropdown() {
         skillOptions.remove();
     selectedSkill = "";
     d3.select("#SkillSelected").text("Skill: ");
-    let conditionalDiv = d3.select("#Skill").node().nextElementSibling;
+    let conditionalDiv = document.getElementById("Skill").nextElementSibling;
     d3.select(conditionalDiv).style("display", "none");
     d3.select(conditionalDiv.firstElementChild).node().checked = false;
     // change selected skill text when dropdown option is clicked
@@ -385,7 +336,7 @@ function createSkillDropdown() {
                         // activate the damage calculation button once a skill has been selected
                         d3.select("#calculateButton").node().disabled = false;
                         // if the skill has a conditional, show the override tickbox, otherwise hide and deselect it
-                        updateConditionalToggles(0);
+                        updateConditionalToggles();
                     });
     });
 }
@@ -409,51 +360,27 @@ function createKeyDropdown(index, htmlElement) {
                             // if a key has already been selected in this slot, deselect it in the selected keys
                             if (keyDisplay.textContent != "None") {
                                 selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
-                                // if doll is papasha, also change her summon's keys
-                                if (selectedDolls[dollIndex] == "Papasha") {
-                                    selectedDolls.forEach((doll, i) => {
-                                        if (doll == "Papasha Summon") {
-                                            selectedKeys[i][keys.indexOf(keyDisplay.textContent)] = 0;
-                                        }
-                                    });
-                                }
                             }
                             // add the key in the selected keys of the doll
                             selectedKeys[dollIndex][keys.indexOf(key_name)] = 1;
-                            // if doll is papasha, also change her summon's keys
-                            if (selectedDolls[dollIndex] == "Papasha") {
-                                selectedDolls.forEach((doll, i) => {
-                                    if (doll == "Papasha Summon") {
-                                        selectedKeys[i][keys.indexOf(key_name)] = 1;
-                                    }
-                                });
-                            }
                             keyDisplay.textContent = key_name;
                         }
                         else {
                             // if a key has already been selected in this slot, deselect it in the selected keys
                             if (keyDisplay.textContent != "None") {
                                 selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
-                                // if doll is papasha, also change her summon's keys
-                                if (selectedDolls[dollIndex] == "Papasha") {
-                                    selectedDolls.forEach((doll, i) => {
-                                        if (doll == "Papasha Summon") {
-                                            selectedKeys[i][keys.indexOf(keyDisplay.textContent)] = 0;
-                                        }
-                                    });
-                                }
                             }
                             keyDisplay.textContent = "None";
                         }
-                        // sometimes keys add conditionals so changing a key might add or remove some
-                        updateConditionalToggles(dollIndex);
                     });
     });
 }
 // when any button is pressed, hide all currently displayed dropdowns
 function hideDropdowns() {
-    elementOptions.style("display", "none");
-    ammoOptions.style("display", "none");
+    if (elementOptions)
+        elementOptions.style("display", "none");
+    if (ammoOptions)
+        ammoOptions.style("display", "none");
     if (fortOptions)
         fortOptions.style("display", "none");
     if (skillOptions)
@@ -477,20 +404,6 @@ function getNestedInput(arr, htmlElement) {
 }
 
 function getTargetStats() {
-    // def, weaknesses, cover, stability, def buffs, damage taken, targeted, aoe, stab damage modifier, dr per stab, dr with stab 
-    /*let targetStats = [0,[],0,  0,           0,          0,          0,       0,      0,                    0,           0];
-    targetStats[0] = getValuefromInput("#targetDef");
-    targetStats[1] = selectedPhases;
-    targetStats[2] = getValuefromInput("#targetCover");
-    targetStats[3] = getValuefromInput("#targetStability");
-    targetStats[4] = getValuefromInput("#targetDefBuffs");
-    targetStats[5] = getValuefromInput("#targetDamageTaken");
-    targetStats[6] = getValuefromInput("#targetTargetedDamage");
-    targetStats[7] = getValuefromInput("#targetAoEDamage");
-    targetStats[8] = getValuefromInput("#targetStabilityMod");
-    targetStats[9] = getValuefromInput("#targetDRPerStab");
-    targetStats[10] = getValuefromInput("#targetDRWithStab");*/
-
     let targetStats = [];
     getNestedInput(targetStats, document.getElementById("TargetColumn"));
 
@@ -602,23 +515,14 @@ function getSkillConditionals(skillName, index) {
 function updateConditionalToggles(index) {
     let skillConditionals;
     let conditionalDiv;
-    // get the skill conditionals and the html element holding the toggles
-    if (index == 0) {
-        if (selectedSkill != "") 
-            skillConditionals = getSkillConditionals(selectedSkill, index);
-        else
-            skillConditionals = [];
-        conditionalDiv = document.getElementById("Skill").nextElementSibling;
-    }
-    else {
         // update function can be called on new slot generation hence selected doll at index may still be blank
         if (selectedDolls[index] != "")
             skillConditionals = getSkillConditionals(SkillNames.SUPPORT, index);
         else
             skillConditionals = [];
         // support units do not have the skill html element so we get them by traversing through the html children array
-        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[13];
-    }
+        conditionalDiv = document.getElementById("Doll_" + (index + 1)).children[index == 0 ? 12 : 13];
+
     if (skillConditionals.length > 0) {
         d3.select(conditionalDiv).style("display", "block");
         // adjust the number of toggles to match the number of conditionals
@@ -794,7 +698,7 @@ initializeDollButtons(0);
     });
 }
 
-d3.select("#calculateButton").on("click", () => {
+d3.select("#startButton").on("click", () => {
     hideDropdowns();
     TurnManager.getInstance().resetLists();
     GameStateManager.getInstance().resetSimulation();
@@ -823,14 +727,122 @@ d3.select("#calculateButton").on("click", () => {
     let newDolls = createDollsFromInput();
     // set the calculation types for each doll
     for (let i = 0; i < numDolls; i++) {
-        GameStateManager.getInstance().setDollCalcType(calcSettings[i], i);
+        GameStateManager.getInstance().setDollCalcType(calcSettings[i], selectedDolls[i]);
     }
 
     GameStateManager.getInstance().startSimulation();
-    //let conditionalOverride = d3.select("#ConditionalOverride").node().checked;
-    let conditionalOverride = getConditionalOverrides();
-    // the first doll is the primary attacker, all others support if applicable
-    TurnManager.getInstance().useDollSkill(newDolls[0].getName(), selectedSkill, conditionalOverride[0]);
-})
+    startSimulation();
+});
 
 d3.select("#Doll_1").style("background-color", slotColors[0]);
+
+var actingDoll = "";
+var selectedSkill = "";
+var skillOptions;
+// after starting the simulation, change the layout of the page
+function startSimulation() {
+    // delete both of the first two columns' contents
+    let col1 = d3.select("div").select("div");
+    col1.selectAll("*").remove();
+    let col2 = d3.select("#Dolls");
+    col2.selectAll("*").remove();
+    dollOptions = null;
+    skillOptions = null;
+    elementOptions = null;
+    ammoOptions = null;
+    fortOptions = null;
+    if (skillOptions)
+        skillOptions.style("display", "none");
+    keyOptions = null;
+    phaseDiv = [];
+    // change the style so that the column height and layout is similar to the first column's
+    col2.style("height", "");
+    col2.style("white-space", "pre-line");
+    // rename the button, for now make it reload the page
+    d3.select("#startButton").text("Perform Action").on("click", () => {location.reload()});
+    // move the hidden ui to the middle column and reveal them
+    document.getElementById("Dolls").appendChild(document.getElementById("CalcSettings"));
+    document.getElementById("Dolls").appendChild(document.getElementById("Skill"));
+    col2.selectAll("div").style("display", "block");
+    d3.select("#CalcSettings").select("div").select("div").style("display", "none");
+    document.getElementById("Dolls").appendChild(document.getElementById("Conditional_1"));
+    initializeActionButtons();
+    //col2.append("div").attr("id", "conditionalHolder").append("input").attr("type", "checkbox");
+    //d3.select("#conditionalHolder").append("label").text("aaaaaaa");
+
+}
+
+function initializeActionButtons() {
+    let actionDiv = document.getElementById("Skill").children;
+    console.log(actionDiv);
+    // doll button changes according to dolls with available turns
+    d3.select(actionDiv[2]).on("click", () => {
+        if (dollOptions) {
+            dollOptions.remove();
+            dollOptions = null;
+        }
+        else {
+            dollOptions = d3.select(actionDiv[2]).append("div").attr("class", "dropdownBox").style("display", "none");
+            let availableDolls = selectedDolls.filter(doll => {
+                if (doll == "Papasha Summon")
+                    return false;
+                return true;
+            });
+            availableDolls.forEach(doll => {
+                dollOptions.append("a")
+                            .text(doll)
+                            .on("click", () => {
+                                actingDoll = doll;
+                                actionDiv[1].textContent = "Doll: " + doll;
+                            });
+            });
+            
+            if (dollOptions.style("display") == "none") {
+                hideDropdowns();
+                dollOptions.style("display", "block");
+            }
+            else
+                hideDropdowns();
+        }
+    });
+    // skill button changes depending on which doll skills are on cooldown or cannot be afforded, support and counter skills are not included and
+    // their conditions to trigger must be met to use
+    d3.select(actionDiv[5]).on("click", () => {
+        if (skillOptions) {
+            skillOptions.remove();
+            skillOptions = null;
+        }
+        else {
+            skillOptions = d3.select(actionDiv[5]).append("div").attr("class", "dropdownBox").style("display", "none");
+            let dollData = GameStateManager.getInstance().getDoll(actingDoll);
+            let cooldowns = dollData.getCooldowns();
+            let skillData = dollData.getFinalSkillData();
+            let availableSkills = [SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].filter((skill, index) => {
+                // check if skill is on cooldown
+                if (cooldowns[index] > 0)
+                    return false;
+                // check if skill cost is higher than current index
+                if (skillData[skill].hasOwnProperty(SkillJSONKeys.COST)) {
+                    if (skillData[skill][SkillJSONKeys.COST] > dollData.getCIndex())
+                        return false;
+                }
+                return true;
+            });
+            availableSkills.forEach(skillName => {
+                skillOptions.append("a")
+                            .text(skillName)
+                            .on("click", () => {
+                                selectedSkill = skillName;
+                                actionDiv[4].textContent = "Skill: " + skillName;
+                            });
+            });
+            
+            if (skillOptions.style("display") == "none") {
+                hideDropdowns();
+                skillOptions.style("display", "block");
+            }
+            else
+                hideDropdowns();
+        }
+    });
+}
