@@ -430,7 +430,7 @@ class Doll extends Unit {
             // check if skill was used during turn or out of turn
             if (!(skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)) {
                 // end turn and decrease counters on buffs if extra command or movement is not triggered
-                if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
+                if (!(this.hasBuff("Extra Command"))) //|| this.hasBuff("Extra Movement")))
                     this.endTurn();
                 else {
                     if (this.hasBuff("Extra Command"))
@@ -450,7 +450,7 @@ class Doll extends Unit {
             this.processPrePostBuffs(skill, supportTarget, null, 1);
             if (!(skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)) {
                 // end turn and decrease counters on buffs if extra command or movement is not triggered
-                if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
+                if (!(this.hasBuff("Extra Command")))// || this.hasBuff("Extra Movement")))
                     this.endTurn();
                 else {
                     if (this.hasBuff("Extra Command"))

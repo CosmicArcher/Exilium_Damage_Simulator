@@ -679,7 +679,8 @@ function startSimulation() {
     col2.style("height", "");
     col2.style("white-space", "pre-line");
     col1.style("white-space", "normal");
-    col1.style("height", "auto");
+    // show current turn and total damage
+    d3.select("#SimControls").selectAll("div").style("display", "block");
     // rename the button and disable it, change the onclick function to add the doll into the turn manager
     d3.select("#startButton").text("Perform Action")
                             .on("click", () => {
@@ -692,6 +693,7 @@ function startSimulation() {
                                     refreshStatDisplay(i);
                                 }
                                 refreshTargetDisplay();
+                                refreshTurnText();
                                 // disable start and skill buttons again until new doll and skill are chosen
                                 document.getElementById("startButton").disabled = true;
                                 selectedSkill = "";
@@ -712,6 +714,7 @@ function startSimulation() {
             refreshStatDisplay(i);
         }
         refreshTargetDisplay();
+        refreshTurnText();
         // if there are no more actions to rewind, disable the button
         if (GameStateManager.getInstance().getActionCount() == 0)
             event.target.disabled = true;
@@ -731,6 +734,7 @@ function startSimulation() {
             refreshStatDisplay(i);
         }
         refreshTargetDisplay();
+        refreshTurnText();
     });
     d3.select("#startRound").on("click", event => {
         GameStateManager.getInstance().endRound();
@@ -747,6 +751,7 @@ function startSimulation() {
             refreshStatDisplay(i);
         }
         refreshTargetDisplay();
+        refreshTurnText();
     });
     document.getElementById("enemyAttack").disabled = false;
     document.getElementById("startRound").disabled = false;
@@ -970,8 +975,8 @@ function initializeDollCards() {
         targetCard.insert("div", "h4").style("float", "right")
                                     .style("margin-right", "15px")
                                     .style("margin-top", "10px")
-                                    .attr("id", "TotalDamage")
-                                    .text(StatTracker.getInstance().getTotalDamage());
+                                    .attr("id", "TargetStability")
+                .text(`Stability: ${target.getStability()} / ${target.getMaxStability()} (${target.getBrokenTurns()} / ${target.getTurnsToRecover()} Turns)`);
         // display phase weaknesses
         let weaknessText = "Weaknesses:";
         let weaknesses = target.getPhaseWeaknesses();
@@ -1094,11 +1099,6 @@ function initializeDollCards() {
                                     refreshTargetDisplay();
                                 });
         }        
-        targetCard.append("div").style("float", "right")
-                                    .style("margin-right", "15px")
-                                    .style("margin-top", "10px")
-                                    .attr("id", "TargetStability")
-                                    .text(`Turns Broken: ${target.getBrokenTurns()}`);
     }
 
     for (let i = 0; i < numDolls + numSummons; i++) {
@@ -1585,16 +1585,17 @@ function updateTargetStatDisplay(statIndex) {
 function refreshTargetDisplay() {
     if (targetStatIndex != -1)
         updateTargetStatDisplay(targetStatIndex);
-    d3.select("#TotalDamage").text(StatTracker.getInstance().getTotalDamage());
+
+    let target = GameStateManager.getInstance().getTarget();
+    d3.select("#TargetStability")
+    .text(`Stability: ${target.getStability()} / ${target.getMaxStability()} (${target.getBrokenTurns()} / ${target.getTurnsToRecover()} Turns)`);
     // display phase weaknesses
     let weaknessText = "Weaknesses:";
-    let target = GameStateManager.getInstance().getTarget();
     let weaknesses = target.getPhaseWeaknesses();
     for (let i = 0; i < weaknesses.length; i++) {
         weaknessText += " " + weaknesses[i];
     }
     d3.select("#Weaknesses").text(weaknessText);
-    d3.select("#TargetStability").text(`Turns Broken: ${target.getBrokenTurns()}`);
 }
 
 function changeTargetStat() {
@@ -1631,4 +1632,16 @@ function changeTargetStat() {
         default :
             console.error(`${statIndex} out of range of stat array`);
     }
+}
+
+function refreshTurnText() {
+    let textHTML = document.getElementById("SimControls").children;
+    // get how many dolls can currently act
+    let dolls = GameStateManager.getInstance().getAllDolls();
+    let readyDolls = 0;
+    dolls.forEach(doll => {
+        readyDolls += doll.hasTurnAvailable();
+    });
+    textHTML[0].textContent = `Round ${GameStateManager.getInstance().getRoundNumber()}: ${readyDolls > 0 ? "Your" : "Enemy"} Turn`;
+    textHTML[1].textContent = `Total Damage: ${StatTracker.getInstance().getTotalDamage()}`;
 }

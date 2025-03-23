@@ -32,6 +32,8 @@ class GameStateManager {
             // rewinding will be implemented as each action creating a clone of all units and modifying them when using skills and applying buffs
             // rewinding to a specific action will delete all indices after that action
             GameStateManagerSingleton.actionCount = 0;
+            // track which "round" the simulation is currently in
+            GameStateManagerSingleton.actionRound = [1];
         }
         else
             console.error("Singleton not yet initialized");
@@ -53,6 +55,7 @@ class GameStateManager {
             // put the latest units as the ones in the get functions
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
+            GameStateManagerSingleton.actionRound.push(1);
 
             StatTracker.getInstance().startSimulation();
         }
@@ -62,6 +65,13 @@ class GameStateManager {
     getActionCount() {
         if (GameStateManagerSingleton) {
             return GameStateManagerSingleton.actionCount;
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    getRoundNumber() {
+        if (GameStateManagerSingleton) {
+            return GameStateManagerSingleton.actionRound[GameStateManagerSingleton.actionCount + 1];
         }
         else
             console.error("Singleton not yet initialized");
@@ -166,6 +176,7 @@ class GameStateManager {
                     doll.endTurn();
                 doll.refreshSupportUses();
             });
+            GameStateManagerSingleton.actionRound[GameStateManagerSingleton.actionCount+1]++;
             GameStateManagerSingleton.lockAction();
         }
         else
@@ -185,6 +196,7 @@ class GameStateManager {
             // put the latest units as the ones in the get functions
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
+            GameStateManagerSingleton.actionRound.push(GameStateManagerSingleton.actionRound[GameStateManagerSingleton.actionCount+1]);
             GameStateManagerSingleton.actionCount++;
 
             StatTracker.getInstance().lockAction();
@@ -209,6 +221,9 @@ class GameStateManager {
             // put these new clones as the ones in the get functions by removing all entries after actionNumber then appending the clones
             GameStateManagerSingleton.target.splice(actionNumber+1, lengthToCut);
             GameStateManagerSingleton.dolls.splice(actionNumber+1, lengthToCut);
+            GameStateManagerSingleton.actionRound.splice(actionNumber+1, lengthToCut);
+
+            GameStateManagerSingleton.actionRound.push(GameStateManagerSingleton.actionRound[actionNumber]);
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
 

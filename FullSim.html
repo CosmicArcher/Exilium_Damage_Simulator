@@ -187,12 +187,14 @@
         <div class="column" id = "Col3" style="background-color: lightgoldenrodyellow;">
             <div style="overflow-y: auto; overflow-x: hidden; height: 300px;" id = "ActionLog"></div>
             <div id = "SimControls" >
+                <div style="text-align: center; display: none;">Round 1: Your Turn</div>
+                <div style="text-align: center; display: none;">Total Damage: </div>
                 <button id = "startButton" disabled>Begin Simulation</button><button id = "rewindButton" style="float: right;" disabled>Undo Action</button>
                 <br>
                 <button id = "enemyAttack" disabled>Call Enemy Attack</button><button id = "startRound" style="float: right;" disabled>Start Next Round</button>
             </div>
             <div id = "CalcSettings" style="white-space: initial; display: none;">
-                <h4>Damage Calculation Setting</h4>
+                <h4>Crit Settings</h4>
                 <div id = "Settings_1">
                     <td>Doll:</td>
                     <button style="margin-left: 5px;">Select Calculation Type</button>

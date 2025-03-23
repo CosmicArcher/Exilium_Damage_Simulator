@@ -35,6 +35,10 @@ class Target extends Unit {
     }
     getStability() {return this.stability;} // for skills that check if stability is broken or not
     getPhaseWeaknesses() {return this.phaseWeaknesses;}
+    // for display purposes
+    getMaxStability() {return this.maxStability;} 
+    getBrokenTurns() {return this.stabilityBrokenTurns;}
+    getTurnsToRecover() {return this.turnsToRecoverStability;}
     // assemble total damage reduction with stability
     getDRPerStab() {return this.drPerStab;}
     getDRWithStab() {return this.drWithStab;}
@@ -90,7 +94,6 @@ class Target extends Unit {
     // setters for use when cloning
     setStability(x) {this.stability = x;}
     setBrokenTurns(x) {this.stabilityBrokenTurns = x;}
-    getBrokenTurns() {return this.stabilityBrokenTurns;}
     // process buffs using json data
     applyBuffEffects(buffData, stacks = 1, stackable = false) {
         super.applyBuffEffects(buffData, stacks, stackable);
