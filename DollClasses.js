@@ -539,6 +539,8 @@ export class PapashaSummon extends Doll {
         if (keysEnabled[2])
             this.attackBoost += 0.1;
     }
+    // papasha summon can never be directly used so it never has its turn available
+    hasTurnAvailable() {return false;}
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
         // papasha skill3 is used entirely by the summon with its stats and buffs, it also does extra damage if the target is large 

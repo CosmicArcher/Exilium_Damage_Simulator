@@ -379,6 +379,8 @@ function hideDropdowns() {
         allBuffDropdown.style("display", "none");
     if (targetStatDropdown)
         targetStatDropdown.style("display", "none");
+    if (dollCardDropdown)
+        dollCardDropdown.style("display", "none");
 }
 
 function getNestedInput(arr, htmlElement) {
@@ -619,6 +621,7 @@ var selectedSkill = "";
 var skillOptions;
 var currentBuffs;
 var selectedBuff = "";
+var dollCardDropdown;
 // options for stat display/editing
 var statOptions = ["Attack",
                     "Crit Rate",
@@ -1103,9 +1106,20 @@ function initializeDollCards() {
 
     for (let i = 0; i < numDolls + numSummons; i++) {
         let dollCard = col1.append("div");
-        dollCard.attr("id", "Doll_" + (i + 1)).attr("class", "dollCard");
-        // show doll name
-        dollCard.append("h4").text(selectedDolls[i]);
+        dollCard.attr("id", "Doll_" + (i + 1)).attr("class", "dollCard").style("display", "none");
+        // show doll name that can be tabbed between all dolls for a more compact ui
+        dollCard.append("button")
+                .style("margin-top", "10px")
+                .text(selectedDolls[i])
+                .on("click", event => {
+                    if (dollCardDropdown.style("display") == "block")
+                        hideDropdowns();
+                    else {
+                        hideDropdowns();
+                        event.target.appendChild(document.getElementById("DollCardDropdown"));
+                        dollCardDropdown.style("display", "block");
+                    }
+                });
         // create the remaining index display
         let doll = GameStateManager.getInstance().getDoll(selectedDolls[i]);
         dollCard.insert("div", "h4").style("float", "right")
@@ -1113,13 +1127,14 @@ function initializeDollCards() {
                                     .style("margin-top", "10px")
                                     .attr("id", "CIndex_" + (i + 1))
                                     .text(`Index ${doll.getCIndex()} / 6`);
+        dollCard.append("br");
         let cooldownText = "Cooldowns:";
         // internally negative cooldown is possible but to avoid confusion just show a lowerbound of 0
         for (let j = 0; j < 4; j++) {
             cooldownText += " " + Math.max(doll.getCooldowns()[j], 0);
         }
         dollCard.append("div").style("margin-bottom", "-10px")
-                            .style("margin-top", "-10px")
+                            
                             .attr("id", "Cooldowns_" + (i + 1))
                             .text(cooldownText);
         dollCard.style("background-color", slotColors[i]);
@@ -1241,6 +1256,7 @@ function initializeDollCards() {
         });
         }        
     }
+    changeDollCard(0);
     // create the stat dropdown that will be shared among all doll cards
     statDropdown = d3.select("div").append("div").attr("class", "dropdownBox").attr("id", "StatDropdown").style("display", "none");
     statOptions.forEach((stat, index) => {
@@ -1279,6 +1295,22 @@ function initializeDollCards() {
                         document.getElementById("StatChange_0").disabled = false;
                     });
     });
+    // create the doll dropdown to swap between doll cards for a more compact ui
+    dollCardDropdown = d3.select("div").append("div").attr("class", "dropdownBox").attr("id", "DollCardDropdown").style("display", "none");
+    selectedDolls.forEach((dollName, index) => {
+        dollCardDropdown.append("a")
+                        .text(dollName)
+                        .on("click", () => {
+                            changeDollCard(index);
+                        });
+    });
+}
+// to swap between different doll cards, hide all except the selected doll
+function changeDollCard(dollIndex) {
+    for (let i = 1; i < numDolls + numSummons + 1; i++) {
+        d3.select("#Doll_" + i).style("display", "none");
+    }
+    d3.select("#Doll_" + (dollIndex + 1)).style("display", "block");
 }
 
 function updateStatDisplay(dollIndex, statIndex) {
