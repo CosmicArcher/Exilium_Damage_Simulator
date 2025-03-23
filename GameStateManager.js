@@ -1,4 +1,5 @@
 import { CalculationTypes } from "./Enums.js";
+import StatTracker from "./StatTracker.js";
 
 let GameStateManagerSingleton;
 
@@ -52,6 +53,8 @@ class GameStateManager {
             // put the latest units as the ones in the get functions
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
+
+            StatTracker.getInstance().startSimulation();
         }
         else
             console.error("Singleton not yet initialized");
@@ -183,6 +186,8 @@ class GameStateManager {
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
             GameStateManagerSingleton.actionCount++;
+
+            StatTracker.getInstance().lockAction();
         }
         else
             console.error("Singleton not yet initialized");
@@ -191,7 +196,7 @@ class GameStateManager {
     rewindToAction(actionNumber) {
         if (GameStateManagerSingleton) {
             GameStateManagerSingleton.actionCount = actionNumber;
-            // clone the version of the units from actionNumber and 
+            // clone the version of the units from actionNumber and put the clones at the new end of the array
             let target = GameStateManagerSingleton.target[actionNumber];
             let dolls = GameStateManagerSingleton.dolls[actionNumber];
             let newTarget = target.cloneUnit();
@@ -206,6 +211,8 @@ class GameStateManager {
             GameStateManagerSingleton.dolls.splice(actionNumber+1, lengthToCut);
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
+
+            StatTracker.getInstance().rewindToAction(actionNumber);
         }
         else
             console.error("Singleton not yet initialized");

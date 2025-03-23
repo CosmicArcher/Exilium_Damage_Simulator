@@ -8,7 +8,7 @@ class EventManager {
         else {
             console.log("Event Manager Instantiated");
             EventManagerSingleton = this;
-            // contains the event name as the key and the jquery callback
+            // contains the event name as the key and the function callback as value
             EventManagerSingleton.listeners = {};
         }
     }

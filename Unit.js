@@ -56,7 +56,7 @@ class Unit {
     // these are called when buffs are added/removed
     addBuff(buffName, sourceName, duration = -1, stacks = 1) {
         let buffData = ResourceLoader.getInstance().getBuffData(buffName);
-        if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENT)) {
+        if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENT) && buffName != "Avalanche") {
             // freeze debuffs attempted to be applied while having avalanche add another stack, regardless of whether the target is immune to the freeze debuff
             if (this.hasBuff("Avalanche") && buffData[BuffJSONKeys.ELEMENT] == Elements.FREEZE && buffData[BuffJSONKeys.BUFF_TYPE] == "Debuff")
                 this.addBuff("Avalanche", "Suomi", -1, 1);

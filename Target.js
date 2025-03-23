@@ -42,6 +42,11 @@ class Target extends Unit {
     getAoEDamageTaken() {return this.aoeDamageTaken;}
     getTargetedDamageTaken() {return this.targetedDamageTaken;}
     getStabilityDamageModifier() {return this.stabilityDamageModifier;}
+    // base stats for cloning
+    getBaseDamageTaken() {return this.baseDamageTaken;}
+    getBaseAoEDamageTaken() {return this.baseAoEDamageTaken;}
+    getBaseTargetedDamageTaken() {return this.baseTargetedDamageTaken;}
+    getBaseStabilityDamageModifier() {return this.baseStabilityDamageModifier;}
     getIsLarge() {return this.isLarge;}
     // only use these setters for quick direct buff input calcs
     setDamageTaken(x) {

@@ -9,6 +9,7 @@ import DollFactory from "./DollFactory.js";
 import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
 import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames} from "./Enums.js";
+import StatTracker from "./StatTracker.js";
 
 var selectedPhases = [];
 var selectedDolls = [""];
@@ -376,6 +377,8 @@ function hideDropdowns() {
         statDropdown.style("display", "none");
     if (allBuffDropdown)
         allBuffDropdown.style("display", "none");
+    if (targetStatDropdown)
+        targetStatDropdown.style("display", "none");
 }
 
 function getNestedInput(arr, htmlElement) {
@@ -475,6 +478,7 @@ TurnManager.getInstance();
 ActionLog.getInstance();
 DollFactory.getInstance();
 GlobalBuffManager.getInstance();
+StatTracker.getInstance();
 }
 
 // target stats dropdowns
@@ -643,6 +647,18 @@ var selectedStatIndex = [];
 var statDropdown;
 
 var allBuffDropdown;
+// for the target card
+var targetStatOptions = ["Defense",
+                        "Current Stability",
+                        "Defense Buffs",
+                        "Damage Taken",
+                        "AoE Damage Taken",
+                        "Targeted Damage Taken",
+                        "Stability Damage Taken",
+                        "Damage Reduction/Stability",
+                        "Damage Reduction w/ Stability"];
+var targetStatDropdown;
+var targetStatIndex = -1;
 // after starting the simulation, change the layout of the page
 function startSimulation() {
     // delete both of the first two columns' contents
@@ -675,6 +691,7 @@ function startSimulation() {
                                     refreshDollDisplay(i);
                                     refreshStatDisplay(i);
                                 }
+                                refreshTargetDisplay();
                                 // disable start and skill buttons again until new doll and skill are chosen
                                 document.getElementById("startButton").disabled = true;
                                 selectedSkill = "";
@@ -694,6 +711,7 @@ function startSimulation() {
             refreshDollDisplay(i);
             refreshStatDisplay(i);
         }
+        refreshTargetDisplay();
         // if there are no more actions to rewind, disable the button
         if (GameStateManager.getInstance().getActionCount() == 0)
             event.target.disabled = true;
@@ -712,6 +730,7 @@ function startSimulation() {
             refreshDollDisplay(i);
             refreshStatDisplay(i);
         }
+        refreshTargetDisplay();
     });
     d3.select("#startRound").on("click", event => {
         GameStateManager.getInstance().endRound();
@@ -727,6 +746,7 @@ function startSimulation() {
             refreshDollDisplay(i);
             refreshStatDisplay(i);
         }
+        refreshTargetDisplay();
     });
     document.getElementById("enemyAttack").disabled = false;
     document.getElementById("startRound").disabled = false;
@@ -939,6 +959,142 @@ function initializeDollCards() {
     for (let i = 0; i < numDolls + numSummons; i++)
         selectedStatIndex.push(-1);
     let col1 = d3.select("div").select("div");
+    // create a card for the target as well
+    {
+        let targetCard = col1.append("div");
+        targetCard.attr("id", "Doll_0").attr("class", "dollCard");
+        let target = GameStateManager.getInstance().getTarget();        
+        // show target name
+        targetCard.append("h4").text(target.getName());
+        // display total damage on upper right
+        targetCard.insert("div", "h4").style("float", "right")
+                                    .style("margin-right", "15px")
+                                    .style("margin-top", "10px")
+                                    .attr("id", "TotalDamage")
+                                    .text(StatTracker.getInstance().getTotalDamage());
+        // display phase weaknesses
+        let weaknessText = "Weaknesses:";
+        let weaknesses = target.getPhaseWeaknesses();
+        for (let i = 0; i < weaknesses.length; i++) {
+            weaknessText += " " + weaknesses[i];
+        }
+        targetCard.append("div").style("margin-bottom", "-10px")
+                            .style("margin-top", "-10px")
+                            .attr("id", "Weaknesses")
+                            .text(weaknessText);
+        targetCard.style("background-color", "darkgoldenrod");
+        // create button that can display current buffs and an add buff option
+        {
+        targetCard.append("br");
+        let targetBuffDisplay = targetCard.append("button").style("float", "right").text("Show Current Buffs");
+        targetBuffDisplay.on("click", () => {
+            if (currentBuffs) {
+                hideDropdowns();
+                targetBuffDisplay.text("Show Current Buffs");
+            }
+            else {
+                hideDropdowns();
+                targetBuffDisplay.text("Hide Current Buffs");
+                // we can share the dropdown with the dolls because it gets deleted repeatedly so the onclick function constantly changes
+                currentBuffs = targetBuffDisplay.append("div").attr("class", "dropdownBox");
+                let buffs = target.getBuffs();
+                // selecting buffs allows the user to remove it from the unit
+                buffs.forEach(buff => {
+                    currentBuffs.append("a")
+                                .text(buff[0])
+                                .on("click", () => {
+                                    // only allow the remove button to be clicked and disable all the other buff edit buttons on other doll cards 
+                                    disableBuffEditButtons();
+                                    document.getElementById("RemoveBuff_0").disabled = false;
+                                    selectedBuff = buff[0];
+                                    d3.select("#SelectedBuff_0").text("Selected Buff: " + buff[0]);
+                                });
+                });
+            }
+        });
+        // for adding or removing buffs
+        targetCard.append("button").text("Select Buff")
+                                .on("click", event => {
+                                    if (allBuffDropdown.style("display") == "block") {
+                                        hideDropdowns();
+                                    }
+                                    else {
+                                        hideDropdowns();
+                                        event.target.appendChild(document.getElementById("AllBuffDropdown"));
+                                        allBuffDropdown.style("display", "block");
+                                    }
+                                });
+        targetCard.append("div").attr("id", "SelectedBuff_0")
+                            .style("padding-top", "10px")
+                            .style("margin-bottom", "-10px")
+                            .text("Selected Buff: ");
+        targetCard.append("br");
+        targetCard.append("button").text("Add Buff")
+                                .attr("id", "AddBuff_0")
+                                .attr("disabled", "true")
+                                .on("click", event => {
+                                    // only add 1 stack and 1 turn of the buff
+                                    target.addBuff(selectedBuff, selectedDolls[dollNum], 1, 1);
+                                    // after removing the buff, disable the button until another buff is selected
+                                    event.target.disabled = true;
+                                    d3.select("#SelectedBuff_0").text("Selected Buff: ");
+                                });
+        targetCard.append("button").text("Remove Buff")
+                                .attr("id", "RemoveBuff_0")
+                                .style("float", "right")
+                                .attr("disabled", "true")
+                                .on("click", event => {
+                                    target.removeBuff(selectedBuff);
+                                    // after removing the buff, disable the button until another buff is selected
+                                    event.target.disabled = true;
+                                    d3.select("#SelectedBuff_0").text("Selected Buff: ");
+                                });
+        targetCard.append("br");
+        targetCard.append("br");
+        }
+        // target stat display and editing
+        {
+        targetCard.append("label").text("View/Edit Stats");
+        targetCard.append("br");
+        targetCard.append("button").text("Select Stat").on("click", () => {
+            if (targetStatDropdown.style("display") == "block")
+                hideDropdowns();
+            else {
+                hideDropdowns();
+                targetStatDropdown.style("display", "block");
+            }
+        });
+        targetCard.append("label").style("margin-left", "10px")
+                                .attr("id", "Stat_0");
+        targetCard.append("button").text("Refresh View")
+                                .attr("id", "StatRefresh_0")
+                                .attr("disabled", "true")
+                                .style("float", "right")
+                                .on("click", () => {
+                                    refreshTargetDisplay();
+                                });
+        targetCard.append("label").text("Final Stat")
+                                .style("float", "right")
+                                .style("margin-right", "10px");
+        targetCard.append("br");
+        targetCard.append("input").attr("type", "text")
+                                .attr("id", "StatEdit_0")
+                                .attr("disabled", "true");
+        targetCard.append("input").attr("type", "text")
+                                .attr("id", "StatTotal_0")
+                                .style("float", "right")
+                                .attr("disabled", "true");
+        targetCard.append("br");
+        targetCard.append("button").text("Change Stat")
+                                .attr("id", "StatChange_0")
+                                .attr("disabled", "true")
+                                .on("click", () => {
+                                    changeTargetStat();
+                                    refreshTargetDisplay();
+                                });
+        }        
+    }
+
     for (let i = 0; i < numDolls + numSummons; i++) {
         let dollCard = col1.append("div");
         dollCard.attr("id", "Doll_" + (i + 1)).attr("class", "dollCard");
@@ -1328,9 +1484,9 @@ function changeDollStat(dollIndex) {
 }
 
 function disableBuffEditButtons() {
-    for (let i = 0; i < numDolls + numSummons; i++) {
-        document.getElementById("AddBuff_" + (i + 1)).disabled = true;
-        document.getElementById("RemoveBuff_" + (i + 1)).disabled = true;
+    for (let i = 0; i < numDolls + numSummons + 1; i++) {
+        document.getElementById("AddBuff_" + i).disabled = true;
+        document.getElementById("RemoveBuff_" + i).disabled = true;
     }
 }
 
@@ -1343,4 +1499,118 @@ function refreshDollDisplay(dollIndex) {
         cooldownText += " " + Math.max(doll.getCooldowns()[j], 0);
     }
     d3.select("#Cooldowns_" + (dollIndex + 1)).text(cooldownText);
+}
+
+function updateTargetStatDisplay(statIndex) {
+    let target = GameStateManager.getInstance().getTarget();
+    targetStat = statIndex;
+    // the base stat is editable, the final stat after all buffs is not
+    let baseStat = 0;
+    let finalStat = 0;
+    let statName;
+    switch(statIndex) {
+        case 0:
+            baseStat = target.getBaseDefense();
+            finalStat = target.getDefense();
+            statName = "Defense";
+            break;
+        case 1:
+            baseStat = target.getStability();
+            finalStat = target.getStability();
+            statName = "Current Stability";
+            break;
+        case 2:
+            baseStat = target.getBaseDefenseBuffs();
+            finalStat = target.getDefenseBuffs();
+            statName = "Defense Buffs";
+            break;
+        case 3:
+            baseStat = target.getBaseDamageTaken();
+            finalStat = target.getDamageTaken();
+            statName = "Damage Taken";
+            break;
+        case 4:
+            baseStat = target.getBaseAoEDamageTaken();
+            finalStat = target.getAoEDamageTaken();
+            statName = "AoE Damage Taken";
+            break;
+        case 5:
+            baseStat = target.getBaseTargetedDamageTaken();
+            finalStat = target.getTargetedDamageTaken();
+            statName = "Targeted Damage Taken";
+            break;
+        case 6:
+            baseStat = target.getBaseStabilityDamageModifier();
+            finalStat = target.getStabilityDamageModifier();
+            statName = "Stability Damage Taken";
+            break;
+        case 7:
+            baseStat = target.getDRPerStab();
+            finalStat = target.getDRPerStab();
+            statName = "Damage Reduction Per Stability";
+            break;
+        case 8:
+            baseStat = target.getDRWithStab();
+            finalStat = target.getDRWithStab();
+            statName = "Damage Reduction With Stability";
+            break;
+        default :
+            console.error(`${statIndex} out of range of stat array`);
+    }
+    document.getElementById("StatEdit_0").value = baseStat;
+    // activate the text input for editing
+    document.getElementById("StatEdit_0").disabled = false;
+    // display the total with buffs but before edits are made
+    document.getElementById("StatTotal_0").value = finalStat;
+    // show which stat was selected as a reminder
+    document.getElementById("Stat_0").textContent = statName;
+}
+
+function refreshTargetDisplay() {
+    if (targetStatIndex != -1)
+        updateTargetStatDisplay(targetStatIndex);
+    d3.select("#TotalDamage").text(StatTracker.getInstance().getTotalDamage());
+    // display phase weaknesses
+    let weaknessText = "Weaknesses:";
+    let weaknesses = GameStateManager.getInstance().getTarget().getPhaseWeaknesses();
+    for (let i = 0; i < weaknesses.length; i++) {
+        weaknessText += " " + weaknesses[i];
+    }
+    d3.select("#Weaknesses").text(weaknessText);
+}
+
+function changeTargetStat() {
+    let target = GameStateManager.getInstance().getTarget();
+    let newStat = document.getElementById("StatEdit_0").value;
+    switch(targetStatIndex) {
+        case 0:
+            target.setDefense(newStat);
+            break;
+        case 1:
+            target.setStability(newStat);
+            break;
+        case 2:
+            target.setDefenseBuffs(newStat);
+            break;
+        case 3:
+            target.setDamageTaken(newStat);
+            break;
+        case 4:
+            target.setAoEDamageTaken(newStat);
+            break;
+        case 5:
+            target.setTargetedDamageTaken(newStat);
+            break;
+        case 6:
+            target.setStabilityDamageModifier(newStat);
+            break;
+        case 7:
+            target.applyDRPerStab(newStat);
+            break;
+        case 8:
+            target.applyDRWithStab(newStat);
+            break;
+        default :
+            console.error(`${statIndex} out of range of stat array`);
+    }
 }

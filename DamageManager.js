@@ -115,7 +115,7 @@ class DamageManager {
         target.takeDamage(element);
         EventManager.getInstance().broadcastEvent("damageDealt", [attacker, target, damage, element, target.getStability(), isCrit]);
         // alert any listeners that damage of this type triggers effects on
-        EventManager.getInstance().broadcastEvent("damageDealtTypes", [attacker.getName(), skillName, element, ammoType, damageType, damage]);
+        EventManager.getInstance().broadcastEvent("damageDealtTypes", [attacker.getName(), skillName, element, ammoType, damageType, damage, isCrit]);
         return damage;
     }
     // will pass the damage to an event observer manager later
