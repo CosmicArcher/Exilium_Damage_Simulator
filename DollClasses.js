@@ -1024,9 +1024,20 @@ export class Sharkry extends Supporter {
                 this.crit_damage += Math.min(buffs, 5) * 0.03;
             }
         }
+        let zoominStacks = 0;
+        if (skillName == SkillNames.SKILL2) {
+            this.currentBuffs.forEach(buff => {
+                if (buff[0].match("Zoom In"))
+                    zoominStacks += buff[3];
+            });
+            this.stabilityDamageModifier += zoominStacks;
+        }
 
         super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
 
+        if (skillName == SkillNames.SKILL2) {
+            this.stabilityDamageModifier -= zoominStacks;
+        }
         if (target.hasBuff("Overburn")) {
             // passively gains 20% crit vs overburn targets
             this.crit_chance -= 0.2;
