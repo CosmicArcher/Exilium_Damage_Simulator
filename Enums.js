@@ -64,7 +64,7 @@ const SkillNames = {
 }
 
 const CalculationTypes = {
-    EXPECTED: "Expected",
+    EXPECTED: "ExpectedValue",
     CRIT: "Crit",
     NOCRIT: "NoCrit",
     SIMULATION: "Random"
@@ -78,7 +78,21 @@ const BuffJSONKeys = {
     ELEMENT : "Element", // element of the buff for certain interactions
     STAT : "Stat", // which stat the buff is classified as, movement, attack, defense, etc.
     STACKABLE : "Stackable", // whether the buff can stack with itself and compound the effects
-    STACK_LIMIT : "Stack_Limit" // maximum number of stacks the unit can have, is not necessarily used in conjunction with "stackable"
+    STACK_LIMIT : "Stack_Limit", // maximum number of stacks the unit can have, is not necessarily used in conjunction with "stackable"
+    ATTACK_PERC : "Attack_Perc",
+    DEFENSE_PERC : "Defense_Perc",
+    STABILITY_TAKEN : "Stability_Taken",
+    DAMAGE_PERC : "Damage_Perc",
+    SUPPORT_PERC : "Support_Perc",
+    EXPOSED_PERC : "Exposed_Perc",
+    CRIT_RATE : "Crit",
+    CRIT_DAMAGE : "Crit_Damage",
+    DAMAGE_TAKEN : "Damage_Taken",
+    STABILITY_DAMAGE : "Stability_Damage",
+    DEFENSE_IGNORE : "Defense_Ignore",
+    AOE_DAMAGE_TAKEN : "AoE_Damage_Taken",
+    TARGETED_DAMAGE_TAKEN : "Targeted_Damage_Taken",
+    PHASE_DAMAGE : "Phase_Damage"
 }
 
 export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes, BuffJSONKeys};

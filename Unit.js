@@ -28,11 +28,11 @@ class Unit {
     getName() {return this.name;}
     // process buffs using json data
     applyBuffEffects(buffData, stacks = 1, stackable = false) {
-        if(buffData.hasOwnProperty("DefensePerc")) {
+        if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_PERC)) {
             if (stackable)
-                this.defenseBuffs += buffData["DefensePerc"] * stacks;
+                this.defenseBuffs += buffData[BuffJSONKeys.DEFENSE_PERC] * stacks;
             else 
-                this.defenseBuffs += buffData["DefensePerc"];
+                this.defenseBuffs += buffData[BuffJSONKeys.DEFENSE_PERC];
         }
     }
     removeBuffEffects(buffData, stacks = 1, stackable = false) {

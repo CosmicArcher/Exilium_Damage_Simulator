@@ -96,28 +96,28 @@ class Target extends Unit {
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty("DamageTaken%"))
-            this.damageTaken += buffData["DamageTakenPerc"] * stackEffect;
-        if(buffData.hasOwnProperty("AoEDamageTaken%"))
-            this.aoeDamageTaken += buffData["AoEDamageTaken%"] * stackEffect;
-        if(buffData.hasOwnProperty("TargetedDamageTaken%"))
-            this.targetedDamageTaken += buffData["TargetedDamageTaken%"] * stackEffect;
-        if(buffData.hasOwnProperty("StabilityDamageTaken"))
-            this.stabilityDamageModifier += buffData["StabilityDamageTaken"] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN))
+            this.damageTaken += buffData[BuffJSONKeys.DAMAGE_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.AOE_DAMAGE_TAKEN))
+            this.aoeDamageTaken += buffData[BuffJSONKeys.AOE_DAMAGE_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.TARGETED_DAMAGE_TAKEN))
+            this.targetedDamageTaken += buffData[BuffJSONKeys.TARGETED_DAMAGE_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN))
+            this.stabilityDamageModifier += buffData[BuffJSONKeys.STABILITY_TAKEN] * stackEffect;
     }
     removeBuffEffects(buffData, stacks = 1, stackable = false) {
         super.removeBuffEffects(buffData, stacks, stackable);
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty("DamageTaken%"))
-            this.damageTaken -= buffData["DamageTakenPerc"] * stackEffect;
-        if(buffData.hasOwnProperty("AoEDamageTaken%"))
-            this.aoeDamageTaken -= buffData["AoEDamageTaken%"] * stackEffect;
-        if(buffData.hasOwnProperty("TargetedDamageTaken%"))
-            this.targetedDamageTaken -= buffData["TargetedDamageTaken%"] * stackEffect;
-        if(buffData.hasOwnProperty("StabilityDamageTaken"))
-            this.stabilityDamageModifier -= buffData["StabilityDamageTaken"] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN))
+            this.damageTaken -= buffData[BuffJSONKeys.DAMAGE_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.AOE_DAMAGE_TAKEN))
+            this.aoeDamageTaken -= buffData[BuffJSONKeys.AOE_DAMAGE_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.TARGETED_DAMAGE_TAKEN))
+            this.targetedDamageTaken -= buffData[BuffJSONKeys.TARGETED_DAMAGE_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN))
+            this.stabilityDamageModifier -= buffData[BuffJSONKeys.STABILITY_TAKEN] * stackEffect;
     }
     addBuff(buffName, sourceName, duration = -1, stacks = 1) {
         super.addBuff(buffName, sourceName, duration, stacks);

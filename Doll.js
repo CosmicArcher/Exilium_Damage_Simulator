@@ -307,19 +307,53 @@ class Doll extends Unit {
         console.error(`${skillName} is not in ${this.name}'s skill names`);
     }
     // process buffs using json data
-    applyBuffEffects(buffData) {
+    applyBuffEffects(buffData, stacks = 1, stackable = false) {
         super.applyBuffEffects(buffData);
-        if(buffData.hasOwnProperty("DamagePerc"))
-            this.damageDealt += buffData["DamagePerc"];
-        if(buffData.hasOwnProperty("AoEDamageTaken%"))
-            this.aoeDamageTaken += buffData["AoEDamageTaken%"];
-        if(buffData.hasOwnProperty("TargetedDamageTaken%"))
-            this.targetedDamageTaken += buffData["TargetedDamageTaken%"];
+        let stackEffect = 1;
+        if (stackable)
+            stackEffect = stacks;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC))
+            this.damageDealt += buffData[BuffJSONKeys.DAMAGE_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.ATTACK_PERC))
+            this.attackBoost += buffData[BuffJSONKeys.ATTACK_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.SUPPORT_PERC))
+            this.supportDamageDealt += buffData[BuffJSONKeys.SUPPORT_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.EXPOSED_PERC))
+            this.exposedDamageDealt += buffData[BuffJSONKeys.EXPOSED_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
+            this.critChance += buffData[BuffJSONKeys.CRIT_RATE] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE))
+            this.critDamage += buffData[BuffJSONKeys.CRIT_DAMAGE] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_DAMAGE))
+            this.stabilityDamageModifier += buffData[BuffJSONKeys.STABILITY_DAMAGE] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_IGNORE))
+            this.defenseIgnore += buffData[BuffJSONKeys.DEFENSE_IGNORE] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.PHASE_DAMAGE))
+            this.phaseDamageDealt += buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
     }
-    removeBuffEffects(buffData) {
+    removeBuffEffects(buffData, stacks = 1, stackable = false) {
         super.removeBuffEffects(buffData);
-        if(buffData.hasOwnProperty("DamagePerc"))
-            this.damageDealt -= buffData["DamagePerc"];
+        let stackEffect = 1;
+        if (stackable)
+            stackEffect = stacks;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC))
+            this.damageDealt -= buffData[BuffJSONKeys.DAMAGE_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.ATTACK_PERC))
+            this.attackBoost -= buffData[BuffJSONKeys.ATTACK_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.SUPPORT_PERC))
+            this.supportDamageDealt -= buffData[BuffJSONKeys.SUPPORT_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.EXPOSED_PERC))
+            this.exposedDamageDealt -= buffData[BuffJSONKeys.EXPOSED_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
+            this.critChance -= buffData[BuffJSONKeys.CRIT_RATE] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE))
+            this.critDamage -= buffData[BuffJSONKeys.CRIT_DAMAGE] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_DAMAGE))
+            this.stabilityDamageModifier -= buffData[BuffJSONKeys.STABILITY_DAMAGE] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_IGNORE))
+            this.defenseIgnore -= buffData[BuffJSONKeys.DEFENSE_IGNORE] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.PHASE_DAMAGE))
+            this.phaseDamageDealt -= buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
     // conditionals in skills are set automatically by the respective doll class or by an override checkbox in the menu

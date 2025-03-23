@@ -2,74 +2,84 @@
     "Blazing Assault 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "AttackPerc" : 0.15,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Attack_Perc" : 0.15,
         "Stat" : "Attack",
         "Element" : "Burn"
     },
     "Attack Up 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "AttackPerc" : 0.1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Attack_Perc" : 0.1,
         "Stat" : "Attack"
     },
     "Attack Up 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "AttackPerc" : 0.15,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Attack_Perc" : 0.15,
         "Stat" : "Attack"
     },
     "Defense Down 1" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "DefensePerc" : -0.2,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Perc" : -0.2,
         "Stat" : "Defense"
     },
     "Defense Down 2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "DefensePerc" : -0.3,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Perc" : -0.3,
         "Stat" : "Defense"
     },
     "Acid Corrosion 2" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "DefensePerc" : -0.3,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Perc" : -0.3,
         "Stat" : "Defense",
         "Element" : "Corrosion"
     },
     "Tenacity" : {
         "Buff_Type" : "Debuff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "DefensePerc" : -0.5,        
-        "StabilityTaken" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
+        "Defense_Perc" : -0.5,        
+        "Stability_Taken" : 1,
         "Stat" : "Defense"
     },
     "Defense Up 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "DefensePerc" : 0.2,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Perc" : 0.2,
         "Stat" : "Defense"
     },
     "Defense Up 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "DefensePerc" : 0.3, 
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Perc" : 0.3, 
         "Stat" : "Defense"
     },
     "Defense Up 3" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 0,
-        "DefensePerc" : 0.4,        
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Perc" : 0.4,        
         "Stat" : "Defense"
     },
     "Edifice" : {
@@ -77,7 +87,7 @@
         "Turn_Based" : 0,
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "DefensePerc" : 0.25,
+        "Defense_Perc" : 0.25,
         "Stack_Limit" : 3,
         "Stackable" : 1,
         "Stat" : "Defense"
@@ -87,7 +97,7 @@
         "Turn_Based" : 0,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "DamagePerc" : 0.15,
+        "Damage_Perc" : 0.15,
         "Stackable" : 1,
         "Stack_Limit" : 99
     },
@@ -128,39 +138,39 @@
         "Turn_Based" : 0,
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
-        "SupportPerc" : 0.15,
-        "ExposedPerc" : 0.1,
-        "Stack_Limit" : -1
+        "Support_Perc" : 0.15,
+        "Exposed_Perc" : 0.1,
+        "Stack_Limit" : 99
     },
     "Support Boost 1 V1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
-        "SupportPerc" : 0.3,
-        "ExposedPerc" : 0.1,
-        "Stack_Limit" : -1
+        "Support_Perc" : 0.3,
+        "Exposed_Perc" : 0.1,
+        "Stack_Limit" : 99
     },
     "Support Boost 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
-        "SupportPerc" : 0.3,
-        "ExposedPerc" : 0.1,
-        "Stack_Limit" : -1
+        "Support_Perc" : 0.3,
+        "Exposed_Perc" : 0.1,
+        "Stack_Limit" : 99
     },
     "Support Boost 2 V4" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
-        "SupportPerc" : 0.3,
-        "ExposedPerc" : 0.1,
-        "Stack_Limit" : -1
+        "Support_Perc" : 0.3,
+        "Exposed_Perc" : 0.1,
+        "Stack_Limit" : 99
     },
     "Alert" : {
-        "Buff_Type" : "Buff",
+        "Buff_Type" : "Neutral",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
@@ -176,7 +186,7 @@
         "Turn_Based" : 0,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "AttackPerc" : 0.1,
+        "Attack_Perc" : 0.1,
         "Stat" : "Attack",
         "Stackable" : 1,
         "Stack_Limit" : 3
@@ -236,16 +246,19 @@
         "Crit_Damage" : 0.03
     },
     "Extra Action" : {
+        "Buff_Type" : "Neutral",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Extra Movement" : {
+        "Buff_Type" : "Neutral",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Extra Command" : {
+        "Buff_Type" : "Neutral",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
@@ -277,7 +290,7 @@
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
         "Stack_Limit" : 99,
-        "DamagePerc" : 0.3
+        "Damage_Perc" : 0.3
     },
     "Active Engagement V5" : {
         "Buff_Type" : "Buff",
@@ -285,7 +298,7 @@
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
         "Stack_Limit" : 99,
-        "DamagePerc" : 0.4
+        "Damage_Perc" : 0.4
     },
     "Feeling Full" : {
         "Buff_Type" : "Buff",
@@ -298,7 +311,7 @@
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "DamageTakenPerc" : 0.1,
+        "Damage_Taken" : 0.1,
         "Stat" : "DamageTaken"
     },
     "Vulnerability 2" : {
@@ -306,7 +319,7 @@
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "DamageTakenPerc" : 0.2,
+        "Damage_Taken" : 0.2,
         "Stat" : "DamageTaken"
     },
     "Overzealous" : {
@@ -322,7 +335,6 @@
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Burn",
-        "StabilityTaken" : 2,
         "Stack_Limit" : 2
     },
     "Zoom In" : {
@@ -330,8 +342,8 @@
         "Turn_Based" : 0,
         "Consumption_Mode" : "AllAttack",
         "Cleanseable" : 0,
-        "DamagePerc" : 0.15,
-        "StabilityDamage" : 2,
+        "Damage_Perc" : 0.15,
+        "Stability_Damage" : 2,
         "Stackable" : 1,
         "Stack_Limit" : 2
     },
@@ -340,8 +352,8 @@
         "Turn_Based" : 0,
         "Consumption_Mode" : "AllAttack",
         "Cleanseable" : 0,
-        "DamagePerc" : 0.2,
-        "StabilityDamage" : 2,
+        "Damage_Perc" : 0.2,
+        "Stability_Damage" : 2,
         "Stackable" : 1,
         "Stack_Limit" : 2
     },
@@ -372,7 +384,7 @@
         "Turn_Based" : 0,
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
-        "DamagePerc" : 0.1,
+        "Damage_Perc" : 0.1,
         "Stack_Limit" : 99
     },
     "Arctic Benediction V1" : {
@@ -380,7 +392,7 @@
         "Turn_Based" : 0,
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
-        "DamagePerc" : 0.2,
+        "Damage_Perc" : 0.2,
         "Stack_Limit" : 99
     },
     "Glacial Domain" : {
@@ -394,7 +406,7 @@
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "DefenseIgnore" : 0.3
+        "Defense_Ignore" : 0.3
     },
     "Corrosive Infusion" : {
         "Buff_Type" : "Debuff",
@@ -411,7 +423,7 @@
         "Cleanseable" : 0,
         "Element" : "Corrosion",
         "Stack_Limit" : 15,
-        "DefensePerc" : -0.01
+        "Defense_Perc" : -0.01
     },
     "Toxic Infiltration" : {
         "Buff_Type" : "Debuff",
@@ -432,66 +444,79 @@
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "DamagePerc" : 0.1
+        "Damage_Perc" : 0.1
     },
     "Damage Up 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "DamagePerc" : 0.2
+        "Damage_Perc" : 0.2
     },
     "Standard Approach" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "AoEDamageTakenPerc" : 0.25,
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 0,
+        "AoE_Damage_Taken" : 0.25,
         "Stack_Limit" : 3
     },
     "Emergency Plan" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 0,
-        "AoEDamageTakenPerc" : 0.25,
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 0,
+        "AoE_Damage_Taken" : 0.25,
         "Stackable" : 1,
         "Stack_Limit" : 3
     },
     "Insight" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Rapture" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 4,
-        "DamagePerc" : 0.075
+        "Damage_Perc" : 0.075
     },
     "Defensive Support" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 4,
-        "DefensePerc" : 0.3,
+        "Defense_Perc" : 0.3,
         "Stat" : "Defense"
     },
     "Impact Response 1" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 1
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 0
     },
     "Wintry Bastion" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 1,
-        "DamageTakenPerc" : -0.3,
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 0,
+        "Damage_Taken" : -0.3,
         "Stack_Limit" : 5,
         "Element" : "Freeze"
     },
     "Shelter" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
-        "Defense_Consumed" : 1,
+        "Consumption_Mode" : "Defense",
+        "Cleanseable" : 0,
         "Stack_Limit" : 3,
-        "StabilityTaken" : -2
+        "Stability_Taken" : -2
     },
     "Continuous Healing 1" : {
         "Buff_Type" : "Buff",
@@ -504,7 +529,7 @@
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "SupportPerc" : 0.3
+        "Support_Perc" : 0.3
     },
     "Power of Unity" : {
         "Buff_Type" : "Buff",
@@ -513,7 +538,7 @@
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 3,
-        "TargetedDamage" : 0.1
+        "Targeted_Damage" : 0.1
     },
     "Tenacity to Withstand" : {
         "Buff_Type" : "Buff",
@@ -608,7 +633,7 @@
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "AttackPerc" : 0.1
+        "Attack_Perc" : 0.1
     },
     "Congestion" : {
         "Buff_Type" : "Debuff",
@@ -622,7 +647,14 @@
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "TargetedDamage" : 0.2
+        "Targeted_Damage" : 0.2
+    },
+    "Targeted Attack Boost 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Targeted_Damage" : 0.1
     },
     "Critical Rate Boost 2" : {
         "Buff_Type" : "Buff",
@@ -631,12 +663,26 @@
         "Cleanseable" : 1,
         "Crit" : 0.2
     },
+    "Critical Rate Boost 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Crit" : 0.1
+    },
     "Phase Boost 2" : {
         "Buff_Type" : "Buff",
         "Turn_Based" : 1,
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Phase_Damage" : 0.2
+    },
+    "Phase Boost 1" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 1,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Phase_Damage" : 0.1
     },
     "Piercing 2" : {
         "Buff_Type" : "Buff",
