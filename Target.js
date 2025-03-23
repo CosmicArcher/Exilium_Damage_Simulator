@@ -90,6 +90,7 @@ class Target extends Unit {
     // setters for use when cloning
     setStability(x) {this.stability = x;}
     setBrokenTurns(x) {this.stabilityBrokenTurns = x;}
+    getBrokenTurns() {return this.stabilityBrokenTurns;}
     // process buffs using json data
     applyBuffEffects(buffData, stacks = 1, stackable = false) {
         super.applyBuffEffects(buffData, stacks, stackable);
@@ -227,6 +228,7 @@ class Target extends Unit {
             if (this.stabilityBrokenTurns == this.turnsToRecoverStability) {
                 this.stability = this.maxStability;
                 this.stabilityBrokenTurns = 0;
+                EventManager.getInstance().broadcastEvent("stabilityRegen", [this.name, this.stability]);
             }
         }
     }

@@ -19,6 +19,7 @@ class ActionLog {
             EventManager.getInstance().addListener("avalanche", ActionLogSingleton.displayAvalanche);
             EventManager.getInstance().addListener("statusApplied", ActionLogSingleton.displayStatus);
             EventManager.getInstance().addListener("stackConsumption", ActionLogSingleton.displayStackConsumption);
+            EventManager.getInstance().addListener("stabilityRegen", ActionLogSingleton.displayStabilityRegen);
         }
     }
 
@@ -65,6 +66,14 @@ class ActionLog {
     displayStackConsumption(param) {
         if (ActionLogSingleton) {
             ActionLogSingleton.addLog(`${param[0]} consumed ${param[1]} ${param[1] > 1 ? "stacks" : "stack"} of ${param[2]}`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+
+    displayStabilityRegen(param) {
+        if (ActionLogSingleton) {
+            ActionLogSingleton.addLog(`${param[0]} recovered stability. Remaining Stability: ${param[1]}`);
         }
         else
             console.error("Singleton not yet initialized");
