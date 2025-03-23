@@ -1056,11 +1056,12 @@ function initializeDollCards() {
         {
         targetCard.append("label").text("View/Edit Stats");
         targetCard.append("br");
-        targetCard.append("button").text("Select Stat").on("click", () => {
+        targetCard.append("button").text("Select Stat").on("click", event => {
             if (targetStatDropdown.style("display") == "block")
                 hideDropdowns();
             else {
                 hideDropdowns();
+                event.target.appendChild(document.getElementById("TargetStatDropdown"));
                 targetStatDropdown.style("display", "block");
             }
         });
@@ -1093,6 +1094,11 @@ function initializeDollCards() {
                                     refreshTargetDisplay();
                                 });
         }        
+        targetCard.append("div").style("float", "right")
+                                    .style("margin-right", "15px")
+                                    .style("margin-top", "10px")
+                                    .attr("id", "TargetStability")
+                                    .text(`Turns Broken: ${target.getBrokenTurns()}`);
     }
 
     for (let i = 0; i < numDolls + numSummons; i++) {
@@ -1262,7 +1268,17 @@ function initializeDollCards() {
                             d3.select("#SelectedBuff_" + dollNum).text("Selected Buff: " + buffNames);
                         });
     });
-
+    // create the stat dropdown that can allow editing of target stats
+    targetStatDropdown = d3.select("div").append("div").attr("class", "dropdownBox").attr("id", "TargetStatDropdown").style("display", "none");
+    targetStatOptions.forEach((stat, index) => {
+        targetStatDropdown.append("a")
+                    .text(stat)
+                    .on("click", () => {
+                        updateTargetStatDisplay(index);
+                        document.getElementById("StatRefresh_0").disabled = false;
+                        document.getElementById("StatChange_0").disabled = false;
+                    });
+    });
 }
 
 function updateStatDisplay(dollIndex, statIndex) {
@@ -1503,7 +1519,7 @@ function refreshDollDisplay(dollIndex) {
 
 function updateTargetStatDisplay(statIndex) {
     let target = GameStateManager.getInstance().getTarget();
-    targetStat = statIndex;
+    targetStatIndex = statIndex;
     // the base stat is editable, the final stat after all buffs is not
     let baseStat = 0;
     let finalStat = 0;
@@ -1572,11 +1588,13 @@ function refreshTargetDisplay() {
     d3.select("#TotalDamage").text(StatTracker.getInstance().getTotalDamage());
     // display phase weaknesses
     let weaknessText = "Weaknesses:";
-    let weaknesses = GameStateManager.getInstance().getTarget().getPhaseWeaknesses();
+    let target = GameStateManager.getInstance().getTarget();
+    let weaknesses = target.getPhaseWeaknesses();
     for (let i = 0; i < weaknesses.length; i++) {
         weaknessText += " " + weaknesses[i];
     }
     d3.select("#Weaknesses").text(weaknessText);
+    d3.select("#TargetStability").text(`Turns Broken: ${target.getBrokenTurns()}`);
 }
 
 function changeTargetStat() {
