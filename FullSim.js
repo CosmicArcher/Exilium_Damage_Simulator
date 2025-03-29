@@ -10,6 +10,7 @@ import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
 import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames} from "./Enums.js";
 import StatTracker from "./StatTracker.js";
+import ChartMaker from "./ChartMaker.js";
 
 var selectedPhases = [];
 var selectedDolls = [""];
@@ -481,6 +482,7 @@ ActionLog.getInstance();
 DollFactory.getInstance();
 GlobalBuffManager.getInstance();
 StatTracker.getInstance();
+ChartMaker.getInstance();
 }
 
 // target stats dropdowns

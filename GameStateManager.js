@@ -1,5 +1,6 @@
 import { CalculationTypes } from "./Enums.js";
 import StatTracker from "./StatTracker.js";
+import ChartMaker from "./ChartMaker.js";
 
 let GameStateManagerSingleton;
 
@@ -58,6 +59,7 @@ class GameStateManager {
             GameStateManagerSingleton.actionRound.push(1);
 
             StatTracker.getInstance().startSimulation();
+            ChartMaker.getInstance().createDPSChart();
         }
         else
             console.error("Singleton not yet initialized");
@@ -200,6 +202,7 @@ class GameStateManager {
             GameStateManagerSingleton.actionCount++;
 
             StatTracker.getInstance().lockAction();
+            ChartMaker.getInstance().createDPSChart();
         }
         else
             console.error("Singleton not yet initialized");
@@ -228,6 +231,7 @@ class GameStateManager {
             GameStateManagerSingleton.dolls.push(newDolls);
 
             StatTracker.getInstance().rewindToAction(actionNumber);
+            ChartMaker.getInstance().createDPSChart();
         }
         else
             console.error("Singleton not yet initialized");

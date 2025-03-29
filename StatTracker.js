@@ -184,7 +184,7 @@ class StatTracker {
                     Object.keys(StatTrackerSingleton.dolls[actionNum][dollName]).forEach(category => {
                         let typeData = {};
                         Object.keys(StatTrackerSingleton.dolls[actionNum][dollName][category]).forEach(type => {
-                            typeData[type] = StatTrackerSingleton.dolls[actionNum][dollName][type];
+                            typeData[type] = StatTrackerSingleton.dolls[actionNum][dollName][category][type];
                         });
                         dollCats[category] = typeData;
                     });
