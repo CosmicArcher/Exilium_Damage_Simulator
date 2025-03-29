@@ -39,7 +39,7 @@ class ChartMaker {
             // move the x-axis to the bottom of the chart instead of the default at the top
             let xAxis = chart.select("g").append("g").attr("transform", `translate(0, 260)`);
             // to have 0 at the bottom and the maximum value at the top, flip the input of range
-            let yScale = d3.scaleBand().range([260, 0]);
+            let yScale = d3.scaleLinear().range([260, 0]);
             // the y-axis defaults to the left so no need to edit its transform
             let yAxis = chart.select("g").append("g");
 
