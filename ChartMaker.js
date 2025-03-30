@@ -3,6 +3,7 @@ import StatTracker from "./StatTracker.js";
 
 let ChartMakerSingleton;
 let dollColors = ["olive", "violet", "deeppink", "orange", "dodgerblue", "aquamarine"];
+let roundColors = ["yellow", "red", "mediumvioletred", "lime", "darkgreen", "blue", "gold", "ivory", "aqua"];
 
 class ChartMaker {
     constructor() {
@@ -105,7 +106,9 @@ class ChartMaker {
             */                
            if (!ChartMakerSingleton.DPSChart.svg) {
                 let dpsChart = {};
-                let chartParts = ChartMaker.createLineChartBase("#DPSChart", 700, 300, 50, 20, 0.1);
+                // set the space width to the full width of the screen on generation
+                let spaceWidth = document.getElementById("DPSChart").offsetWidth;
+                let chartParts = ChartMaker.createLineChartBase("#DPSChart", spaceWidth, 300, 50, 20, 0.1);
                 dpsChart.svg = chartParts[0];
                 dpsChart.body = chartParts[1];
                 dpsChart.xScale = chartParts[2];
@@ -114,6 +117,12 @@ class ChartMaker {
                 dpsChart.yAxis = chartParts[5];
 
                 ChartMakerSingleton.DPSChart = dpsChart;
+            }
+            else {
+                // update the width of the charts if the window was resized between actions
+                let spaceWidth = document.getElementById("DPSChart").offsetWidth;
+                ChartMakerSingleton.DPSChart.svg.attr("width", spaceWidth);
+                ChartMakerSingleton.DPSChart.xScale.range([0, spaceWidth - 100]);
             }
             
             let dpsChart = ChartMakerSingleton.DPSChart;
@@ -124,6 +133,10 @@ class ChartMaker {
             dpsChart.xAxis.call(d3.axisBottom(dpsChart.xScale).tickFormat(d3.format(".0f")));
             // flatten the nested objects into an array of objects
             let dollTotalDamage = [];
+            // get the action number cutoffs at each round by getting the first action number where the round number changes
+            let currRound = 1;
+            let startCutoff = 0;
+            let roundCutoffs = [];
             for (let i = 0; i <= actionCount; i++) {
                 Object.keys(dollDamages[i]).forEach(doll => {
                     let obj = {};
@@ -132,7 +145,14 @@ class ChartMaker {
                     obj["Damage"] = dollDamages[i][doll]["Special"]["Total"];
                     dollTotalDamage.push(obj);
                 });
+                if (currRound < rounds[i]) {
+                    roundCutoffs.push([startCutoff, i]);
+                    currRound = rounds[i];
+                    startCutoff = i;
+                }
             }
+            // add the latest action count as the endpoint of the last round
+            roundCutoffs.push([startCutoff, actionCount]);
             // use d3.max to pass a function to get the total damage of the latest action but use math.max to set a minimum value of 100 for the scale
             dpsChart.yScale.domain([0, Math.max(100,d3.max(dollTotalDamage, d => {
                 // only consider latest total damage for the scale
@@ -155,6 +175,15 @@ class ChartMaker {
                                 let line = d3.line().x(d => dpsChart.xScale(d.ActionNumber)).y(d => dpsChart.yScale(d.Damage));
                                 return line(actionData[1]);
                             });
+            // create background bars to more easily identify which round the parts of the plot belong to
+            let bars = dpsChart.body.selectAll("rect").data(roundCutoffs);
+            bars.join("rect")
+                            .attr("x", d => dpsChart.xScale(d[0]))
+                            .attr("y", 0)
+                            .attr("width", d => dpsChart.xScale(d[1]) - dpsChart.xScale(d[0]))
+                            .attr("height", 260)
+                            .attr("fill", (d, i) => roundColors[i])
+                            .attr("opacity", 0.2);
         }
         else
             console.error("Singleton not yet initialized");
