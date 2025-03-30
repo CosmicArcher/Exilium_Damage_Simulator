@@ -27,8 +27,7 @@ var phaseDiv = [null];
 var fortOptions;
 var calcOptions;
 // for use when dynamically adding and removing doll slots
-var slotColors = ["olive", "violet", "deeppink", "orange", "dodgerblue", "aquamarine"];
-
+var slotColors;
 // an error gets thrown when putting resourceloader.getinstance() directly in the .on(click) functions
 function getDolls() {
     return ResourceLoader.getInstance().getAllDolls();
@@ -483,6 +482,7 @@ DollFactory.getInstance();
 GlobalBuffManager.getInstance();
 StatTracker.getInstance();
 ChartMaker.getInstance();
+slotColors = ChartMaker.getDollColors();
 }
 
 // target stats dropdowns

@@ -78,6 +78,13 @@ class GameStateManager {
         else
             console.error("Singleton not yet initialized");
     }
+    getRounds() {
+        if (GameStateManagerSingleton) {
+            return GameStateManagerSingleton.actionRound;
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
     // game state manager holds reference to the target
     registerTarget(target) {
         if (GameStateManagerSingleton) {
