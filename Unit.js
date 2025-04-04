@@ -1,7 +1,7 @@
 import ResourceLoader from "./ResourceLoader.js";
 import DamageManager from "./DamageManager.js";
 import EventManager from "./EventManager.js";
-import { BuffJSONKeys, Elements } from "./Enums.js";
+import { AmmoTypes, AttackTypes, BuffJSONKeys, Elements, CalculationTypes } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 // root class for dolls (attackers) and targets (defenders)
 class Unit {
@@ -43,14 +43,89 @@ class Unit {
                 this.defenseBuffs -= buffData["DefensePerc"];
         }
     }
-    // for applying overburn and corrosive pressure
+    // for applying overburn and corrosive infusion
     applyDoT(buffName, sourceName) {
         let attacker = GameStateManager.getInstance().getDoll(sourceName);
         if (buffName == "Overburn") {
             DamageManager.getInstance().applyFixedDamage(attacker.getAttack() * 0.1, sourceName);
         }
-        else if (buffName == "Corrosive Pressure") {
-
+        // toxic infiltration and corrosive infusion are capable of critting and scale with damage dealt buffs so treat it like a normal skill calculation
+        else if (buffName == "Corrosive Infusion" || buffName == "Corrosive Infusion V2") {
+            let doll = GameStateManager.getInstance().getDoll(sourceName);
+            let calcType = GameStateManager.getInstance().getDollCalcType(sourceName);
+            let isCrit;
+            let tempCritDmg = doll.getCritDamage();
+            switch(calcType) {
+                case CalculationTypes.CRIT:
+                    isCrit = 1;
+                    break;
+                case CalculationTypes.NOCRIT:
+                    isCrit = 0;
+                    break;
+                case CalculationTypes.EXPECTED: // get the expected value of the attack through linear interpolation from 1 to crit damage using crit rate
+                    isCrit = 1;
+                    // the effective value of crit rate should be bounded to 0-1
+                    let tempCritRate = Math.max(Math.min(doll.getCritRate(), 1), 0); 
+                    tempCritDmg = (tempCritDmg - 1) * tempCritRate + 1; 
+                    break;
+                case CalculationTypes.SIMULATION:
+                    isCrit = RNGManager.getInstance().getRNG() <= doll.getCritRate(); // simulate a crit rng roll
+                    break;
+                default:
+                    console.error(`${calculationType} is not a valid calculation type`);
+            }
+            // corrosive infusion damage scales with stack count
+            let dotStacks = 0;
+            for (let i = 0; i < this.currentBuffs.length && dotStacks == 0; i++) {
+                if (this.currentBuffs[i][0] == buffName)
+                    dotStacks = this.currentBuffs[i][3];
+            }
+            // klukai key 3 adds a 15% dmg buff on corrosive infusion if the target is stability broken
+            if (doll.getKeyEnabled(2) && this.stability == 0)
+                doll.setDamageDealt(doll.getDamageDealt() + 0.15);
+            // skillname argument is only used for broadcasting the skill name for dps statistics so it is fine to go outside of the SkillNames enum
+            DamageManager.getInstance().calculateDamage(doll, this, doll.getAttack() * 0.12 * dotStacks, Elements.CORROSION, AmmoTypes.NONE,
+                                                        AttackTypes.AOE, isCrit, tempCritDmg, 0, 1, "Corrosive Infusion");
+                                                        
+            if (doll.getKeyEnabled(2) && this.stability == 0)
+                doll.setDamageDealt(doll.getDamageDealt() - 0.15);
+        }
+        else if (buffName == "Toxic Infiltration") {
+            let doll = GameStateManager.getInstance().getDoll(sourceName);
+            let calcType = GameStateManager.getInstance().getDollCalcType(sourceName);
+            let isCrit;
+            let tempCritDmg = doll.getCritDamage();
+            switch(calcType) {
+                case CalculationTypes.CRIT:
+                    isCrit = 1;
+                    break;
+                case CalculationTypes.NOCRIT:
+                    isCrit = 0;
+                    break;
+                case CalculationTypes.EXPECTED: // get the expected value of the attack through linear interpolation from 1 to crit damage using crit rate
+                    isCrit = 1;
+                    // the effective value of crit rate should be bounded to 0-1
+                    let tempCritRate = Math.max(Math.min(doll.getCritRate(), 1), 0); 
+                    tempCritDmg = (tempCritDmg - 1) * tempCritRate + 1; 
+                    break;
+                case CalculationTypes.SIMULATION:
+                    isCrit = RNGManager.getInstance().getRNG() <= doll.getCritRate(); // simulate a crit rng roll
+                    break;
+                default:
+                    console.error(`${calculationType} is not a valid calculation type`);
+            }
+            // toxic infiltration damage increases at v5
+            let dotMulti = doll.getFortification() > 4 ? 0.8 : 0.6;
+            // skillname argument is only used for broadcasting the skill name for dps statistics so it is fine to go outside of the SkillNames enum
+            DamageManager.getInstance().calculateDamage(doll, this, doll.getAttack() * dotMulti, Elements.CORROSION, AmmoTypes.NONE,
+                                                        AttackTypes.AOE, isCrit, tempCritDmg, 0, 1, "Toxic Infiltration");
+            // key 6 applies 1 stack of corrosive infusion after toxic infiltration triggers and the target survives which is always assumed
+            if (doll.getKeyEnabled(5)) {
+                if (doll.getFortification() > 1)
+                    this.addBuff("Corrosive Infusion V2", "Klukai", 2, 1);
+                else
+                    this.addBuff("Corrosive Infusion", "Klukai", 2, 1);
+            }
         }
     }
     // these are called when buffs are added/removed
@@ -238,8 +313,16 @@ class Unit {
         this.currentBuffs.forEach(buff => {
             if (buff[4]) {
                 // apply overburn damage over time effect, damage updates as the source's attack stat changes
-                if (buff[0] == "Overburn" || buff[0] == "Corrosive Pressure") {
+                if (buff[0] == "Overburn" || buff[0] == "Corrosive Infusion" || buff[0] == "Corrosive Infusion V2") {
                     this.applyDoT(buff[0], buff[6]);
+                }
+                // if toxic infiltration is present, add 1 stack of corrosive infusion on ending turn
+                if (buff[0] == "Toxic Infiltration") {
+                    let doll = GameStateManager.getInstance().getDoll("Klukai");
+                    if (doll.getFortification() > 1)
+                        this.addBuff("Corrosive Infusion V2", "Klukai", 2, 1);
+                    else
+                        this.addBuff("Corrosive Infusion", "Klukai", 2, 1);
                 }
                 // if 2 stacks of frozen and ending turn, turn frozen into frigid
                 if (buff[0] == "Frozen" && buff[3] == 2) {

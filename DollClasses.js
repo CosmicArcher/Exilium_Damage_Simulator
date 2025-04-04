@@ -1225,3 +1225,205 @@ export class Ksenia extends Supporter {
         return super.cloneUnit(new Ksenia(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
     }
 }
+
+export class Klukai extends Doll {
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
+        super("Klukai", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+
+        // klukai ult cd is reduced by every 3 index gained
+        this.IndexGained = 0;
+        // klukai index to ult cd reduction is not active when performing ult extra actions, otherwise peritya would have been much worse with her
+        this.isActing = false;
+        // track whether the 2nd activation of ult has been used or not
+        this.repeatedSkill = false;
+    }
+
+    getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        // prevent index gain from converting to ult cdr while acting
+        this.isActing = true; 
+        // v4 skill2 3rd conditional is phase exploit, 1st and 2nd conditionals are assumed always false due to the nature of the simulation
+        if (this.fortification > 3 && skillName == SkillNames.SKILL2) {
+            let weaknesses = target.getPhaseWeaknesses();
+            if (weaknesses.includes(Elements.CORROSION) || weaknesses.includes(AmmoTypes.MEDIUM))
+                conditionalTriggered[2] = true;
+        }
+        // assume that the target is always a boss and single target scenario
+        if (skillName == SkillNames.ULT) {
+            if (this.fortification > 2)
+                conditionalTriggered[0] = true;
+            // key 2 condition is if ult hits only 1 target
+            if (this.keysEnabled[1])
+                conditionalTriggered[1] = true;
+            // key 5 gives 20 or 40% damage boost depending on fortification (ult size)
+            if (this.keysEnabled[4]) {
+                this.damageDealt += 0.2;
+                if (this.fortification == 6)
+                    this.damageDealt += 0.2;
+            }
+        }
+        // check if target already has toxic infiltration for skill3 damage boost
+        if (skillName == SkillNames.SKILL3) {
+            // v5+ skill3 applies toxic infiltration before the attack if any corrosion debuffs are already on the target
+            if (this.fortification > 4 && target.hasBuffElement(Elements.CORROSION, true))
+                conditionalTriggered[1] = true;
+            if (target.hasBuff("Toxic Infiltration"))
+                conditionalTriggered[0] = true;
+            else if (this.fortification > 4)
+                if (conditionalTriggered[1])
+                    conditionalTriggered[0] = true;
+        }
+        // v5+ toxic infiltration also applies the 30% dmg buff on all attacks rather than just for skill3
+        let dmgBuff = 0;
+        if (this.fortification > 4) {
+            // also account for the pre-target buff applications by certain skills
+            if (target.hasBuff("Toxic Infiltration") || skillName == SkillNames.ULT) 
+                dmgBuff = 0.3;
+            else if (skillName == SkillNames.SKILL3)
+                if (conditionalTriggered[1])
+                    dmgBuff = 0.3;
+            this.damageDealt += dmgBuff;
+        }
+
+        super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
+
+        if (this.fortification > 4) {
+            this.damageDealt -= dmgBuff;
+        }
+        if (skillName == SkillNames.ULT) {
+            if (this.keysEnabled[4]) {
+                this.damageDealt -= 0.2;
+                if (this.fortification == 6)
+                    this.damageDealt -= 0.2;
+            }
+        }
+        // if target already has corrosive infusion, add 1 or 2 stacks depending on Klukai fortification
+        if (target.hasBuff("Corrosive Infusion") || target.hasBuff("Corrosive Infusion V2")) {
+            if (this.fortification > 1)
+                target.addBuff("Corrosive Infusion V2", this.name, 2, 2);
+            else
+                target.addBuff("Corrosive Infusion", this.name, 2, 1);
+        }
+        // klukai passive applies 1 stack of corrosive infusion with any attack, 2 if skill2 as it has 2 hits
+        let dotStacks = 1;
+        if (skillName == SkillNames.SKILL2) {
+            dotStacks++;
+            // also check if the conditional override of skill2 was checked to either add another DoT stack or give 2 index and -1 ult cd
+            if (conditionalTriggered[0]) {
+                this.adjustIndex(2);
+                this.cooldowns[3]--;
+            }
+            else
+                dotStacks++;
+            // the 2nd hit of skill2 is guaranteed to hit the target with corrosive infusion stacks already present so add the stacks from that too
+            dotStacks++;
+            if (this.fortification > 1)
+                dotStacks++;
+        }
+        if (this.fortification > 1)
+            target.addBuff("Corrosive Infusion V2", this.name, 2, dotStacks);
+        else
+            target.addBuff("Corrosive Infusion", this.name, 2, dotStacks);
+        // v6 klukai ult triggers corrosive infusion and toxic infiltration after the attack
+        if (skillName == SkillNames.ULT && this.fortification == 6) {
+            // klukai does not have support skills so target always points to the enemy target
+            // it is guaranteed that the target will have both corrosive infusion and toxic infiltration so there is no need to check
+            target.applyDoT("Corrosive Infusion V2", this.name);
+            target.applyDoT("Toxic Infiltration", this.name);
+        }
+        // v1+ klukai skill3 triggers the death effect of toxic infiltration if the target survives
+        else if (skillName == SkillNames.SKILL3 && this.fortification > 0) {
+            target.applyDoT("Toxic Infiltration", this.name);
+        }
+        // ult 1st conditional is to allow reactivation of the ultimate but only once per turn
+        if (!this.repeatedSkill) {
+            if (skillName == SkillNames.ULT && conditionalTriggered[0]) {
+                this.cooldowns[3] = 0;
+                // prevent other skills from being used by setting their cooldowns to 1
+                for (let i = 0; i < 3; i++)
+                    this.cooldowns[i] = 1;
+                this.repeatedSkill = true;
+            } 
+        }
+        else {
+            this.endTurn();
+            this.cooldowns[3] = 6;
+            this.repeatedSkill = false;
+        }
+        // gain 1 stack of competitive spirit after attacking, 2 if skill2 was used as it hits the target twice
+        let stackGain = 1;
+        if (skillName == SkillNames.SKILL2)
+            stackGain++;
+        if (this.fortification > 1)
+            this.addBuff("Competitive Spirit V2", this.name, -1, stackGain);
+        else
+            this.addBuff("Competitive Spirit", this.name, -1, stackGain);
+        // also gain 1 index per attack
+        this.adjustIndex(stackGain);
+
+        // is acting flag should become false once end turn is called so convert index if that has happened after the skill
+        if (!this.isActing) {
+            this.convertIndexGain();
+        }
+    }
+
+    adjustIndex(gain) {
+        super.adjustIndex(gain);
+        // for every 3 index gained, reduce ult cd by 1 or 2 depending on fortification
+        if (gain > 0) {
+            this.IndexGained += gain;
+            this.convertIndexGain();
+        }
+    }
+
+    convertIndexGain() {
+        if (!this.isActing) {
+            while (this.IndexGained >= 3) {
+                this.IndexGained -= 3;
+                this.cooldowns[3]--;
+                // v2+ reduces ult cd by 1 additional turn and adds another stack of corrosive infusion if the target already has it
+                if (this.fortification > 1) {
+                    this.cooldowns[3]--;
+                    let target = GameStateManager.getInstance().getTarget();
+                    if (target.hasBuff("Corrosive Infusion V2")) {
+                        target.addBuff("Corrosive Infusion V2", this.name, 2, 1);
+                    }
+                }
+            }
+        }
+    }
+
+    endTurn() {
+        super.endTurn();
+        this.isActing = false;
+    }
+
+    refreshSupportUses() {
+        super.refreshSupportUses();
+        // key 1 applies 1 stack of corrosive infusion and gains 2 index if there is only 1 target which is assumed always true
+        if (this.keysEnabled[0]) {
+            let target = GameStateManager.getInstance().getTarget();
+            if (!target)
+                target = GameStateManager.getInstance().getBaseTarget();
+            if (this.fortification > 1)
+                target.addBuff("Corrosive Infusion V2", this.name, 2, 1);
+            else
+                target.addBuff("Corrosive Infusion", this.name, 2, 1);
+            this.adjustIndex(2);
+        }
+    }
+
+    checkDamage(skillName, attackerName) {
+        // key 4 gives 1 index per allied support attack
+        if (this.keysEnabled[3] && skillName == SkillNames.SUPPORT)
+            this.adjustIndex(1);
+    }
+
+    cloneUnit() {
+        let newDoll = new Klukai(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled);
+        // ensure that tracked index gain is passed onto the clone
+        newDoll.IndexGained = this.IndexGained;
+        newDoll.isActing = this.isActing;
+        newDoll.repeatedSkill = this.repeatedSkill;
+        return super.cloneUnit(newDoll);
+    }
+}

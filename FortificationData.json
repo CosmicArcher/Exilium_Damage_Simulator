@@ -727,31 +727,21 @@
                 }]
             }
         },
-        "V2" : {
-            "Skill2" : {
-                "Conditional" : {
-                    "Condition_Text" : "No Kill",
-                    "Post_Target_Buff" : [{
-                        "Name" : "Corrosive Infusion V2",
-                        "Duration" : 2
-                    }]
-                }
-            }  
-        },
         "V3" : {
             "Ultimate" : {
                 "Conditional" : [{
-                    "Condition_Text" : "Boss",
+                    "Condition_Text" : "2+ Hits/Boss",
+                    "Damage_Boost" : 0.5,
                     "Pre_Self_Buff" : [{
                         "Name" : "Extra Command"
-                    }],
-                    "Pre_Target_Buff" : [{
-                        "Name" : "Defense Down 2",
-                        "Duration" : 2
-                    }, {
-                        "Name" : "Toxic Infiltration",
-                        "Duration" : 2
                     }]
+                }],
+                "Pre_Target_Buff" : [{
+                    "Name" : "Defense Down 2",
+                    "Duration" : 2
+                }, {
+                    "Name" : "Toxic Infiltration",
+                    "Duration" : 2
                 }]
             }
         },
@@ -760,15 +750,18 @@
                 "Multiplier" : 1,
                 "Append" : {
                     "Conditional" : [{
-                        "Condition_Text" : "3 Stacks",
+                        "Condition_Text" : "3 Stacks DoT",
                         "Extra_Attack" : {
                             "Type" : "Attack",
                             "Multiplier" : 0.75,
                             "Damage_Type" : "AoE",
-                            "StabilityDamage" : 3,
-                            "Ammo_Type" : "Medium",
+                            "StabilityDamage" : 0,
+                            "Ammo_Type" : "None",
                             "Element" : "Corrosion"
                         }
+                    }, {
+                        "Condition_Text" : "Phase Exploit",
+                        "Cover_Ignore" : 0.15
                     }]
                 }
             }
@@ -776,35 +769,15 @@
         "V5" : {
             "Skill3" : {
                 "Multiplier" : 1.1,
-                "Post_Target_Buff" : [{
-                    "Name" : "Toxic Infiltration V5",
-                    "Duration" : 2
-                }],
-                "Conditional" : [{
-                    "Condition_Text" : "Corrosion Debuff",
-                    "Pre_Target_Buff" : [{
-                        "Name" : "Toxic Infiltration V5",
-                        "Duration" : 2
+                "Append" : {
+                    "Conditional" : [{
+                        "Condition_Text" : "Has Corrosion Debuff",
+                        "Pre_Target_Buff" : [{
+                            "Name" : "Toxic Infiltration",
+                            "Duration" : 2
+                        }]
                     }]
-                }, {
-                    "Condition_Text" : "Has Toxic Infiltration",
-                    "Damage_Boost" : 0.3
-                }]
-            },
-            "Ultimate" : {
-                "Conditional" : [{
-                    "Condition_Text" : "Boss",
-                    "Pre_Self_Buff" : [{
-                        "Name" : "Extra Command"
-                    }],
-                    "Pre_Target_Buff" : [{
-                        "Name" : "Defense Down 2",
-                        "Duration" : 2
-                    }, {
-                        "Name" : "Toxic Infiltration V5",
-                        "Duration" : 2
-                    }]
-                }]
+                }
             }
         },
         "V6" : {

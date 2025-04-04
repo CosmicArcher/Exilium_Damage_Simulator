@@ -365,5 +365,34 @@
         },
         "Discount Guide" : {
         }
+    },
+    "Klukai" : {
+        "Deadly Entwine" : {
+
+        },
+        "One Fell Swoop" : {
+            "Skill" : {
+                "Ultimate" : {
+                    "Append" : {
+                        "Conditional" : [{
+                            "Condition_Text" : "Single Target",
+                            "Damage_Boost" : 0.3
+                        }]
+                    }
+                }
+            }
+        },
+        "No Mercy" : {
+
+        },
+        "Strong Support" : {
+
+        },
+        "Limit Break" : {
+
+        },
+        "Moment of Doom" : {
+            
+        }
     }
 }

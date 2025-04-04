@@ -218,6 +218,7 @@ class TurnManager {
             let element = damageData[2];
             let ammo = damageData[3];
             let damageType = damageData[4];
+            let skillName = damageData[1];
             // check if array for that key already exists
             if (TurnManagerSingleton.damageListeners.hasOwnProperty(element)) {
                 TurnManagerSingleton.damageListeners[element].forEach(dollName => {
@@ -235,6 +236,12 @@ class TurnManager {
                 TurnManagerSingleton.damageListeners[damageType].forEach(dollName => {
                     let doll = GameStateManager.getInstance().getDoll(dollName)
                     doll.checkDamage(damageType, damageData[0]);
+                })
+            }
+            if (TurnManagerSingleton.damageListeners.hasOwnProperty(skillName)) {
+                TurnManagerSingleton.damageListeners[skillName].forEach(dollName => {
+                    let doll = GameStateManager.getInstance().getDoll(dollName)
+                    doll.checkDamage(skillName, damageData[0]);
                 })
             }
         }
