@@ -1007,11 +1007,14 @@ function initializeDollCards() {
                 targetBuffDisplay.text("Hide Current Buffs");
                 // we can share the dropdown with the dolls because it gets deleted repeatedly so the onclick function constantly changes
                 currentBuffs = targetBuffDisplay.append("div").attr("class", "dropdownBox");
+                // refresh target reference
+                target = GameStateManager.getInstance().getTarget();
                 let buffs = target.getBuffs();
                 // selecting buffs allows the user to remove it from the unit
                 buffs.forEach(buff => {
                     currentBuffs.append("a")
-                                .text(buff[0])
+                                // display stacks, buffname, duration left
+                                .text(`${buff[3] != 1 ? buff[3] + " " : ""}${buff[0]} - ${buff[2] > 0 ? buff[2] : "Indefinite"} Turns`)
                                 .on("click", () => {
                                     // only allow the remove button to be clicked and disable all the other buff edit buttons on other doll cards 
                                     disableBuffEditButtons();
@@ -1044,6 +1047,7 @@ function initializeDollCards() {
                                 .attr("disabled", "true")
                                 .on("click", event => {
                                     // only add 1 stack and 1 turn of the buff
+                                    target = GameStateManager.getInstance().getTarget();
                                     target.addBuff(selectedBuff, selectedDolls[dollNum], 1, 1);
                                     // after removing the buff, disable the button until another buff is selected
                                     event.target.disabled = true;
@@ -1054,6 +1058,7 @@ function initializeDollCards() {
                                 .style("float", "right")
                                 .attr("disabled", "true")
                                 .on("click", event => {
+                                    target = GameStateManager.getInstance().getTarget();
                                     target.removeBuff(selectedBuff);
                                     // after removing the buff, disable the button until another buff is selected
                                     event.target.disabled = true;
@@ -1153,11 +1158,14 @@ function initializeDollCards() {
                 hideDropdowns();
                 buffDisplay.text("Hide Current Buffs");
                 currentBuffs = buffDisplay.append("div").attr("class", "dropdownBox");
+                // refresh doll reference to get latest version of the doll
+                doll = GameStateManager.getInstance().getDoll(selectedDolls[i]);
                 let buffs = doll.getBuffs();
                 // selecting buffs allows the user to remove it from the unit
                 buffs.forEach(buff => {
                     currentBuffs.append("a")
-                                .text(buff[0])
+                                // display stacks, buffname, duration left
+                                .text(`${buff[3] != 1 ? buff[3] + " " : ""}${buff[0]} - ${buff[2] > 0 ? buff[2] : "Indefinite"} Turns`)
                                 .on("click", event => {
                                     let dollNum = +event.target.parentNode.parentNode.parentNode.id.slice(5);
                                     // only allow the remove button to be clicked and disable all the other buff edit buttons on other doll cards 
@@ -1676,6 +1684,9 @@ function refreshTurnText() {
     dolls.forEach(doll => {
         readyDolls += doll.hasTurnAvailable();
     });
-    textHTML[0].textContent = `Round ${GameStateManager.getInstance().getRoundNumber()}: ${readyDolls > 0 ? "Your" : "Enemy"} Turn`;
+    d3.select(textHTML[0]).style("opacity", 0).transition()
+                        .duration(200)
+                        .style("opacity", 1)
+                        .text(`Round ${GameStateManager.getInstance().getRoundNumber()}: ${readyDolls > 0 ? "Your" : "Enemy"} Turn`);
     textHTML[1].textContent = `Total Damage: ${StatTracker.getInstance().getTotalDamage()}`;
 }
