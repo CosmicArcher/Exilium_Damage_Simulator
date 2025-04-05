@@ -97,6 +97,8 @@ function addDoll() {
     newNode.children[7].textContent = "None";
     newNode.children[9].textContent = "None";
     newNode.children[11].textContent = "None";
+    // deactivate the start button until all doll slots have a selected doll
+    document.getElementById("startButton").disabled = true;
     // if the phase buffs are open in the original div, close it
     d3.select(newNode.lastElementChild.lastElementChild).style("display", "none");
 
@@ -118,7 +120,7 @@ function addCalcOption() {
     // add a row under the calculation settings section
     let newSetting = document.getElementById("CalcSettings").children[1].cloneNode(true);
     newSetting.firstChild.textContent = "Doll: ";
-    newSetting.firstElementChild.textContent = "Calculation";
+    newSetting.firstElementChild.textContent = "Select Calculation Type";
     newSetting.id = "Settings_" + (numDolls + numSummons);
     d3.select(newSetting.lastElementChild).on("click", () => {
         // reuse the dropdown among all buttons for this setting
@@ -207,10 +209,15 @@ function initializeDollButtons(index) {
                                 dollStats[index == 0 ? 8 : 9].textContent = "None";
                                 dollStats[index == 0 ? 10 : 11].textContent = "None";
                                 selectedKeys[dollIndex] = [0,0,0,0,0,0];
-                                // selecting doll 1 enables the start button
-                                if (dollIndex == 0) {
-                                    d3.select("#startButton").node().disabled = false;
+                                // selecting a doll in every slot re-enables the start button
+                                let dollsSet = true;
+                                for (let i = 0; i < numDolls && dollsSet; i++) {
+                                    // if any of the doll slots still does not have a selected doll, exit the loop early
+                                    if (selectedDolls[i] == "")
+                                        dollsSet = false;
                                 }
+                                if (dollsSet)
+                                    document.getElementById("startButton").disabled = false;
                             });
             });
         }
@@ -424,12 +431,6 @@ function getConditionalOverrides() {
         }
     }
     return overrides;
-}
-
-// get the skill keys of doll at index
-function getDollSkills(index) {
-    let dollSkills = ResourceLoader.getInstance().getSkillData(selectedDolls[index]);
-    return Object.keys(dollSkills);
 }
 // get the key data of doll at index
 function getDollKeys(index) {
@@ -705,6 +706,8 @@ function startSimulation() {
                                 document.getElementById("Skill").lastElementChild.disabled = true;
                                 document.getElementById("Skill").children[1].textContent = "Doll: ";
                                 document.getElementById("Skill").children[4].textContent = "Skill: ";
+                                // hide the conditional toggles since the skill has been used
+                                updateConditionalToggles();
                                 // allow the rewind button to be pressed because there is now an action that we can rewind
                                 document.getElementById("rewindButton").disabled = false;
                             });
@@ -713,6 +716,14 @@ function startSimulation() {
     d3.select("#rewindButton").on("click", event => {
         // undo the previous action
         GameStateManager.getInstance().rewindToAction(GameStateManager.getInstance().getActionCount() - 1);
+        // disable start and skill buttons again until new doll and skill are chosen
+        document.getElementById("startButton").disabled = true;
+        selectedSkill = "";
+        document.getElementById("Skill").lastElementChild.disabled = true;
+        document.getElementById("Skill").children[1].textContent = "Doll: ";
+        document.getElementById("Skill").children[4].textContent = "Skill: ";
+        // hide the conditional toggles since the skill has been used
+        updateConditionalToggles();
         // refresh doll stat displays
         for (let i = 0; i < numDolls + numSummons; i++) {
             refreshDollDisplay(i);
@@ -801,6 +812,7 @@ function initializeActionButtons() {
                                 document.getElementById("startButton").disabled = true;
                                 // changing doll deselects the previously chosen skill
                                 selectedSkill = "";
+                                actionDiv[4].textContent = "Skill: ";
                                 updateConditionalToggles();
                             });
             });
