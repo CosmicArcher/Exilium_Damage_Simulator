@@ -596,18 +596,18 @@ d3.select("#startButton").on("click", () => {
     // get input values and create target
     let targetStats = getTargetStats();
     let globalBuffs = getGlobalStats();
-    let newTarget = new Target("6p62", targetStats[0], targetStats[2], 2, selectedPhases);
+    let newTarget = new Target("6p62", targetStats[0], targetStats[2], targetStats[3], selectedPhases);
     GameStateManager.getInstance().registerTarget(newTarget);
     newTarget.finishCloning();
     //newTarget.disableBuffs();
     GameStateManager.getInstance().addCover(targetStats[1]);
-    newTarget.setDefenseBuffs(targetStats[3]);
-    newTarget.setDamageTaken(targetStats[4]);
-    newTarget.setTargetedDamageTaken(targetStats[5]);
-    newTarget.setAoEDamageTaken(targetStats[6]);
-    newTarget.setStabilityDamageModifier(targetStats[7]);
-    newTarget.applyDRPerStab(targetStats[8]);
-    newTarget.applyDRWithStab(targetStats[9]);
+    newTarget.setDefenseBuffs(targetStats[4]);
+    newTarget.setDamageTaken(targetStats[5]);
+    newTarget.setTargetedDamageTaken(targetStats[6]);
+    newTarget.setAoEDamageTaken(targetStats[7]);
+    newTarget.setStabilityDamageModifier(targetStats[8]);
+    newTarget.applyDRPerStab(targetStats[9]);
+    newTarget.applyDRWithStab(targetStats[10]);
     newTarget.setIsLarge(document.getElementById("largeToggle").checked);
     newTarget.setIsBoss(document.getElementById("bossToggle").checked);
     // apply global stat buffs
