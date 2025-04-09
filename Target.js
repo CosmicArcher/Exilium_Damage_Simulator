@@ -28,6 +28,7 @@ class Target extends Unit {
         this.drWithStab = 0;
         // tag for some skills, bosses are typically large
         this.isLarge = true;
+        this.isBoss = true;
         // bosses are typically immune to command prohibition statuses
         this.buffImmunity = ["Frigid", "Stun", "Taunt", "Paralysis", "Overheated"];
         // Track whether a weakness was implanted by a tile or is inherent
@@ -52,6 +53,7 @@ class Target extends Unit {
     getBaseTargetedDamageTaken() {return this.baseTargetedDamageTaken;}
     getBaseStabilityDamageModifier() {return this.baseStabilityDamageModifier;}
     getIsLarge() {return this.isLarge;}
+    getIsBoss() {return this.isBoss;}
     // only use these setters for quick direct buff input calcs
     setDamageTaken(x) {
         this.resetDamageTaken();
@@ -74,6 +76,7 @@ class Target extends Unit {
         this.stabilityDamageModifier += x;
     }
     setIsLarge(x) {this.isLarge = x;}
+    setIsBoss(x) {this.isBoss = x;}
     // changing the base buffs requires resetting the added value to 0 first
     resetDamageTaken() {
         this.damageTaken -= this.baseDamageTaken;
@@ -268,6 +271,7 @@ class Target extends Unit {
         targetClone.setBrokenTurns(this.stabilityBrokenTurns);
         targetClone.setStability(this.stability);
         targetClone.setIsLarge(this.isLarge);
+        targetClone.setIsBoss(this.isBoss);
         // buffs are enabled by default so check if they are disabled when cloning
         if (!this.buffsEnabled)
             targetClone.disableBuffs();

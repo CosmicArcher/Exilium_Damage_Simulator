@@ -608,6 +608,8 @@ d3.select("#startButton").on("click", () => {
     newTarget.setStabilityDamageModifier(targetStats[7]);
     newTarget.applyDRPerStab(targetStats[8]);
     newTarget.applyDRWithStab(targetStats[9]);
+    newTarget.setIsLarge(document.getElementById("largeToggle").checked);
+    newTarget.setIsBoss(document.getElementById("bossToggle").checked);
     // apply global stat buffs
     GlobalBuffManager.getInstance().setGlobalAttack(globalBuffs[0]);
     GlobalBuffManager.getInstance().setGlobalDamage(globalBuffs[1]);
@@ -1038,16 +1040,7 @@ function checkSkillType() {
     let actionDiv = document.getElementById("Skill").children;
     let doll = GameStateManager.getInstance().getDoll(actingDoll);
     let skillData = doll.getFinalSkillData()[selectedSkill];
-    if (skillData[SkillJSONKeys.TYPE] == "Attack") {
-        d3.select(actionDiv[7]).style("display", "none");
-        d3.select(actionDiv[8]).style("display", "none");
-        // clear the selections while hiding it
-        selectedBuffTarget = "";
-        actionDiv[7].textContent = "Target:";
-        // activate the perform action button if not a buffing skill
-        document.getElementById("startButton").disabled = false;
-    }
-    else {
+    if (skillData[SkillJSONKeys.TYPE] == "Buff") {
         // check the target of the buffing skill, self, all, or ally, only ally allows target selection, the other 2 automatically target self
         d3.select(actionDiv[7]).style("display", "initial");
         if (skillData[SkillJSONKeys.BUFF_TARGET] == "Ally") {
@@ -1063,7 +1056,15 @@ function checkSkillType() {
             // since there is no need to select a target, activate the perform action button
             document.getElementById("startButton").disabled = false;
         }
-        
+    }
+    else {
+        d3.select(actionDiv[7]).style("display", "none");
+        d3.select(actionDiv[8]).style("display", "none");
+        // clear the selections while hiding it
+        selectedBuffTarget = "";
+        actionDiv[7].textContent = "Target:";
+        // activate the perform action button if not a buffing skill
+        document.getElementById("startButton").disabled = false;
     }
 }
 // create cards that show a Doll's stats, index, and cooldowns

@@ -494,6 +494,8 @@ export class Papasha extends Doll {
         }
         else {
             summon.getSkillDamage(SkillNames.SKILL3, target, calculationType, conditionalTriggered);
+            // don't forget to end papasha's own turn
+            this.endTurn();
         }
         // summon buff durations are timed with papasha end turn
         summon.endTurn();
@@ -1261,9 +1263,9 @@ export class Klukai extends Doll {
             if (weaknesses.includes(Elements.CORROSION) || weaknesses.includes(AmmoTypes.MEDIUM))
                 conditionalTriggered[2] = true;
         }
-        // assume that the target is always a boss and single target scenario
+        // assume that the target is always a single target scenario
         if (skillName == SkillNames.ULT) {
-            if (this.fortification > 2)
+            if (this.fortification > 2 && target.getIsBoss())
                 conditionalTriggered[0] = true;
             // key 2 condition is if ult hits only 1 target
             if (this.keysEnabled[1])
