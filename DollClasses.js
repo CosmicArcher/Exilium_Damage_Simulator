@@ -391,7 +391,7 @@ export class Suomi extends Supporter {
             this.consumeAttackBuffs();
             DamageManager.getInstance().applyFixedDamage(fixedDamage, this.name);
             // apply avalanche stacks
-            if (target) {
+            if (target[0]) {
                 let statusEffects = skill[SkillJSONKeys.POST_TARGET_BUFF];
                 statusEffects.forEach(buff => {
                     let stacks = 1;
@@ -400,7 +400,7 @@ export class Suomi extends Supporter {
                     let duration = -1;
                     if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
                         duration = buff[SkillJSONKeys.BUFF_DURATION];
-                    target.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                    target[0].addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
                 });
             }
             // tick down buffs before applying shield to self

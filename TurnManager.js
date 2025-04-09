@@ -141,7 +141,7 @@ class TurnManager {
                     // DoT action format is [null, target, buffName, sourceName]
                     currentAction[1].takeDoTDamage(currentAction[2], currentAction[3]);
                 }
-                console.log(TurnManagerSingleton.actionSequence);
+                
                 console.log("Actions left: " + TurnManagerSingleton.actionSequence.length);
             }
             TurnManagerSingleton.actionsRunning = false;
