@@ -113,8 +113,8 @@ class StatTracker {
     addFixedDamage(param) {
         if (StatTrackerSingleton) {
             if (StatTrackerSingleton.dolls[StatTrackerSingleton.actionCount + 1].hasOwnProperty(param[0])) {
-                StatTrackerSingleton.dolls[StatTrackerSingleton.actionCount + 1][param[0]]["Special"]["Fixed"] += param[5];
-                StatTrackerSingleton.dolls[StatTrackerSingleton.actionCount + 1][param[0]]["Special"]["Total"] += param[5];
+                StatTrackerSingleton.dolls[StatTrackerSingleton.actionCount + 1][param[0]]["Special"]["Fixed"] += param[2];
+                StatTrackerSingleton.dolls[StatTrackerSingleton.actionCount + 1][param[0]]["Special"]["Total"] += param[2];
             }
             else
                 console.error(`${param[0]} name does not exist in stat tracker`);
