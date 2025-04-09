@@ -100,25 +100,55 @@ class TurnManager {
         else
             console.error("Singleton not yet initialized");
     }
-
-    processActionSequence() {
+    // for skills that buff targets rather than attacking an enemy
+    useBuffSkill(dollName, targetName, skillName, conditionalOverride = [false]) {
+        if (TurnManagerSingleton) {
+            let doll = GameStateManager.getInstance().getDoll(dollName);
+            let buffTarget = GameStateManager.getInstance().getDoll(targetName);
+            let calcType = GameStateManager.getInstance().getDollCalcType(dollName);
+            TurnManagerSingleton.actionSequence.push([dollName, [null, buffTarget], skillName, calcType, conditionalOverride]);
+            if (!TurnManagerSingleton.actionsRunning)
+                TurnManagerSingleton.processActionSequence();
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // for inserting DoT triggering into the action sequence as certain supports like peritya's can cut in between DoTs
+    activateDoT(buffName, sourceName) {
+        let target = GameStateManager.getInstance().getTarget();
+        // leave the first element as empty to be identified as a DoT action instead of a skill
+        TurnManagerSingleton.actionSequence.push([null, target, buffName, sourceName]);
+        if (!TurnManagerSingleton.actionsRunning)
+            TurnManagerSingleton.processActionSequence(false);
+    }
+    // go through the action sequence as a stack where any new actions triggered by the latest will be processed first over the default targeted supports
+    processActionSequence(isAttack = true) { // isAttack is a flag used to determine whether the sequence was started by the perform action or end round button
         if (TurnManagerSingleton) {
             TurnManagerSingleton.actionsRunning = true;
             while (TurnManagerSingleton.actionSequence.length > 0) {
                 let currentAction = TurnManagerSingleton.actionSequence.pop();
-                let doll = GameStateManager.getInstance().getDoll(currentAction[0]);
-                // actions are an array consisting of [dollName, target/[target, supported doll], skillName, calculationType, conditionalOverride]
-                if (![SkillNames.SUPPORT, SkillNames.INTERCEPT, SkillNames.COUNTERATTACK].includes(currentAction[2])) {
-                    doll.getSkillDamage(currentAction[2], currentAction[1], currentAction[3], currentAction[4]);
+                // check if action is a skill use or a DoT trigger
+                if (currentAction[0] != null) {
+                    let doll = GameStateManager.getInstance().getDoll(currentAction[0]);
+                    // actions are an array consisting of [dollName, target/[target, supported doll], skillName, calculationType, conditionalOverride]
+                    if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(currentAction[2])) {
+                        doll.getSkillDamage(currentAction[2], currentAction[1], currentAction[3], currentAction[4]);
+                    }
+                    else
+                        doll.useSupportSkill(currentAction[1], currentAction[3], currentAction[4]);
                 }
-                else
-                    doll.useSupportSkill(currentAction[1], currentAction[3], currentAction[4]);
-
+                else {
+                    // DoT action format is [null, target, buffName, sourceName]
+                    currentAction[1].takeDoTDamage(currentAction[2], currentAction[3]);
+                }
+                
                 console.log("Actions left: " + TurnManagerSingleton.actionSequence.length);
             }
             TurnManagerSingleton.actionsRunning = false;
             // once all the supports and skill are used, lock the end state and prepare a new set of clones for the next action
-            GameStateManager.getInstance().lockAction();
+            if (isAttack)
+                GameStateManager.getInstance().lockAction();
+            // if action sequence was started by a dot triggered on turn end, do not lock action because the end round button will have already called it
         }
         else
             console.error("Singleton not yet initialized");
@@ -218,6 +248,7 @@ class TurnManager {
             let element = damageData[2];
             let ammo = damageData[3];
             let damageType = damageData[4];
+            let skillName = damageData[1];
             // check if array for that key already exists
             if (TurnManagerSingleton.damageListeners.hasOwnProperty(element)) {
                 TurnManagerSingleton.damageListeners[element].forEach(dollName => {
@@ -235,6 +266,12 @@ class TurnManager {
                 TurnManagerSingleton.damageListeners[damageType].forEach(dollName => {
                     let doll = GameStateManager.getInstance().getDoll(dollName)
                     doll.checkDamage(damageType, damageData[0]);
+                })
+            }
+            if (TurnManagerSingleton.damageListeners.hasOwnProperty(skillName)) {
+                TurnManagerSingleton.damageListeners[skillName].forEach(dollName => {
+                    let doll = GameStateManager.getInstance().getDoll(dollName)
+                    doll.checkDamage(skillName, damageData[0]);
                 })
             }
         }
@@ -255,7 +292,8 @@ class TurnManager {
     // when a conditional support is met (aoe, debuff application, etc.)
     alertPendingSupport(dollName) {
         if (TurnManagerSingleton) {
-            TurnManagerSingleton.actionSequence.push([dollName, GameStateManager.getInstance().getTarget(), SkillNames.SUPPORT, CalculationTypes.EXPECTED, [false]]);
+            let calcType = GameStateManager.getInstance().getDollCalcType(dollName);
+            TurnManagerSingleton.actionSequence.push([dollName, GameStateManager.getInstance().getTarget(), SkillNames.SUPPORT, calcType, [false]]);
         }
         else
             console.error("Singleton not yet initialized");

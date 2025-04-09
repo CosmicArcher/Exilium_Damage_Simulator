@@ -1327,6 +1327,7 @@
         },
         "Skill2" : {
             "Type" : "Attack",
+            "Cost" : 3,
             "Multiplier" : 0.8,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 3,
@@ -1336,20 +1337,17 @@
                 "Type" : "Attack",
                 "Multiplier" : 0.6,
                 "Damage_Type" : "AoE",
-                "StabilityDamage" : 3,
-                "Ammo_Type" : "Medium",
+                "StabilityDamage" : 0,
+                "Ammo_Type" : "None",
                 "Element" : "Corrosion"
             },
-            "Conditional" : {
-                "Condition_Text" : "No Kill",
-                "Post_Target_Buff" : [{
-                    "Name" : "Corrosive Infusion",
-                    "Duration" : 2
-                }]
-            }
+            "Conditional" : [{
+                "Condition_Text" : "1+ Kill"
+            }]
         },
         "Skill3" : {
             "Type" : "Attack",
+            "Cost" : 3,
             "Multiplier" : 0.9,
             "Damage_Type" : "AoE",
             "StabilityDamage" : 1,
@@ -1366,9 +1364,10 @@
         },
         "Ultimate" : {
             "Type" : "Attack",
+            "Cooldown" : 6,
             "Multiplier" : 1,
             "Damage_Type" : "AoE",
-            "StabilityDamage" : 0,
+            "StabilityDamage" : 2,
             "Ammo_Type" : "None",
             "Element" : "Corrosion",
             "Conditional" : [{

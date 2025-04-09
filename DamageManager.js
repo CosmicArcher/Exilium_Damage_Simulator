@@ -112,7 +112,7 @@ class DamageManager {
         if (weaknessModifier == 1)
             target.reduceStability(totalStabDamage);
         // inform the target that it has been "hit" and reduce the counters of any buffs that last for a number of hits rather than turns
-        target.takeDamage(element);
+        target.takeDamage(element, attacker.getName());
         EventManager.getInstance().broadcastEvent("damageDealt", [attacker, target, damage, element, target.getStability(), isCrit]);
         // alert any listeners that damage of this type triggers effects on
         EventManager.getInstance().broadcastEvent("damageDealtTypes", [attacker.getName(), skillName, element, ammoType, damageType, damage, isCrit]);
@@ -121,7 +121,7 @@ class DamageManager {
     // will pass the damage to an event observer manager later
     applyFixedDamage(damage, sourceName) {
         let target = GameStateManager.getInstance().getTarget();
-        target.takeDamage("");
+        target.takeDamage("", sourceName);
         damage = Math.max(damage,1);
         EventManager.getInstance().broadcastEvent("fixedDamage", [sourceName, target, damage, target.getStability()]);
     }

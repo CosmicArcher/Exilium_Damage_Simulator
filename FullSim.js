@@ -97,6 +97,8 @@ function addDoll() {
     newNode.children[7].textContent = "None";
     newNode.children[9].textContent = "None";
     newNode.children[11].textContent = "None";
+    // deactivate the start button until all doll slots have a selected doll
+    document.getElementById("startButton").disabled = true;
     // if the phase buffs are open in the original div, close it
     d3.select(newNode.lastElementChild.lastElementChild).style("display", "none");
 
@@ -118,7 +120,7 @@ function addCalcOption() {
     // add a row under the calculation settings section
     let newSetting = document.getElementById("CalcSettings").children[1].cloneNode(true);
     newSetting.firstChild.textContent = "Doll: ";
-    newSetting.firstElementChild.textContent = "Calculation";
+    newSetting.firstElementChild.textContent = "Select Calculation Type";
     newSetting.id = "Settings_" + (numDolls + numSummons);
     d3.select(newSetting.lastElementChild).on("click", () => {
         // reuse the dropdown among all buttons for this setting
@@ -156,7 +158,7 @@ function removeDoll(index) {
     d3.select("#Doll_" + (index + 1)).remove();
     // remove the doll's entry in the calculation settings section too
     calcSettings.splice(index, 1);
-    spliceNodeList(document.getElementById("CalcSettings").children, 2 * index + 1, 2);
+    d3.select("#Settings_" + (index + 1)).remove();
     // remove their respective conditional toggles
     d3.select("#Conditional_" + (index + 1)).remove();
     // shift the id numbers of the ones after that set
@@ -207,10 +209,15 @@ function initializeDollButtons(index) {
                                 dollStats[index == 0 ? 8 : 9].textContent = "None";
                                 dollStats[index == 0 ? 10 : 11].textContent = "None";
                                 selectedKeys[dollIndex] = [0,0,0,0,0,0];
-                                // selecting doll 1 enables the start button
-                                if (dollIndex == 0) {
-                                    d3.select("#startButton").node().disabled = false;
+                                // selecting a doll in every slot re-enables the start button
+                                let dollsSet = true;
+                                for (let i = 0; i < numDolls && dollsSet; i++) {
+                                    // if any of the doll slots still does not have a selected doll, exit the loop early
+                                    if (selectedDolls[i] == "")
+                                        dollsSet = false;
                                 }
+                                if (dollsSet)
+                                    document.getElementById("startButton").disabled = false;
                             });
             });
         }
@@ -381,6 +388,8 @@ function hideDropdowns() {
         targetStatDropdown.style("display", "none");
     if (dollCardDropdown)
         dollCardDropdown.style("display", "none");
+    if (buffTargetDropdown)
+        buffTargetDropdown.style("display", "none");
 }
 
 function getNestedInput(arr, htmlElement) {
@@ -424,12 +433,6 @@ function getConditionalOverrides() {
         }
     }
     return overrides;
-}
-
-// get the skill keys of doll at index
-function getDollSkills(index) {
-    let dollSkills = ResourceLoader.getInstance().getSkillData(selectedDolls[index]);
-    return Object.keys(dollSkills);
 }
 // get the key data of doll at index
 function getDollKeys(index) {
@@ -623,6 +626,8 @@ var selectedSkill = "";
 var skillOptions;
 var currentBuffs;
 var selectedBuff = "";
+var selectedBuffTarget = "";
+var buffTargetDropdown;
 var dollCardDropdown;
 // options for stat display/editing
 var statOptions = ["Attack",
@@ -690,8 +695,18 @@ function startSimulation() {
     d3.select("#startButton").text("Perform Action")
                             .on("click", () => {
                                 let conditionalOverrides = getConditionalOverrides();
+                                // get the index of the acting doll
+                                let actingIndex = 0;
+                                selectedDolls.forEach((doll, index) => {
+                                    if (doll == actingDoll)
+                                        actingIndex = index;
+                                });
                                 // tbh there is no support that has a conditional to my knowledge
-                                TurnManager.getInstance().useDollSkill(actingDoll, selectedSkill, conditionalOverrides[0]);
+                                // check if the skill is an attack or buffing skill
+                                if (selectedBuffTarget == "")
+                                    TurnManager.getInstance().useDollSkill(actingDoll, selectedSkill, conditionalOverrides[actingIndex]);
+                                else 
+                                    TurnManager.getInstance().useBuffSkill(actingDoll, selectedBuffTarget, selectedSkill, conditionalOverrides[actingIndex]);
                                 // refresh doll stat displays
                                 for (let i = 0; i < numDolls + numSummons; i++) {
                                     refreshDollDisplay(i);
@@ -702,9 +717,17 @@ function startSimulation() {
                                 // disable start and skill buttons again until new doll and skill are chosen
                                 document.getElementById("startButton").disabled = true;
                                 selectedSkill = "";
-                                document.getElementById("Skill").lastElementChild.disabled = true;
-                                document.getElementById("Skill").children[1].textContent = "Doll: ";
-                                document.getElementById("Skill").children[4].textContent = "Skill: ";
+                                let actionDiv = document.getElementById("Skill").children;
+                                actionDiv[5].disabled = true;
+                                actionDiv[1].textContent = "Doll: ";
+                                actionDiv[4].textContent = "Skill: ";
+                                // hide the conditional toggles since the skill has been used
+                                updateConditionalToggles();
+                                d3.select(actionDiv[7]).style("display", "none");
+                                d3.select(actionDiv[8]).style("display", "none");
+                                // clear the selections while hiding it
+                                selectedBuffTarget = "";
+                                actionDiv[7].textContent = "Target:";
                                 // allow the rewind button to be pressed because there is now an action that we can rewind
                                 document.getElementById("rewindButton").disabled = false;
                             });
@@ -713,6 +736,14 @@ function startSimulation() {
     d3.select("#rewindButton").on("click", event => {
         // undo the previous action
         GameStateManager.getInstance().rewindToAction(GameStateManager.getInstance().getActionCount() - 1);
+        // disable start and skill buttons again until new doll and skill are chosen
+        document.getElementById("startButton").disabled = true;
+        selectedSkill = "";
+        document.getElementById("Skill").children[5].disabled = true;
+        document.getElementById("Skill").children[1].textContent = "Doll: ";
+        document.getElementById("Skill").children[4].textContent = "Skill: ";
+        // hide the conditional toggles since the skill has been used
+        updateConditionalToggles();
         // refresh doll stat displays
         for (let i = 0; i < numDolls + numSummons; i++) {
             refreshDollDisplay(i);
@@ -801,6 +832,7 @@ function initializeActionButtons() {
                                 document.getElementById("startButton").disabled = true;
                                 // changing doll deselects the previously chosen skill
                                 selectedSkill = "";
+                                actionDiv[4].textContent = "Skill: ";
                                 updateConditionalToggles();
                             });
             });
@@ -842,9 +874,8 @@ function initializeActionButtons() {
                             .on("click", () => {
                                 selectedSkill = skillName;
                                 actionDiv[4].textContent = "Skill: " + skillName;
-                                // activate the perform action button
-                                document.getElementById("startButton").disabled = false;
                                 updateConditionalToggles();
+                                checkSkillType();
                             });
             });
             
@@ -854,13 +885,46 @@ function initializeActionButtons() {
             }
             else
                 hideDropdowns();
+            // also remove the doll dropdown if it is active
+            if (dollOptions) {
+                dollOptions.remove();
+                dollOptions = null;
+            }
         }
+    });
+
+    // show a list of all dolls that will be used for selecting buff targets
+    buffTargetDropdown = d3.select(actionDiv[8]).append("div").attr("class", "dropdownBox").style("display", "none");
+    selectedDolls.forEach(doll => {
+        buffTargetDropdown.append("a")
+                    .text(doll)
+                    .on("click", () => {
+                        selectedBuffTarget = doll;
+                        actionDiv[7].textContent = "Target: " + doll; 
+                        // activate the perform action button now that a buff target has been selected
+                        document.getElementById("startButton").disabled = false;
+                    });
+    });
+    d3.select(actionDiv[8]).on("click", () => {
+        if (buffTargetDropdown.style("display") == "none") {
+            hideDropdowns();
+            buffTargetDropdown.style("display", "block");
+        }
+        else
+            hideDropdowns();
     });
 }
 
 function getSkillConditionals(skillName, index) {
     let conditionals = [];
-    // get the doll's inherent skill conditionals
+    let doll = GameStateManager.getInstance().getDoll(selectedDolls[index]);
+    let skillData = doll.getFinalSkillData();
+    if (skillData[skillName].hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
+        skillData[skillName][SkillJSONKeys.CONDITIONAL].forEach(condition => {
+            conditionals.push(condition);
+        });
+    }
+    /*// get the doll's inherent skill conditionals
     let baseSkill = ResourceLoader.getInstance().getSkillData(selectedDolls[index])[skillName];
     if (baseSkill.hasOwnProperty(SkillJSONKeys.CONDITIONAL)) {
         baseSkill[SkillJSONKeys.CONDITIONAL].forEach(obj => {
@@ -923,7 +987,7 @@ function getSkillConditionals(skillName, index) {
                 });
             }
         }
-    }
+    }*/
     return conditionals;
 }
 // adjust the conditionalDiv content based on how many conditionals are present in the doll's skill
@@ -941,7 +1005,7 @@ function updateConditionalToggles() {
         if (skillConditionals.length > 0) {
             d3.select(conditionalDiv).style("display", "block");
             // write the name of the doll these conditionals belong to
-            conditionalDiv.firstElementChild.textContent = doll;
+            conditionalDiv.firstElementChild.textContent = doll + " " + doll == actingDoll ? selectedSkill : "Support";
             // adjust the number of toggles to match the number of conditionals
             while (skillConditionals.length > conditionalDiv.children.length / 3) {
                 d3.select(conditionalDiv).append("br");
@@ -963,6 +1027,39 @@ function updateConditionalToggles() {
                 spliceNodeList(conditionalDiv.children, 3, conditionalDiv.children.length - 3);
         }
     });
+}
+// check if the selected skill is an attack or buffing skill and display/hide the buff target selection
+function checkSkillType() {
+    let actionDiv = document.getElementById("Skill").children;
+    let doll = GameStateManager.getInstance().getDoll(actingDoll);
+    let skillData = doll.getFinalSkillData()[selectedSkill];
+    if (skillData[SkillJSONKeys.TYPE] == "Attack") {
+        d3.select(actionDiv[7]).style("display", "none");
+        d3.select(actionDiv[8]).style("display", "none");
+        // clear the selections while hiding it
+        selectedBuffTarget = "";
+        actionDiv[7].textContent = "Target:";
+        // activate the perform action button if not a buffing skill
+        document.getElementById("startButton").disabled = false;
+    }
+    else {
+        // check the target of the buffing skill, self, all, or ally, only ally allows target selection, the other 2 automatically target self
+        d3.select(actionDiv[7]).style("display", "initial");
+        if (skillData[SkillJSONKeys.BUFF_TARGET] == "Ally") {
+            d3.select(actionDiv[8]).style("display", "initial");
+            // deactivate the perform action button while a buff target has not yet been selected
+            document.getElementById("startButton").disabled = true;
+        }
+        else {
+            d3.select(actionDiv[8]).style("display", "none");
+            // automatically set selected buff target as self
+            selectedBuffTarget = actingDoll;
+            actionDiv[7].textContent = "Target: " + actingDoll;
+            // since there is no need to select a target, activate the perform action button
+            document.getElementById("startButton").disabled = false;
+        }
+        
+    }
 }
 // create cards that show a Doll's stats, index, and cooldowns
 function initializeDollCards() {
@@ -1007,11 +1104,14 @@ function initializeDollCards() {
                 targetBuffDisplay.text("Hide Current Buffs");
                 // we can share the dropdown with the dolls because it gets deleted repeatedly so the onclick function constantly changes
                 currentBuffs = targetBuffDisplay.append("div").attr("class", "dropdownBox");
+                // refresh target reference
+                target = GameStateManager.getInstance().getTarget();
                 let buffs = target.getBuffs();
                 // selecting buffs allows the user to remove it from the unit
                 buffs.forEach(buff => {
                     currentBuffs.append("a")
-                                .text(buff[0])
+                                // display stacks, buffname, duration left
+                                .text(`${buff[3] != 1 ? buff[3] + " " : ""}${buff[0]} - ${buff[2] > 0 ? buff[2] : "Indefinite"} Turns`)
                                 .on("click", () => {
                                     // only allow the remove button to be clicked and disable all the other buff edit buttons on other doll cards 
                                     disableBuffEditButtons();
@@ -1044,6 +1144,7 @@ function initializeDollCards() {
                                 .attr("disabled", "true")
                                 .on("click", event => {
                                     // only add 1 stack and 1 turn of the buff
+                                    target = GameStateManager.getInstance().getTarget();
                                     target.addBuff(selectedBuff, selectedDolls[dollNum], 1, 1);
                                     // after removing the buff, disable the button until another buff is selected
                                     event.target.disabled = true;
@@ -1054,6 +1155,7 @@ function initializeDollCards() {
                                 .style("float", "right")
                                 .attr("disabled", "true")
                                 .on("click", event => {
+                                    target = GameStateManager.getInstance().getTarget();
                                     target.removeBuff(selectedBuff);
                                     // after removing the buff, disable the button until another buff is selected
                                     event.target.disabled = true;
@@ -1153,11 +1255,14 @@ function initializeDollCards() {
                 hideDropdowns();
                 buffDisplay.text("Hide Current Buffs");
                 currentBuffs = buffDisplay.append("div").attr("class", "dropdownBox");
+                // refresh doll reference to get latest version of the doll
+                doll = GameStateManager.getInstance().getDoll(selectedDolls[i]);
                 let buffs = doll.getBuffs();
                 // selecting buffs allows the user to remove it from the unit
                 buffs.forEach(buff => {
                     currentBuffs.append("a")
-                                .text(buff[0])
+                                // display stacks, buffname, duration left
+                                .text(`${buff[3] != 1 ? buff[3] + " " : ""}${buff[0]} - ${buff[2] > 0 ? buff[2] : "Indefinite"} Turns`)
                                 .on("click", event => {
                                     let dollNum = +event.target.parentNode.parentNode.parentNode.id.slice(5);
                                     // only allow the remove button to be clicked and disable all the other buff edit buttons on other doll cards 
@@ -1676,6 +1781,9 @@ function refreshTurnText() {
     dolls.forEach(doll => {
         readyDolls += doll.hasTurnAvailable();
     });
-    textHTML[0].textContent = `Round ${GameStateManager.getInstance().getRoundNumber()}: ${readyDolls > 0 ? "Your" : "Enemy"} Turn`;
+    d3.select(textHTML[0]).style("opacity", 0).transition()
+                        .duration(200)
+                        .style("opacity", 1)
+                        .text(`Round ${GameStateManager.getInstance().getRoundNumber()}: ${readyDolls > 0 ? "Your" : "Enemy"} Turn`);
     textHTML[1].textContent = `Total Damage: ${StatTracker.getInstance().getTotalDamage()}`;
 }

@@ -171,7 +171,7 @@ class Target extends Unit {
     applyDRPerStab(x) {this.drPerStab = x;}
     applyDRWithStab(x) {this.drWithStab = x;}
     // check if any buffs get consumed by defending and reduce a stack
-    takeDamage(element) {
+    takeDamage(element, attackerName) {
         this.currentBuffs.forEach((buff) => {
             if (buff[5] == "Defense") { // check if buff stacks are consumed by defending
                 buff[3]--;
@@ -193,15 +193,24 @@ class Target extends Unit {
                 }
                 EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, 1, buff[0]]);
             }
-            // if the target has corrosive infusion and takes corrosion damage, add another stack
-            else if (buff[0].match("Corrosive Infusion") && element == Elements.CORROSION) {
+            // if the target has corrosive infusion and takes corrosion damage from not Klukai, add another stack
+            else if (buff[0].match("Corrosive Infusion") && element == Elements.CORROSION && attackerName != "Klukai") {
                 let doll = GameStateManager.getInstance().getDoll(buff[6]);
                 if (doll.fortification < 2)
                     this.addBuff("Corrosive Infusion", "Klukai", 2, 1);
-                else
-                    this.addBuff("Corrosive Infusion V2", "Klukai", 2, 1);
+                else // v2+ klukai applies 2 stacks for allied corrosion damage or her own attacks on a target with corrosive infusion
+                    this.addBuff("Corrosive Infusion V2", "Klukai", 2, 2);
             }
         });
+        // if Klukai is present and corrosive damage is taken from not Klukai, give her 1 index, also grant 1 passive stack if v2+
+        if (element == Elements.CORROSION && GameStateManager.getInstance().hasDoll("Klukai") && attackerName != "Klukai") {
+            let doll = GameStateManager.getInstance().getDoll("Klukai");
+            doll.adjustIndex(1);
+            // check if v2+ to apply 1 competitive spirit stack
+            if (doll.getFortification() > 1) {
+                doll.addBuff("Competitive Spirit V2", "Klukai", -1, 1);
+            }
+        }
     }
     // called to decrease the counter of buffs that only tick down from the primary attacker and not supports
     takePrimaryDamage() {

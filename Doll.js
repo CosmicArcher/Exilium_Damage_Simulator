@@ -78,6 +78,8 @@ class Doll extends Unit {
     getCIndex() {return this.CIndex;}
     getCooldowns() {return this.cooldowns;}
     getFinalSkillData() {return this.skillData;}
+    getFortification() {return this.fortification;}
+    getKeyEnabled(index) {return this.keysEnabled[index];} 
 
     getAttack() {return this.attack * (1 + this.attackBoost + GlobalBuffManager.getInstance().getGlobalAttack());}
     getCritRate() {return this.critChance;}

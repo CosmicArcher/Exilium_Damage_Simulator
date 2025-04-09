@@ -92,7 +92,8 @@ const BuffJSONKeys = {
     DEFENSE_IGNORE : "Defense_Ignore",
     AOE_DAMAGE_TAKEN : "AoE_Damage_Taken",
     TARGETED_DAMAGE_TAKEN : "Targeted_Damage_Taken",
-    PHASE_DAMAGE : "Phase_Damage"
+    PHASE_DAMAGE : "Phase_Damage",
+    ELEMENTAL_DAMAGE : "Elemental_Damage" // elemental damage buffs, value is an object where key is the element and value is the amount of damage increase
 }
 
 export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes, BuffJSONKeys};

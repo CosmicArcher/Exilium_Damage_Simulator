@@ -432,12 +432,23 @@
         "Cleanseable" : 0,
         "Element" : "Corrosion"
     },
-    "Toxic Infiltration V5" : {
-        "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+    "Competitive Spirit" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Element" : "Corrosion"
+        "Stackable" : 1,
+        "Stack_Limit" : 8,
+        "Elemental_Damage" : {"Corrosion" : 0.05}
+    },
+    "Competitive Spirit V2" : {
+        "Buff_Type" : "Buff",
+        "Turn_Based" : 0,
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0,
+        "Stackable" : 1,
+        "Stack_Limit" : 12,
+        "Elemental_Damage" : {"Corrosion" : 0.05}
     },
     "Damage Up 1" : {
         "Buff_Type" : "Buff",

@@ -80,7 +80,7 @@
     <div style="width: 100%; display: table;">
         <a href="./index.html" class="pageTab">Simple Sim</a>
         <a href="./FullSim.html" id = "refreshPage" class="pageTab" style="float: right;">Return to Start</a>
-        <h1 style="text-align: center;">Turn-by-Turn Combat Sim</h1>
+        <h1 style="text-align: center; margin-top: -20px;">Turn-by-Turn Combat Sim</h1>
         <div class="column" style="background-color: lightgray;">
             <div id = "TargetColumn">
                 <h2>Target Stats</h2>
@@ -208,12 +208,14 @@
                 <label>Doll:</label>
                 <button>Select Doll</button><br>
                 <label>Skill:</label>
-                <button disabled>Select Skill</button>
+                <button disabled>Select Skill</button><br>
+                <label style="display: none;">Target:</label>
+                <button style="display: none;">Buff Target</button>
             </div>
             <div style="display: none;" id = "ConditionalHolder">
                 <div id = "Conditional_1" style="display: none; white-space: normal;">
                     <p>Doll</p>
-                    <input type="checkbox" >
+                    <input type="checkbox">
                     <label>Condition</label>
                 </div>
             </div>
