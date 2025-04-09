@@ -97,6 +97,8 @@ function addDoll() {
     newNode.children[7].textContent = "None";
     newNode.children[9].textContent = "None";
     newNode.children[11].textContent = "None";
+    // deselect the phase strike toggle if the first slot had it selected
+    newNode.children[13].checked = false;
     // deactivate the start button until all doll slots have a selected doll
     document.getElementById("startButton").disabled = true;
     // if the phase buffs are open in the original div, close it
@@ -304,6 +306,9 @@ function createDollsFromInput() {
         newDoll.setElementDamage(Elements.CORROSION, dollStats[18]);
         newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
         newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
+        // get the phase strike checkbox input
+        if (document.getElementById("Doll_" + (i + 1)).children[i == 0 ? 12 : 13].checked)
+            newDoll.applyPhaseStrike();
         dolls.push(newDoll);
         // papasha summon inherits the same atk, def, hp but not damage buffs or crit
         if (selectedDolls[i] == "Papasha") {

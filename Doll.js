@@ -62,6 +62,8 @@ class Doll extends Unit {
         this.baseStabilityDamageModifier = 0;
         this.baseStabilityIgnore = 0;
         this.baseAttackBoost = 0;
+        // phase strike is a 15% damage buff if the target has any elemental debuffs
+        this.hasPhaseStrike = false;
         // keys will be arranged numerically
         this.keysEnabled = keys;
 
@@ -87,6 +89,7 @@ class Doll extends Unit {
     getBaseCrit() {return this.baseCritChance;}
     getBaseCritDamage() {return this.baseCritDamage;}
     getBaseAttack() {return this.attack;}
+    getPhaseStrike() {return this.hasPhaseStrike;}
     // get any stats relevant to damage calculation
     getDefenseIgnore() {return this.defenseIgnore;}
     getDamageDealt() {return this.damageDealt;}
@@ -189,6 +192,8 @@ class Doll extends Unit {
         this.attackBoost += x;
     }
     setAttack(x) {this.attack = x;}
+    // the value should never change once the simulation starts so there is no need to have a way to set the flag back to the default value of false
+    applyPhaseStrike() {this.hasPhaseStrike = true;}
     setCritRate(x) {
         this.resetCrit();
         this.baseCritChance = x;
@@ -841,6 +846,8 @@ class Doll extends Unit {
         newDoll.setStabilityIgnore(this.baseStabilityIgnore);
         newDoll.setAttackBoost(this.baseAttackBoost);
         newDoll.setDefenseBuffs(this.baseDefenseBuffs);
+        if (this.hasPhaseStrike)
+            newDoll.applyPhaseStrike();
 
         if (!this.buffsEnabled)
             newDoll.disableBuffs();

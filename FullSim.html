@@ -82,7 +82,7 @@
         <a href="./FullSim.html" id = "refreshPage" class="pageTab" style="float: right;">Return to Start</a>
         <h1 style="text-align: center; margin-top: -20px;">Turn-by-Turn Combat Sim</h1>
         <div class="column" style="background-color: lightgray;">
-            <div id = "TargetColumn">
+            <div id = "TargetColumn" style="margin-top: -30px;">
                 <h2>Target Stats</h2>
                 <label for = "targetDef">Defense:</label>
                 <input type = "text" id = "targetDef"><br>
@@ -91,7 +91,7 @@
                 <button id = "AmmoWeakness">Select Ammo Weakness</button><br>
                 <label for = "targetCover">Cover Value (0.0x):</label>
                 <input type = "text" id = "targetCover"><br>
-                <label for = "targetStability">Stability:</label>
+                <label for = "targetStability">Max Stability:</label>
                 <input type = "text" id = "targetStability"><br>
                 <div style="height: 200px;" class="statScroll">
                     <label for = "targetDefBuffs">Defense Buffs/Debuffs Sum (+- 0.0x):</label>
@@ -137,6 +137,7 @@
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label><br>
+                <input type="checkbox"><label> Has Phase Strike</label>
                 <label >Base Attack:</label>
                 <input type = "text"><br>
                 <label >Base Crit Rate (0.0x):</label>

@@ -75,6 +75,17 @@ class DamageManager {
         totalBuffs += target.getDamageTaken();
         totalBuffs += attacker.getDamageDealt();
         totalBuffs += GlobalBuffManager.getInstance().getGlobalDamage();
+        // check if the attacker has phase strike and then check if the target has elemental debuffs then add the damage if true
+        if (attacker.getPhaseStrike()) {
+            let elements = Object.values(Elements);
+            let hasElementalDebuff = false;
+            for (let i = 0; i < elements.length && !hasElementalDebuff; i++) {
+                if (target.hasBuffElement(elements[i], true))
+                    hasElementalDebuff = true;
+            }
+            if (hasElementalDebuff)
+                totalBuffs += 0.15;
+        }
         if (damageType == AttackTypes.TARGETED) {
             totalBuffs += target.getTargetedDamageTaken();
             totalBuffs += attacker.getTargetedDamage();
