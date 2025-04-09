@@ -1239,6 +1239,20 @@ export class Klukai extends Doll {
     }
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
+        // v6 klukai ult triggers corrosive infusion and toxic infiltration after the attack
+        // because applyDoT simply adds the DoT trigger function to the turn manager sequence, there are no issues using these functions before the DoTs
+        // are applied by the attack, they are placed here to allow peritya support to squeeze in between the attack and the triggered DoTs
+        if (skillName == SkillNames.ULT && this.fortification == 6) {
+            // klukai does not have support skills so target always points to the enemy target
+            // it is guaranteed that the target will have both corrosive infusion and toxic infiltration so there is no need to check
+            target.applyDoT("Toxic Infiltration", this.name);
+            target.applyDoT("Corrosive Infusion V2", this.name);
+        }
+        // v1+ klukai skill3 triggers the death effect of toxic infiltration if the target survives
+        else if (skillName == SkillNames.SKILL3 && this.fortification > 0) {
+            target.applyDoT("Toxic Infiltration", this.name);
+        }
+
         // prevent index gain from converting to ult cdr while acting
         this.isActing = true; 
         // v4 skill2 3rd conditional is phase exploit, 1st and 2nd conditionals are assumed always false due to the nature of the simulation
@@ -1323,17 +1337,6 @@ export class Klukai extends Doll {
             target.addBuff("Corrosive Infusion V2", this.name, 2, dotStacks);
         else
             target.addBuff("Corrosive Infusion", this.name, 2, dotStacks);
-        // v6 klukai ult triggers corrosive infusion and toxic infiltration after the attack
-        if (skillName == SkillNames.ULT && this.fortification == 6) {
-            // klukai does not have support skills so target always points to the enemy target
-            // it is guaranteed that the target will have both corrosive infusion and toxic infiltration so there is no need to check
-            target.applyDoT("Corrosive Infusion V2", this.name);
-            target.applyDoT("Toxic Infiltration", this.name);
-        }
-        // v1+ klukai skill3 triggers the death effect of toxic infiltration if the target survives
-        else if (skillName == SkillNames.SKILL3 && this.fortification > 0) {
-            target.applyDoT("Toxic Infiltration", this.name);
-        }
         // ult 1st conditional is to allow reactivation of the ultimate but only once per turn
         if (!this.repeatedSkill) {
             if (skillName == SkillNames.ULT && conditionalTriggered[0]) {

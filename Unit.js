@@ -3,6 +3,7 @@ import DamageManager from "./DamageManager.js";
 import EventManager from "./EventManager.js";
 import { AmmoTypes, AttackTypes, BuffJSONKeys, Elements, CalculationTypes } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
+import TurnManager from "./TurnManager.js";
 // root class for dolls (attackers) and targets (defenders)
 class Unit {
     constructor(name, defense) { // some dolls use their defense stats for damage
@@ -43,8 +44,12 @@ class Unit {
                 this.defenseBuffs -= buffData["DefensePerc"];
         }
     }
-    // for applying overburn and corrosive infusion
+    // for alerting DoT damage application to the turn manager since peritya support will trigger in between corrosive infusion and toxic infiltration procs
     applyDoT(buffName, sourceName) {
+        TurnManager.getInstance().activateDoT(buffName, sourceName);
+    }
+    // for taking the DoT damage itself, should only be called by the turn manager
+    takeDoTDamage(buffName, sourceName) {
         let attacker = GameStateManager.getInstance().getDoll(sourceName);
         if (buffName == "Overburn") {
             DamageManager.getInstance().applyFixedDamage(attacker.getAttack() * 0.1, sourceName);
