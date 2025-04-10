@@ -1,0 +1,80 @@
+{
+    "Daydream" : {
+        "Type" : "AR",
+        "Trait" : "Special"
+    },
+    "Golden Melody" : {
+        "Type" : "AR",
+        "Trait" : "Random Buff",
+        "Trigger" : "End"
+    },
+    "Guerno" : {
+        "Type" : "AR",
+        "Trait" : "Random Buff",
+        "Trigger" : "Start"
+    },
+    "Heavy Strings" : {
+        "Type" : "AR",
+        "Trait" : "Random Buff",
+        "Trigger" : "Start"
+    },
+    "Maid's Rules" : {
+        "Type" : "AR",
+        "Trait" : "Special"
+    },
+    "Planeta" : {
+        "Type" : "AR",
+        "Trait" : "Random Attack Buff",
+        "Trigger" : "Start"
+    },
+    "Scylla" : {
+        "Type" : "AR",
+        "Trait" : "Def Ignore",
+        "Base" : "Phase Exploit",
+        "Bonus" : "Corrosion"
+    },
+    "Mjolnir" :  {
+        "Type" : "MG",
+        "Trait" : "AoE Debuff"
+    },
+    "Optical Illusion" : {
+        "Type" : "MG",
+        "Trait" : "AoE Debuff"
+    },
+    "Classified Manuscript" : {
+        "Type" : "SMG",
+        "Trait" : "Move Buff"
+    },
+    "Svarog" : {
+        "Type" : "SMG",
+        "Trait" : "Def Ignore",
+        "Base" : "Debuff Scaling"
+    },
+    "Unspoken Calling" : {
+        "Type" : "SMG",
+        "Trait" : "Move Buff"
+    },
+    "Arcana" : {
+        "Type" : "RF",
+        "Trait" : "Insight Stability Ignore"
+    },
+    "Bittersweet Caramel" : {
+        "Type" : "RF",
+        "Trait" : "Def Ignore",
+        "Base" : "Passive",
+        "Bonus" : "Freeze"
+    },
+    "Eulogistic Verse" : {
+        "Type" : "RF",
+        "Trait" : "Def Ignore",
+        "Base" : "Phase Exploit",
+        "Bonus" : "Freeze"
+    },
+    "Samosek" : {
+        "Type" : "RF",
+        "Trait" : "Insight Stability Ignore"
+    },
+    "Other Gun" : {
+        
+    }
+}

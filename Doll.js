@@ -66,6 +66,9 @@ class Doll extends Unit {
         this.hasPhaseStrike = false;
         // keys will be arranged numerically
         this.keysEnabled = keys;
+        // weapon passives are hardcoded into whichever area they are triggered for now until a more elegant solution is found
+        this.weaponName = "Other Gun";
+        this.weaponCalib = 1;
 
         this.turnAvailable = true;
         this.cooldowns = [0,0,0,0];
@@ -79,6 +82,7 @@ class Doll extends Unit {
     hasTurnAvailable() {return this.turnAvailable;}
     getCIndex() {return this.CIndex;}
     getCooldowns() {return this.cooldowns;}
+    // other miscellaneous getters
     getFinalSkillData() {return this.skillData;}
     getFortification() {return this.fortification;}
     getKeyEnabled(index) {return this.keysEnabled[index];} 
@@ -90,6 +94,8 @@ class Doll extends Unit {
     getBaseCritDamage() {return this.baseCritDamage;}
     getBaseAttack() {return this.attack;}
     getPhaseStrike() {return this.hasPhaseStrike;}
+    getWeaponName() {return this.weaponName;}
+    getWeaponCalibration() {return this.weaponCalib;}
     // get any stats relevant to damage calculation
     getDefenseIgnore() {return this.defenseIgnore;}
     getDamageDealt() {return this.damageDealt;}
@@ -194,6 +200,11 @@ class Doll extends Unit {
     setAttack(x) {this.attack = x;}
     // the value should never change once the simulation starts so there is no need to have a way to set the flag back to the default value of false
     applyPhaseStrike() {this.hasPhaseStrike = true;}
+    // intended to only be called at the start of the simulation
+    equipWeapon(weaponName, weaponCalib) {
+        this.weaponName = weaponName;
+        this.weaponCalib = weaponCalib;
+    }
     setCritRate(x) {
         this.resetCrit();
         this.baseCritChance = x;
@@ -848,7 +859,7 @@ class Doll extends Unit {
         newDoll.setDefenseBuffs(this.baseDefenseBuffs);
         if (this.hasPhaseStrike)
             newDoll.applyPhaseStrike();
-
+        newDoll.equipWeapon(this.weaponName, this.weaponCalib);
         if (!this.buffsEnabled)
             newDoll.disableBuffs();
         else {
