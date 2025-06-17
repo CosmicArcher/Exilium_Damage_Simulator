@@ -73,7 +73,7 @@ const CalculationTypes = {
 const BuffJSONKeys = {
     BUFF_TYPE : "Buff_Type", // string
     TURN_BASED : "Turn_Based", // bool, whether duration is reduced per endTurn() called
-    CONSUMPTION_MODE : "Consumption_Mode", // stack consumption mode, Attack, AllAttack, Defense, None
+    CONSUMPTION_MODE : "Consumption_Mode", // stack consumption mode, Attack, AllAttack, ActiveAttack, Support, Defense, None
     CLEANSEABLE : "Cleanseable", // bool, whether "cleanse" can remove the buff
     ELEMENT : "Element", // element of the buff for certain interactions
     STAT : "Stat", // which stat the buff is classified as, movement, attack, defense, etc.
@@ -93,7 +93,34 @@ const BuffJSONKeys = {
     AOE_DAMAGE_TAKEN : "AoE_Damage_Taken",
     TARGETED_DAMAGE_TAKEN : "Targeted_Damage_Taken",
     PHASE_DAMAGE : "Phase_Damage",
-    ELEMENTAL_DAMAGE : "Elemental_Damage" // elemental damage buffs, value is an object where key is the element and value is the amount of damage increase
+    ELEMENTAL_DAMAGE : "Elemental_Damage" // elemental damage buffs, value is an array where 0 index is the element and 1 index is the amount of damage increase
 }
 
-export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes, BuffJSONKeys};
+const WeaponJSONKeys = {
+    TYPE : "Type", // string, which gun type they belong to. AR, SMG, etc. will be used later to limit gun options according to doll
+    TRAIT : "Trait", // string, 
+    PASSIVE : "Passive",  // object containing the permanent stat buffs
+    GLOBAL : "Global", // object containing global non-stacking buff name
+    ON_MOVE : "On_Move", // object containing stat buffs if unit moved, assumed true for non support attacks
+    STEPS : "Steps", // int, number of steps needed to trigger on_move effects, assumed max steps are always done
+    NO_MOVE : "No_Move", // object containing stat buffs if unit has not moved, assumed always true in proper play
+    OUT_OF_COVER : "Out_of_Cover", // object containing stat buffs if target has 0% cover damage reduction
+    PHASE_EXPLOIT : "Phase_Exploit", // object containing stat buffs if any weaknesses are exploited
+    EXPLOIT_ELEMENT : "Element", // array containing the exploited element for bonus effects in index 0 and index 1 contains an array of the bonus values
+    ELEMENTAL_DEBUFF : "Elemental_Debuff", // object containing stat buffs if target has debuff of element type
+    DEBUFF_ELEMENT : "Element", // element that triggers elemental debuff bonus
+    ON_INSIGHT : "On_Insight", // object containing stat buffs if insight is present
+    AOE_CORROSION : "AoE_Corrosion", // array for cluckay gun damage passive which is extremely specific on the damage type boosted
+    ELEMENTAL_DAMAGE : "Elemental_Damage", // array for elemental damage, same format as buff elemental_damage but the 1 index can be array if scaling with calib
+    DAMAGE_PERC : "Damage_Perc",  // array for damage increase, each index corresponds to a calibration level
+    PHASE_DAMAGE : "Phase_Damage", // array for phase damage, same format as above
+    CRIT_DAMAGE : "Crit_Damage", // array for crit damage, same format as above
+    DEFENSE_IGNORE : "Defense_Ignore", // array for defense ignore, same format as above
+    STABILITY_IGNORE : "Stability_Ignore", // array for stability ignore, same format as above
+    BUFF : "Buff", // object, buffs that are applied after a condition, condition checks are hardcoded into the doll class, same format as skill buff objects
+    BUFF_TARGET : "Target", // self or (enemy) target, buff target
+    BUFF_NAME : "Name", // name of buff, full name is assembled with this and the calibration as stack limit and buff amount can improve as gun calibration increases
+    BUFF_STACKS : "Stacks" // array as certain guns apply more stacks as calib increases
+}
+
+export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes, BuffJSONKeys, WeaponJSONKeys};

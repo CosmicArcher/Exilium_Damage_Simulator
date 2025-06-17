@@ -7,8 +7,8 @@ import RNGManager from "./RNGManager.js";
 import TurnManager from "./TurnManager.js";
 
 class Supporter extends Doll {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification, supportLimit, keysEnabled) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+    constructor(name, defense, attack, crit_chance, crit_damage, fortification, supportLimit, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         this.supportLimit = supportLimit;
         this.supportsUsed = 0;
@@ -38,8 +38,8 @@ class Supporter extends Doll {
 }
 
 class Interceptor extends Doll {
-    constructor(name, defense, attack, crit_chance, crit_damage, fortification, interceptLimit, keysEnabled) {
-        super(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+    constructor(name, defense, attack, crit_chance, crit_damage, fortification, interceptLimit, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super(name, defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         this.interceptLimit = interceptLimit;
         this.interceptsUsed = 0;
@@ -73,8 +73,8 @@ class Interceptor extends Doll {
 }
 
 export class Qiongjiu extends Supporter {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Qiongjiu", defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Qiongjiu", defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         this.supportEnabled = true;
 
@@ -152,13 +152,13 @@ export class Qiongjiu extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Qiongjiu(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Qiongjiu(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Makiatto extends Interceptor {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Makiatto", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Makiatto", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         this.interceptEnabled = false;
         // fortifications increase intercept limit during ult duration
@@ -313,13 +313,13 @@ export class Makiatto extends Interceptor {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Makiatto(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Makiatto(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Suomi extends Supporter {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Suomi", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Suomi", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         this.supportEnabled = true;
         // 2nd key starts with full index
@@ -439,13 +439,13 @@ export class Suomi extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Suomi(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Suomi(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Papasha extends Doll {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Papasha", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Papasha", defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         if (fortification > 2)
             this.addBuff("Power of Unity", this.name, -1, 3);
@@ -494,6 +494,8 @@ export class Papasha extends Doll {
         }
         else {
             summon.getSkillDamage(SkillNames.SKILL3, target, calculationType, conditionalTriggered);
+            // don't forget to end papasha's own turn
+            this.endTurn();
         }
         // summon buff durations are timed with papasha end turn
         summon.endTurn();
@@ -520,13 +522,13 @@ export class Papasha extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Papasha(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Papasha(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class PapashaSummon extends Doll {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Papasha Summon", defense, attack, 0.2, 1.2, fortification, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Papasha Summon", defense, attack, 0.2, 1.2, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         // the summon inherits all of papasha's basic stats except crit which are locked to the base values outside of buffs
         if (fortification > 2) {
@@ -574,13 +576,13 @@ export class PapashaSummon extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new PapashaSummon(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new PapashaSummon(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Daiyan extends Interceptor {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Daiyan", defense, attack, crit_chance, crit_damage, fortification, 1, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Daiyan", defense, attack, crit_chance, crit_damage, fortification, 1, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         this.interceptEnabled = false;
         // key 2 starts with full index
@@ -682,13 +684,13 @@ export class Daiyan extends Interceptor {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Daiyan(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Daiyan(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Tololo extends Doll {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Tololo", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Tololo", defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         // passively starts with full index
         this.CIndex = 6;
@@ -801,13 +803,13 @@ export class Tololo extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Tololo(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Tololo(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class MosinNagant extends Supporter {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Mosin-Nagant", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Mosin-Nagant", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
         // support is always available but requires specific conditions to be used
         this.supportEnabled = true;
         // track skill3 uses for bonus effects
@@ -899,15 +901,15 @@ export class MosinNagant extends Supporter {
     }
 
     cloneUnit() {
-        let doll = new MosinNagant(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled);
+        let doll = new MosinNagant(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);
         doll.skill3Uses = this.skill3Uses;
         return super.cloneUnit(doll);
     }
 }
 
 export class Vepley extends Doll {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Vepley", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Vepley", defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         // assume that the enemy always has movement debuff with vepley present so key 1 always happens
         if (keysEnabled[0])
@@ -940,13 +942,13 @@ export class Vepley extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Vepley(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Vepley(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Peritya extends Supporter {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Peritya", defense, attack, crit_chance, crit_damage, fortification, 6, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Peritya", defense, attack, crit_chance, crit_damage, fortification, 6, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
         // support is always available but requires aoe damage to trigger it
         this.supportEnabled = true;
         // key 5 starts with full index
@@ -989,13 +991,13 @@ export class Peritya extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Peritya(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Peritya(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Sharkry extends Supporter {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Sharkry", defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Sharkry", defense, attack, crit_chance, crit_damage, fortification, 3, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
         // support is activated by equipping key 2
         if (keysEnabled[1])
             this.supportEnabled = true;
@@ -1084,13 +1086,13 @@ export class Sharkry extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Sharkry(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Sharkry(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Cheeta extends Supporter {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Cheeta", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Cheeta", defense, attack, crit_chance, crit_damage, fortification, 2, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
         // key 1 starts with full index
         if (this.keysEnabled[0])
             this.CIndex = 6;
@@ -1138,13 +1140,13 @@ export class Cheeta extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Cheeta(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Cheeta(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Ksenia extends Supporter {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Ksenia", defense, attack, crit_chance, crit_damage, fortification, 1, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Ksenia", defense, attack, crit_chance, crit_damage, fortification, 1, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
         // always has support enabled
         this.supportEnabled = true;
         // v4 increases the support limit
@@ -1222,13 +1224,13 @@ export class Ksenia extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Ksenia(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled));
+        return super.cloneUnit(new Ksenia(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
 export class Klukai extends Doll {
-    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled) {
-        super("Klukai", defense, attack, crit_chance, crit_damage, fortification, keysEnabled);
+    constructor(defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike) {
+        super("Klukai", defense, attack, crit_chance, crit_damage, fortification, keysEnabled, weaponName, weaponCalib, hasPhaseStrike);
 
         // klukai ult cd is reduced by every 3 index gained
         this.IndexGained = 0;
@@ -1261,9 +1263,9 @@ export class Klukai extends Doll {
             if (weaknesses.includes(Elements.CORROSION) || weaknesses.includes(AmmoTypes.MEDIUM))
                 conditionalTriggered[2] = true;
         }
-        // assume that the target is always a boss and single target scenario
+        // assume that the target is always a single target scenario
         if (skillName == SkillNames.ULT) {
-            if (this.fortification > 2)
+            if (this.fortification > 2 && target.getIsBoss())
                 conditionalTriggered[0] = true;
             // key 2 condition is if ult hits only 1 target
             if (this.keysEnabled[1])
@@ -1422,7 +1424,7 @@ export class Klukai extends Doll {
     }
 
     cloneUnit() {
-        let newDoll = new Klukai(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled);
+        let newDoll = new Klukai(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);
         // ensure that tracked index gain is passed onto the clone
         newDoll.IndexGained = this.IndexGained;
         newDoll.isActing = this.isActing;

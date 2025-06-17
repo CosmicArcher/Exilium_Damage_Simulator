@@ -82,46 +82,49 @@
         <a href="./FullSim.html" id = "refreshPage" class="pageTab" style="float: right;">Return to Start</a>
         <h1 style="text-align: center; margin-top: -20px;">Turn-by-Turn Combat Sim</h1>
         <div class="column" style="background-color: lightgray;">
-            <div id = "TargetColumn">
-                <h2>Target Stats</h2>
+            <div id = "TargetColumn" style="margin-top: -30px;">
+                <h2 style="margin-bottom: -10px;">Target Stats</h2>
                 <label for = "targetDef">Defense:</label>
-                <input type = "text" id = "targetDef"><br>
+                <input type = "text" id = "targetDef" value="8046"><br>
                 <label for = "ElementWeakness" id = "PhasesSelected">Phase Weaknesses: None</label>
                 <button id = "ElementWeakness">Select Element Weakness</button>
                 <button id = "AmmoWeakness">Select Ammo Weakness</button><br>
+                <input type="checkbox" id = "largeToggle" checked><label> Is Large</label>   <input type="checkbox" id = "bossToggle" checked><label> Is Boss</label>
                 <label for = "targetCover">Cover Value (0.0x):</label>
-                <input type = "text" id = "targetCover"><br>
-                <label for = "targetStability">Stability:</label>
-                <input type = "text" id = "targetStability"><br>
+                <input type = "text" id = "targetCover" value="0"><br>
+                <label for = "targetStability">Max Stability:</label>
+                <input type = "text" id = "targetStability" value="65"><br>
+                <label for = "targetStabilityRegen">Turns to Regenerate Stability:</label>
+                <input type = "text" id = "targetStabilityRegen" value="2"><br>
                 <div style="height: 200px;" class="statScroll">
                     <label for = "targetDefBuffs">Defense Buffs/Debuffs Sum (+- 0.0x):</label>
-                    <input type = "text" id = "targetDefBuffs"><br>
+                    <input type = "text" id = "targetDefBuffs" value="0"><br>
                     <label for = "targetDamageTaken">Damage Taken Sum (+- 0.0x):</label>
-                    <input type = "text" id = "targetDamageTaken"><br>
+                    <input type = "text" id = "targetDamageTaken" value="0"><br>
                     <label for = "targetTargetedDamage">Targeted Damage Taken Sum (+- 0.0x):</label>
-                    <input type = "text" id = "targetTargetedDamage"><br>
+                    <input type = "text" id = "targetTargetedDamage" value="0"><br>
                     <label for = "targetAoEDamage">AoE Damage Sum (+- 0.0x):</label>
-                    <input type = "text" id = "targetAoEDamage"><br>
+                    <input type = "text" id = "targetAoEDamage" value="0"><br>
                     <label for = "targetStabilityMod">Stability Damage Modifier (+-x):</label>
-                    <input type = "text" id = "targetStabilityMod"><br>
+                    <input type = "text" id = "targetStabilityMod" value="0"><br>
                     <label for = "targetDRPerStab">Damage Reduction per Stability (0.0x):</label>
-                    <input type = "text" id = "targetDRPerStab"><br>
+                    <input type = "text" id = "targetDRPerStab" value="0"><br>
                     <label for = "targetDRWithStab">Damage Reduction with Stability (0.0x):</label>
-                    <input type = "text" id = "targetDRWithStab">
+                    <input type = "text" id = "targetDRWithStab" value="0">
                 </div>
             </div>
-            <div id = "GlobalBuffs", style="border-top: 1px solid black;">
+            <div id = "GlobalBuffs", style="border-top: 1px solid black; margin-top: -30px;">
                 <h2>Global Buffs</h2>
                 <label for = "globalAttack">Global Attack Buff (0.0x):</label>
-                <input type = "text" id = "globalAttack"><br>
+                <input type = "text" id = "globalAttack" value = "0"><br>
                 <label for = "globalDamage">Global Damage Buff (0.0x):</label>
-                <input type = "text" id = "globalDamage"><br>
+                <input type = "text" id = "globalDamage" value = "0"><br>
                 <label for = "globalAoEDamage">Global AoE Damage (0.0x):</label>
-                <input type = "text" id = "globalAoEDamage"><br>
+                <input type = "text" id = "globalAoEDamage" value = "0"><br>
                 <label for = "globalTargetedDamage">Global Targeted Damage (0.0x):</label>
-                <input type = "text" id = "globalTargetedDamage"><br>
+                <input type = "text" id = "globalTargetedDamage" value = "0"><br>
                 <label for = "globalFreezeDamage">Global Freeze Damage (Except Dush) (0.0x):</label>
-                <input type = "text" id = "globalFreezeDamage">
+                <input type = "text" id = "globalFreezeDamage" value = "0">
             </div>
         </div>
         <div class= "column" id = "Dolls" style="background-color: lightslategray; white-space: normal; height: auto;">
@@ -137,52 +140,56 @@
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label>
                 <button disabled>Select Key</button><label style="margin-left: 5px;">None</label><br>
+                <label>Weapon: C1 Other Gun</label>
+                <button disabled>Select Weapon</button>
+                <button disabled>Calibration</button><br>
+                <input type="checkbox"><label> Has Phase Strike</label>
                 <label >Base Attack:</label>
-                <input type = "text"><br>
+                <input type = "text" value="3000"><br>
                 <label >Base Crit Rate (0.0x):</label>
-                <input type = "text"><br>
+                <input type = "text" value="0.2"><br>
                 <label >Base Crit Damage (1.0x):</label>
-                <input type = "text"><br>
+                <input type = "text" value="1.2"><br>
                 <div style="height: 280px;" class="statScroll">
                     <label >Defense Ignore (0.0x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Damage Dealt (+- 0.0x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Targeted Damage Dealt (+- 0.0x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >AoE Damage Dealt (+- 0.0x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Slowed Damage Dealt (+- 0.0x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Def Down Damage Dealt (+- 0.0x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Out-of-Turn Damage Dealt (+- 0.0x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Cover Ignore (0.0x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Stability Damage (+- x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Stability Ignore (+- x):</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="0"><br>
                     <label >Base Defense:</label>
-                    <input type = "text"><br>
+                    <input type = "text" value="800"><br>
                     <button>Element Damage (0.0x):
                     </button>
                     <div style="display: none;">
                         <label >(All) Phase Damage:</label>
-                        <input type = "text"><br>
+                        <input type = "text" value="0"><br>
                         <label >Physical Damage:</label>
-                        <input type = "text" ><br>
+                        <input type = "text" value="0" ><br>
                         <label >Freeze Damage:</label>
-                        <input type = "text" ><br>
+                        <input type = "text" value="0" ><br>
                         <label >Burn Damage:</label>
-                        <input type = "text" ><br>
+                        <input type = "text" value="0" ><br>
                         <label >Corrosion Damage:</label>
-                        <input type = "text" ><br>
+                        <input type = "text" value="0" ><br>
                         <label >Hydro Damage:</label>
-                        <input type = "text" ><br>
+                        <input type = "text" value="0" ><br>
                         <label >Electric Damage:</label>
-                        <input type = "text" >
+                        <input type = "text" value="0" >
                     </div>
                 </div>
             </div>

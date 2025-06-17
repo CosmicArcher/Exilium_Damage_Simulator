@@ -8,13 +8,15 @@ import GlobalBuffManager from "./GlobalBuffManager.js"
 import DollFactory from "./DollFactory.js";
 import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
-import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames} from "./Enums.js";
+import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames, WeaponJSONKeys} from "./Enums.js";
 import StatTracker from "./StatTracker.js";
 import ChartMaker from "./ChartMaker.js";
 
 var selectedPhases = [];
 var selectedDolls = [""];
 var selectedFortifications = [0];
+var selectedWeapons = ["Other Gun"];
+var selectedCalibrations = [1];
 var selectedKeys = [[0,0,0,0,0,0]];
 var calcSettings = [CalculationTypes.EXPECTED];
 var numDolls = 1;
@@ -25,7 +27,8 @@ var dollOptions;
 var keyOptions;
 var phaseDiv = [null];
 var fortOptions;
-var calcOptions;
+var weaponOptions;
+var calibOptions;
 // for use when dynamically adding and removing doll slots
 var slotColors;
 // an error gets thrown when putting resourceloader.getinstance() directly in the .on(click) functions
@@ -73,6 +76,7 @@ function addDoll() {
     newNode.firstElementChild.textContent = "-";
     newNode.id = "Doll_" + numDolls;
     newNode.children[1].innerHTML = "Doll: ";
+    newNode.children[12].innerHTML = "Weapon: Other Gun";
     d3.select(newNode).style("background-color", slotColors[numDolls-1]);
 
     let removeButton = d3.select(newNode).insert("button", "label");
@@ -87,16 +91,22 @@ function addDoll() {
     phaseDiv.push(null);
     selectedFortifications.push(0);
     selectedDolls.push("");
+    selectedWeapons.push("Other Gun");
+    selectedCalibrations.push(1);
     selectedKeys.push([0,0,0,0,0,0]);
     document.getElementById("Dolls").appendChild(newNode);
-    // deactivate the fortification and key buttons until doll is selected
+    // deactivate the fortification, weapons and key buttons until doll is selected
     newNode.children[4].disabled = true;
     newNode.children[6].disabled = true;
     newNode.children[8].disabled = true;
     newNode.children[10].disabled = true;
+    newNode.children[14].disabled = true;
+    newNode.children[15].disabled = true;
     newNode.children[7].textContent = "None";
     newNode.children[9].textContent = "None";
     newNode.children[11].textContent = "None";
+    // deselect the phase strike toggle if the first slot had it selected
+    newNode.children[17].checked = false;
     // deactivate the start button until all doll slots have a selected doll
     document.getElementById("startButton").disabled = true;
     // if the phase buffs are open in the original div, close it
@@ -142,6 +152,8 @@ function addCalcOption() {
 function removeDoll(index) {
     // remove data at index from arrays
     selectedFortifications.splice(index, 1);
+    selectedWeapons.splice(index, 1);
+    selectedCalibrations.splice(index, 1);
     selectedKeys.splice(index, 1);
     d3.select(phaseDiv[index]).remove();
     phaseDiv.splice(index, 1);
@@ -204,6 +216,9 @@ function initializeDollButtons(index) {
                                 dollStats[index == 0 ? 5 : 6].disabled = false;
                                 dollStats[index == 0 ? 7 : 8].disabled = false;
                                 dollStats[index == 0 ? 9 : 10].disabled = false;
+                                // enable the weapon dropdown buttons as well
+                                dollStats[index == 0 ? 13 : 14].disabled = false;
+                                dollStats[index == 0 ? 14 : 15].disabled = false;
                                 // clear the displayed keys from the previous doll
                                 dollStats[index == 0 ? 6 : 7].textContent = "None";
                                 dollStats[index == 0 ? 8 : 9].textContent = "None";
@@ -222,7 +237,7 @@ function initializeDollButtons(index) {
             });
         }
     });
-    // if fortification button is selected, show a list from V0-V6 to set the fortification of the doll
+    // if fortification button is clicked, show a list from V0-V6 to set the fortification of the doll
     d3.select(dollStats[index == 0 ? 3 : 4]).on("click", () => {
         // if dropdown list has not yet been created
         if (!fortOptions) {
@@ -244,6 +259,59 @@ function initializeDollButtons(index) {
         if (fortOptions.style("display") == "none") { 
             hideDropdowns();
             fortOptions.style("display", "block");
+        }
+        else
+            hideDropdowns();
+    });
+    // if weapon button is clicked, show a list of all weapons for now regardless of the doll's eligibility to equip the weapons
+    d3.select(dollStats[index == 0 ? 13 : 14]).on("click", () => {
+        // if dropdown list has not yet been created
+        if (!weaponOptions) {
+            weaponOptions = d3.select(dollStats[index == 0 ? 13 : 14]).append("div").attr("class", "dropdownBox").style("display", "none");
+            let weapons = ResourceLoader.getInstance().getAllWeapons();
+            weapons.forEach(weapon => {
+                weaponOptions.append("a")
+                            .text(weapon)
+                            .on("click", (event) => {
+                                let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
+                                selectedWeapons[dollIndex] = weapon;
+                                updateSelectedWeapon(dollIndex);
+                            });
+            });
+        } // if dropdown has already been created, reuse it by transferring it as a child of a new weapon button
+        else {
+            dollStats[index == 0 ? 13 : 14].appendChild(weaponOptions.node());
+        }
+        // toggle the dropdown list
+        if (weaponOptions.style("display") == "none") { 
+            hideDropdowns();
+            weaponOptions.style("display", "block");
+        }
+        else
+            hideDropdowns();
+    });
+    // if weapon calibration button is clicked, show calibration levels 1-6
+    d3.select(dollStats[index == 0 ? 14 : 15]).on("click", () => {
+        // if dropdown list has not yet been created
+        if (!calibOptions) {
+            calibOptions = d3.select(dollStats[index == 0 ? 14 : 15]).append("div").attr("class", "dropdownBox").style("display", "none");
+            for (let i = 1; i < 7; i++) {
+                calibOptions.append("a")
+                            .text("C" + i)
+                            .on("click", (event) => {
+                                let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
+                                selectedCalibrations[dollIndex] = i;
+                                updateSelectedWeapon(dollIndex);
+                            });
+            }
+        } // if dropdown has already been created, reuse it by transferring it as a child of a new weapon button
+        else {
+            dollStats[index == 0 ? 14 : 15].appendChild(calibOptions.node());
+        }
+        // toggle the dropdown list
+        if (calibOptions.style("display") == "none") { 
+            hideDropdowns();
+            calibOptions.style("display", "block");
         }
         else
             hideDropdowns();
@@ -284,7 +352,8 @@ function createDollsFromInput() {
     for (let i = 0; i < numDolls; i++) {
         let dollStats = getDollStats(i)
         let newDoll = DollFactory.getInstance().createDoll(selectedDolls[i], dollStats[13], dollStats[0], dollStats[1], dollStats[2], 
-            selectedFortifications[i], selectedKeys[i]);
+            selectedFortifications[i], selectedKeys[i], selectedWeapons[i], selectedCalibrations[i],
+            document.getElementById("Doll_" + (i + 1)).children[i == 0 ? 16 : 17].checked); // get the phase strike checkbox input
         //newDoll.disableBuffs();
         newDoll.finishCloning();
         newDoll.setDamageDealt(dollStats[4]);
@@ -304,11 +373,21 @@ function createDollsFromInput() {
         newDoll.setElementDamage(Elements.CORROSION, dollStats[18]);
         newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
         newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
+        // check if the weapon applies a global buff
+        let weaponData = ResourceLoader.getInstance().getWeaponData(selectedWeapons[i]);
+        if (weaponData.hasOwnProperty(WeaponJSONKeys.GLOBAL)) {
+            // assemble global buff name using weapon name and calib
+            let weaponBuff = weaponData[WeaponJSONKeys.GLOBAL][WeaponJSONKeys.BUFF_NAME] + " C" + selectedCalibrations[i];
+            GlobalBuffManager.getInstance().addGlobalWeaponBuff([weaponBuff, selectedDolls[i]]);
+        }
         dolls.push(newDoll);
         // papasha summon inherits the same atk, def, hp but not damage buffs or crit
         if (selectedDolls[i] == "Papasha") {
             let newDoll = DollFactory.getInstance().createDoll("Papasha Summon", dollStats[13], dollStats[0], dollStats[1], dollStats[2], 
-                selectedFortifications[i], selectedKeys[i]);
+                selectedFortifications[i], selectedKeys[i], "Other Gun", 1, false);
+            // check if papasha has svarog for the extra targeted damage buff on her summon
+            if (selectedWeapons[i] == "Svarog")
+                newDoll.setTargetedDamage(0.12 + 0.03 * selectedCalibrations[i]);
             newDoll.finishCloning();
             dolls.push(newDoll);
             numSummons++;
@@ -373,6 +452,10 @@ function hideDropdowns() {
     phaseDiv.forEach(div => {
         div.style("display", "none");
     });
+    if (weaponOptions)
+        weaponOptions.style("display", "none");
+    if (calibOptions)
+        calibOptions.style("display", "none");
     if (calcOptions)
         calcOptions.style("display", "none");
     // just delete the current buff display if it exists since the list always changes
@@ -443,6 +526,11 @@ function updateSelectedDoll(index) {
     document.getElementById("Doll_" + (index + 1)).children[index == 0 ? 1 : 2].textContent = "Doll: V" + selectedFortifications[index] + " " + selectedDolls[index];
     document.getElementById("Settings_" + (index + 1)).firstChild.textContent = selectedDolls[index];
 }
+
+function updateSelectedWeapon(index) {
+    document.getElementById("Doll_" + (index + 1)).children[index == 0 ? 12 : 13]
+        .textContent = `Weapon: C${selectedCalibrations[index]} ${selectedWeapons[index] == "" ? "Other Gun" : selectedWeapons[index]}`;
+}
 // change weakness text based on selected list, write none if empty
 function updatePhaseText() {
     let newText = "Phase Weaknesses:";
@@ -478,6 +566,7 @@ ResourceLoader.getInstance().loadBuffJSON();
 ResourceLoader.getInstance().loadSkillJSON();
 ResourceLoader.getInstance().loadFortJSON();
 ResourceLoader.getInstance().loadKeyJSON();
+ResourceLoader.getInstance().loadWeaponJSON();
 EventManager.getInstance();
 TurnManager.getInstance();
 ActionLog.getInstance();
@@ -591,18 +680,20 @@ d3.select("#startButton").on("click", () => {
     // get input values and create target
     let targetStats = getTargetStats();
     let globalBuffs = getGlobalStats();
-    let newTarget = new Target("6p62", targetStats[0], targetStats[2], 2, selectedPhases);
+    let newTarget = new Target("6p62", targetStats[0], targetStats[2], targetStats[3], selectedPhases);
     GameStateManager.getInstance().registerTarget(newTarget);
     newTarget.finishCloning();
     //newTarget.disableBuffs();
     GameStateManager.getInstance().addCover(targetStats[1]);
-    newTarget.setDefenseBuffs(targetStats[3]);
-    newTarget.setDamageTaken(targetStats[4]);
-    newTarget.setTargetedDamageTaken(targetStats[5]);
-    newTarget.setAoEDamageTaken(targetStats[6]);
-    newTarget.setStabilityDamageModifier(targetStats[7]);
-    newTarget.applyDRPerStab(targetStats[8]);
-    newTarget.applyDRWithStab(targetStats[9]);
+    newTarget.setDefenseBuffs(targetStats[4]);
+    newTarget.setDamageTaken(targetStats[5]);
+    newTarget.setTargetedDamageTaken(targetStats[6]);
+    newTarget.setAoEDamageTaken(targetStats[7]);
+    newTarget.setStabilityDamageModifier(targetStats[8]);
+    newTarget.applyDRPerStab(targetStats[9]);
+    newTarget.applyDRWithStab(targetStats[10]);
+    newTarget.setIsLarge(document.getElementById("largeToggle").checked);
+    newTarget.setIsBoss(document.getElementById("bossToggle").checked);
     // apply global stat buffs
     GlobalBuffManager.getInstance().setGlobalAttack(globalBuffs[0]);
     GlobalBuffManager.getInstance().setGlobalDamage(globalBuffs[1]);
@@ -624,6 +715,7 @@ d3.select("#Doll_1").style("background-color", slotColors[0]);
 var actingDoll = "";
 var selectedSkill = "";
 var skillOptions;
+var calcOptions;
 var currentBuffs;
 var selectedBuff = "";
 var selectedBuffTarget = "";
@@ -1033,16 +1125,7 @@ function checkSkillType() {
     let actionDiv = document.getElementById("Skill").children;
     let doll = GameStateManager.getInstance().getDoll(actingDoll);
     let skillData = doll.getFinalSkillData()[selectedSkill];
-    if (skillData[SkillJSONKeys.TYPE] == "Attack") {
-        d3.select(actionDiv[7]).style("display", "none");
-        d3.select(actionDiv[8]).style("display", "none");
-        // clear the selections while hiding it
-        selectedBuffTarget = "";
-        actionDiv[7].textContent = "Target:";
-        // activate the perform action button if not a buffing skill
-        document.getElementById("startButton").disabled = false;
-    }
-    else {
+    if (skillData[SkillJSONKeys.TYPE] == "Buff") {
         // check the target of the buffing skill, self, all, or ally, only ally allows target selection, the other 2 automatically target self
         d3.select(actionDiv[7]).style("display", "initial");
         if (skillData[SkillJSONKeys.BUFF_TARGET] == "Ally") {
@@ -1058,7 +1141,15 @@ function checkSkillType() {
             // since there is no need to select a target, activate the perform action button
             document.getElementById("startButton").disabled = false;
         }
-        
+    }
+    else {
+        d3.select(actionDiv[7]).style("display", "none");
+        d3.select(actionDiv[8]).style("display", "none");
+        // clear the selections while hiding it
+        selectedBuffTarget = "";
+        actionDiv[7].textContent = "Target:";
+        // activate the perform action button if not a buffing skill
+        document.getElementById("startButton").disabled = false;
     }
 }
 // create cards that show a Doll's stats, index, and cooldowns
@@ -1145,7 +1236,7 @@ function initializeDollCards() {
                                 .on("click", event => {
                                     // only add 1 stack and 1 turn of the buff
                                     target = GameStateManager.getInstance().getTarget();
-                                    target.addBuff(selectedBuff, selectedDolls[dollNum], 1, 1);
+                                    target.addBuff(selectedBuff, target.getName(), 1, 1);
                                     // after removing the buff, disable the button until another buff is selected
                                     event.target.disabled = true;
                                     d3.select("#SelectedBuff_0").text("Selected Buff: ");

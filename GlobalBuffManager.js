@@ -33,6 +33,7 @@ class GlobalBuffManager {
                 "Hydro" : 0,
                 "Electric" : 0
             }
+            GlobalBuffManagerSingleton.globalBuffs = [];
         }
         else
             console.error("Singleton not yet initialized");
@@ -152,6 +153,20 @@ class GlobalBuffManager {
                 console.error(`${element} does not exist in global buffs`);
         }
         else
+            console.error("Singleton not yet initialized");
+    }
+    addGlobalWeaponBuff(buffName) {
+        if (GlobalBuffManagerSingleton) {
+            GlobalBuffManagerSingleton.globalBuffs.push(buffName);
+        }
+        else 
+            console.error("Singleton not yet initialized");
+    }
+    getGlobalWeaponBuffs() {
+        if (GlobalBuffManagerSingleton) {
+            return GlobalBuffManagerSingleton.globalBuffs;
+        }
+        else 
             console.error("Singleton not yet initialized");
     }
 }

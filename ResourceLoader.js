@@ -29,6 +29,9 @@ class ResourceLoader {
     loadKeyJSON() {
         d3.json("KeyData.json").then(d => ResourceLoaderSingleton.keyJSON = d);
     }
+    loadWeaponJSON() {
+        d3.json("WeaponData.json").then(d => ResourceLoaderSingleton.weaponJSON = d);
+    }
     // give the resulting json corresponding to buff or doll
     getBuffData(buffName) {
         if (ResourceLoaderSingleton) {
@@ -76,6 +79,16 @@ class ResourceLoader {
         else
             console.error("Singleton not yet initialized");
     }
+    getWeaponData(weaponName) {
+        if (ResourceLoaderSingleton) {
+            if (ResourceLoaderSingleton.weaponJSON.hasOwnProperty(weaponName))
+                return ResourceLoaderSingleton.weaponJSON[weaponName];
+            else
+                console.error(`${weaponName} Weapon Name does not exist in key data`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
     // for unit selection dropdown
     getAllDolls() {
         if (ResourceLoaderSingleton) {
@@ -84,6 +97,13 @@ class ResourceLoader {
         else
             console.error("Singleton not yet initialized");
     }
+    getAllWeapons() {
+        if (ResourceLoaderSingleton) {
+            return Object.keys(ResourceLoaderSingleton.weaponJSON);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    } 
 }
 
 export default ResourceLoader;
