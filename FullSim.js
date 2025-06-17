@@ -8,14 +8,14 @@ import GlobalBuffManager from "./GlobalBuffManager.js"
 import DollFactory from "./DollFactory.js";
 import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
-import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames} from "./Enums.js";
+import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames, WeaponJSONKeys} from "./Enums.js";
 import StatTracker from "./StatTracker.js";
 import ChartMaker from "./ChartMaker.js";
 
 var selectedPhases = [];
 var selectedDolls = [""];
 var selectedFortifications = [0];
-var selectedWeapons = [""];
+var selectedWeapons = ["Other Gun"];
 var selectedCalibrations = [1];
 var selectedKeys = [[0,0,0,0,0,0]];
 var calcSettings = [CalculationTypes.EXPECTED];
@@ -91,7 +91,7 @@ function addDoll() {
     phaseDiv.push(null);
     selectedFortifications.push(0);
     selectedDolls.push("");
-    selectedWeapons.push("");
+    selectedWeapons.push("Other Gun");
     selectedCalibrations.push(1);
     selectedKeys.push([0,0,0,0,0,0]);
     document.getElementById("Dolls").appendChild(newNode);
@@ -352,7 +352,8 @@ function createDollsFromInput() {
     for (let i = 0; i < numDolls; i++) {
         let dollStats = getDollStats(i)
         let newDoll = DollFactory.getInstance().createDoll(selectedDolls[i], dollStats[13], dollStats[0], dollStats[1], dollStats[2], 
-            selectedFortifications[i], selectedKeys[i]);
+            selectedFortifications[i], selectedKeys[i], selectedWeapons[i], selectedCalibrations[i],
+            document.getElementById("Doll_" + (i + 1)).children[i == 0 ? 16 : 17].checked); // get the phase strike checkbox input
         //newDoll.disableBuffs();
         newDoll.finishCloning();
         newDoll.setDamageDealt(dollStats[4]);
@@ -372,15 +373,21 @@ function createDollsFromInput() {
         newDoll.setElementDamage(Elements.CORROSION, dollStats[18]);
         newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
         newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
-        newDoll.equipWeapon(selectedWeapons[i], selectedCalibrations[i]);
-        // get the phase strike checkbox input
-        if (document.getElementById("Doll_" + (i + 1)).children[i == 0 ? 16 : 17].checked)
-            newDoll.applyPhaseStrike();
+        // check if the weapon applies a global buff
+        let weaponData = ResourceLoader.getInstance().getWeaponData(selectedWeapons[i]);
+        if (weaponData.hasOwnProperty(WeaponJSONKeys.GLOBAL)) {
+            // assemble global buff name using weapon name and calib
+            let weaponBuff = weaponData[WeaponJSONKeys.GLOBAL][WeaponJSONKeys.BUFF_NAME] + " C" + selectedCalibrations[i];
+            GlobalBuffManager.getInstance().addGlobalWeaponBuff([weaponBuff, selectedDolls[i]]);
+        }
         dolls.push(newDoll);
         // papasha summon inherits the same atk, def, hp but not damage buffs or crit
         if (selectedDolls[i] == "Papasha") {
             let newDoll = DollFactory.getInstance().createDoll("Papasha Summon", dollStats[13], dollStats[0], dollStats[1], dollStats[2], 
-                selectedFortifications[i], selectedKeys[i]);
+                selectedFortifications[i], selectedKeys[i], "Other Gun", 1, false);
+            // check if papasha has svarog for the extra targeted damage buff on her summon
+            if (selectedWeapons[i] == "Svarog")
+                newDoll.setTargetedDamage(0.12 + 0.03 * selectedCalibrations[i]);
             newDoll.finishCloning();
             dolls.push(newDoll);
             numSummons++;
@@ -1229,7 +1236,7 @@ function initializeDollCards() {
                                 .on("click", event => {
                                     // only add 1 stack and 1 turn of the buff
                                     target = GameStateManager.getInstance().getTarget();
-                                    target.addBuff(selectedBuff, selectedDolls[dollNum], 1, 1);
+                                    target.addBuff(selectedBuff, target.getName(), 1, 1);
                                     // after removing the buff, disable the button until another buff is selected
                                     event.target.disabled = true;
                                     d3.select("#SelectedBuff_0").text("Selected Buff: ");

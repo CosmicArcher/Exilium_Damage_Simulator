@@ -1,6 +1,7 @@
 import { CalculationTypes } from "./Enums.js";
 import StatTracker from "./StatTracker.js";
 import ChartMaker from "./ChartMaker.js";
+import GlobalBuffManager from "./GlobalBuffManager.js";
 
 let GameStateManagerSingleton;
 
@@ -41,9 +42,13 @@ class GameStateManager {
     }
     startSimulation() {
         if (GameStateManagerSingleton) {
-            // activate all the turn start effects
+            // activate all the turn start effects and apply global weapon buffs
+            let globalWeaponPairs = GlobalBuffManager.getInstance().getGlobalWeaponBuffs();
             GameStateManagerSingleton.dolls[0].forEach(doll => {
                 doll.refreshSupportUses();
+                globalWeaponPairs.forEach(weaponDoll => {
+                    doll.addBuff(weaponDoll[0], weaponDoll[1], -1, 1);
+                });
             });
             // clone the first version of the units
             let target = GameStateManagerSingleton.target[0];

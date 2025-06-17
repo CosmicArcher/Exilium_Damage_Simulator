@@ -1,6 +1,6 @@
 import Unit from "./Unit.js";
 import ResourceLoader from "./ResourceLoader.js";
-import { SkillNames, CalculationTypes, SkillJSONKeys, Elements, BuffJSONKeys } from "./Enums.js";
+import { SkillNames, CalculationTypes, SkillJSONKeys, Elements, BuffJSONKeys, WeaponJSONKeys, AttackTypes } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 import DamageManager from "./DamageManager.js";
 import RNGManager from "./RNGManager.js";
@@ -8,7 +8,7 @@ import GlobalBuffManager from "./GlobalBuffManager.js"
 import EventManager from "./EventManager.js";
 
 class Doll extends Unit {
-    constructor(name, defense, attack, baseCrit, baseCritDamage, fortification, keys = [0,0,0,0,0,0]) {
+    constructor(name, defense, attack, baseCrit, baseCritDamage, fortification, keys = [0,0,0,0,0,0], weaponName, weaponCalib, hasPhaseStrike = false) {
         super(name, defense);
         this.attack = attack;
         this.baseCritChance = baseCrit;
@@ -63,20 +63,25 @@ class Doll extends Unit {
         this.baseStabilityIgnore = 0;
         this.baseAttackBoost = 0;
         // phase strike is a 15% damage buff if the target has any elemental debuffs
-        this.hasPhaseStrike = false;
+        this.hasPhaseStrike = hasPhaseStrike;
         // keys will be arranged numerically
         this.keysEnabled = keys;
         // weapon passives are hardcoded into whichever area they are triggered for now until a more elegant solution is found
-        this.weaponName = "Other Gun";
-        this.weaponCalib = 1;
+        this.weaponName = weaponName;
+        this.weaponCalib = weaponCalib;
 
         this.turnAvailable = true;
         this.cooldowns = [0,0,0,0];
+        this.executingExtraAction = false;
 
         this.initializeSkillData();
         // merge the skill json with the fortification and key modifications of skills
         this.applyFortificationData();
         this.applyKeyData();
+
+        this.initializeWeaponData();
+        // apply the passive buffs of the gun
+        this.applyGunEffects(WeaponJSONKeys.PASSIVE);
     }
     // for tracking which dolls have turns available
     hasTurnAvailable() {return this.turnAvailable;}
@@ -198,13 +203,6 @@ class Doll extends Unit {
         this.attackBoost += x;
     }
     setAttack(x) {this.attack = x;}
-    // the value should never change once the simulation starts so there is no need to have a way to set the flag back to the default value of false
-    applyPhaseStrike() {this.hasPhaseStrike = true;}
-    // intended to only be called at the start of the simulation
-    equipWeapon(weaponName, weaponCalib) {
-        this.weaponName = weaponName;
-        this.weaponCalib = weaponCalib;
-    }
     setCritRate(x) {
         this.resetCrit();
         this.baseCritChance = x;
@@ -288,6 +286,9 @@ class Doll extends Unit {
         // change skilldata from a reference to resource loader's json to directly having its own copy of the values
         this.copySkillJSON();
     }
+    initializeWeaponData() {
+        this.weaponData = ResourceLoader.getInstance().getWeaponData(this.weaponName);
+    }
     // merge the upgrades from fortification into skill data
     applyFortificationData() {
         for (let i = 1; i <= this.fortification; i++) {
@@ -317,6 +318,108 @@ class Doll extends Unit {
                 }
             }
         }
+    }
+    addBuff(buffName, sourceName, duration = -1, stacks = 1) {
+        // apply gun bonus when insight is gained but not already present to prevent unintended stacking
+        if (buffName == "Insight" && !this.hasBuff("Insight"))
+            this.applyGunEffects(WeaponJSONKeys.ON_INSIGHT);
+        super.addBuff(buffName, sourceName, duration, stacks);
+        // golden melody applies charging buff upon gaining non-charging buffs
+        if (this.weaponName == "Golden Melody" && !/Charging C/.test(buffName)) {
+            let buffData = ResourceLoader.getInstance().getBuffData(buffName);
+            // only apply charging if a buff is applied, not debuffs
+            if (buffData[BuffJSONKeys.BUFF_TYPE] == "Buff")
+                this.applyGunBuffs();
+        }
+    }
+    removeBuff(buffName) {
+        // remove on insight gun effects when losing the buff
+        if (buffName == "Insight")
+            this.removeGunEffects(WeaponJSONKeys.ON_INSIGHT);
+        super.removeBuff(buffName);
+    }
+    // apply the buffs of the gun that belong to the specified key, passive, on_move, exposed, phase_exploit, etc
+    applyGunEffects(objectKey = WeaponJSONKeys.PASSIVE, triggerElement = Elements.PHYSICAL) {
+        // check if gun has a passive effect
+        if (this.weaponData.hasOwnProperty(objectKey)) {
+            let passiveData = this.weaponData[objectKey];
+            // passives that have conditions that stack are assumed to have stacked to the max on all attacks unless it requires movement
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.DAMAGE_PERC))
+                this.damageDealt += passiveData[WeaponJSONKeys.DAMAGE_PERC][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.CRIT_DAMAGE))
+                this.critDamage += passiveData[WeaponJSONKeys.CRIT_DAMAGE][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.DEFENSE_IGNORE))
+                this.defenseIgnore += passiveData[WeaponJSONKeys.DEFENSE_IGNORE][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.ELEMENTAL_DAMAGE))
+                this.elementDamageDealt[passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][0]] += passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][1][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.PHASE_DAMAGE))
+                this.phaseDamageDealt += passiveData[WeaponJSONKeys.PHASE_DAMAGE][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.STABILITY_IGNORE))
+                this.stabilityIgnore += passiveData[WeaponJSONKeys.STABILITY_IGNORE][this.weaponCalib - 1];
+
+            // for the case of phase exploit, check if it has bonus effects on a specific element exploited
+            if (objectKey == WeaponJSONKeys.PHASE_EXPLOIT) {
+                if (passiveData.hasOwnProperty(WeaponJSONKeys.EXPLOIT_ELEMENT)) {
+                    // the only time this bonus effect exists is in weapon traits for defense ignore which do not scale with calibration
+                    if (passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][0] == triggerElement)
+                        this.defenseIgnore += passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][1][this.weaponCalib - 1];
+                }
+            }
+        }
+    }
+    // for removing gun effects that should only take effect for certain attacks
+    removeGunEffects(objectKey = WeaponJSONKeys.PHASE_EXPLOIT, triggerElement = Elements.PHYSICAL) {
+        // check if gun has a passive effect
+        if (this.weaponData.hasOwnProperty(objectKey)) {
+            let passiveData = this.weaponData[objectKey];
+            // passives that have conditions that stack are assumed to have stacked to the max on all attacks unless it requires movement
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.DAMAGE_PERC))
+                this.damageDealt -= passiveData[WeaponJSONKeys.DAMAGE_PERC][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.CRIT_DAMAGE))
+                this.critDamage -= passiveData[WeaponJSONKeys.CRIT_DAMAGE][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.DEFENSE_IGNORE))
+                this.defenseIgnore -= passiveData[WeaponJSONKeys.DEFENSE_IGNORE][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.ELEMENTAL_DAMAGE))
+                this.elementDamageDealt[passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][0]] -= passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][1][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.PHASE_DAMAGE))
+                this.phaseDamageDealt -= passiveData[WeaponJSONKeys.PHASE_DAMAGE][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.STABILITY_IGNORE))
+                this.stabilityIgnore -= passiveData[WeaponJSONKeys.STABILITY_IGNORE][this.weaponCalib - 1];
+
+            // for the case of phase exploit, check if it has bonus effects on a specific element exploited
+            if (objectKey == WeaponJSONKeys.PHASE_EXPLOIT) {
+                if (passiveData.hasOwnProperty(WeaponJSONKeys.EXPLOIT_ELEMENT)) {
+                    // the only time this bonus effect exists is in weapon traits for defense ignore
+                    if (passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][0] == triggerElement)
+                        this.defenseIgnore -= passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][1][this.weaponCalib - 1];
+                }
+            }
+        }
+    }
+    // for applying the buffs of the gun, called only with specific gun names in their respective areas
+    applyGunBuffs() {
+        if (this.weaponData.hasOwnProperty(WeaponJSONKeys.BUFF)) {
+            let buffData = this.weaponData[WeaponJSONKeys.BUFF];
+            // if the buff data is for the doll herself
+            if (buffData[WeaponJSONKeys.BUFF_TARGET] == "Self") {
+                this.addBuff(buffData[WeaponJSONKeys.BUFF_NAME] + " C" + this.weaponCalib, this.name, -1, buffData[WeaponJSONKeys.BUFF_STACKS][this.weaponCalib - 1]);
+            }
+            // if the buff data is for the target of the attack
+            else {
+                let target = GameStateManager.getInstance().getTarget();
+                target.addBuff(buffData[WeaponJSONKeys.BUFF_NAME] + " C" + this.weaponCalib, this.name, -1, buffData[WeaponJSONKeys.BUFF_STACKS][this.weaponCalib - 1]);
+            }
+        }
+        else {
+            console.error(`${this.weaponName} does not have buffs`);
+        }
+    }
+    // for getting the element of the debuffs that triggers special gun effects
+    getGunElementExploit() {
+        if (this.weaponData.hasOwnProperty(WeaponJSONKeys.ELEMENTAL_DEBUFF))
+            return this.weaponData[WeaponJSONKeys.ELEMENTAL_DEBUFF][WeaponJSONKeys.DEBUFF_ELEMENT];
+        else
+            return Elements.PHYSICAL;
     }
     // get the attack type of the skill 
     getSkillAttackType(skillName) {
@@ -348,6 +451,8 @@ class Doll extends Unit {
             this.defenseIgnore += buffData[BuffJSONKeys.DEFENSE_IGNORE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.PHASE_DAMAGE))
             this.phaseDamageDealt += buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
+        if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENTAL_DAMAGE))
+            this.elementDamageDealt[buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][0]] += buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][1] * stackEffect;
     }
     removeBuffEffects(buffData, stacks = 1, stackable = false) {
         super.removeBuffEffects(buffData);
@@ -372,6 +477,8 @@ class Doll extends Unit {
             this.defenseIgnore -= buffData[BuffJSONKeys.DEFENSE_IGNORE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.PHASE_DAMAGE))
             this.phaseDamageDealt -= buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
+        if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENTAL_DAMAGE))
+            this.elementDamageDealt[buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][0]] -= buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][1] * stackEffect;
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
     // conditionals in skills are set automatically by the respective doll class or by an override checkbox in the menu
@@ -413,7 +520,18 @@ class Doll extends Unit {
         }
 
         if (skill[SkillJSONKeys.TYPE] == "Attack") {
-            this.processPrePostBuffs(skill, enemyTarget, supportTarget, 1);
+            // C6 heavy strings (no more rng) and classified manuscript are assumed that their cleanse procs from proper use
+            if (this.weaponName == "Heavy Strings" && this.weaponCalib == 6)
+                enemyTarget.addBuff("Cleanse", this.name, 1, 1);
+            else if (this.weaponName == "Classified Manuscript") {
+                if (this.weaponCalib < 3)
+                    enemyTarget.addBuff("Cleanse", this.name, 1, 1);
+                else if (this.weaponCalib < 6)
+                    enemyTarget.addBuff("Cleanse", this.name, 1, 2);
+                else
+                    enemyTarget.addBuff("Cleanse", this.name, 1, 3);
+            }
+            this.processPrePostBuffs(skill, enemyTarget, supportTarget, true);
             // if out of turn attack, temporarily increase damage dealt stat then undo once damage has been calculated
             if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
                 this.damageDealt += this.supportDamageDealt;
@@ -434,52 +552,66 @@ class Doll extends Unit {
             if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
                 this.damageDealt -= this.supportDamageDealt;
 
-            this.processPrePostBuffs(skill, enemyTarget, supportTarget, 0);
+            this.processPrePostBuffs(skill, enemyTarget, supportTarget, false);
             // some skills have an extra attack which, unless stated otherwise, have the same data as the first attack 
             if (skill.hasOwnProperty(SkillJSONKeys.EXTRA_ATTACK)) {
                 let extraAttack = skill[SkillJSONKeys.EXTRA_ATTACK];
 
-                this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 1);
+                this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, true);
 
                 damage += this.processAttack(extraAttack, calculationType, enemyTarget, skillName);
 
-                this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, 0);
+                this.processPrePostBuffs(extraAttack, enemyTarget, supportTarget, false);
             }
             // check if skill was used during turn or out of turn
             if (!(skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)) {
                 // end turn and decrease counters on buffs if extra command or movement is not triggered
-                if (!(this.hasBuff("Extra Command"))) //|| this.hasBuff("Extra Movement")))
+                if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
                     this.endTurn();
                 else {
-                    if (this.hasBuff("Extra Command"))
+                    if (this.hasBuff("Extra Command")) {
                         this.removeBuff("Extra Command");
-                    if (this.hasBuff("Extra Movement"))
+                        this.executingExtraAction = true;
+                    }
+                    if (this.hasBuff("Extra Movement")) {
                         this.removeBuff("Extra Movement");
+                        this.executingExtraAction = true;
+                        // temporary until movement grid is implemented
+                        this.endTurn();
+                    }
                 }
                 // extra action counts down on buff duration but enables another turn
                 if (this.hasBuff("Extra Action")) {
                     this.turnAvailable = true;
                     this.removeBuff("Extra Action");
+                    this.executingExtraAction = true;
                 }
             }
         }
         // if a buffing skill rather than attack, process buff data with supportTarget in the target parameter
         else {
-            this.processPrePostBuffs(skill, supportTarget, null, 1);
+            this.processPrePostBuffs(skill, supportTarget, null, true);
             if (!(skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)) {
                 // end turn and decrease counters on buffs if extra command or movement is not triggered
-                if (!(this.hasBuff("Extra Command")))// || this.hasBuff("Extra Movement")))
+                if (!(this.hasBuff("Extra Command") || this.hasBuff("Extra Movement")))
                     this.endTurn();
                 else {
-                    if (this.hasBuff("Extra Command"))
+                    if (this.hasBuff("Extra Command")) {
                         this.removeBuff("Extra Command");
-                    if (this.hasBuff("Extra Movement"))
+                        this.executingExtraAction = true;
+                    }
+                    if (this.hasBuff("Extra Movement")) {
                         this.removeBuff("Extra Movement");
+                        this.executingExtraAction = true;
+                        // temporary until movement grid is implemented
+                        this.endTurn();
+                    }
                 }
                 // extra action counts down on buff duration but enables another turn
                 if (this.hasBuff("Extra Action")) {
                     this.turnAvailable = true;
                     this.removeBuff("Extra Action");
+                    this.executingExtraAction = true;
                 }
             }
 
@@ -495,6 +627,9 @@ class Doll extends Unit {
                             if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
                                 duration = buff[SkillJSONKeys.BUFF_DURATION];
                             doll.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                            // if source has sparkling centerstage, apply 1 stack of gun passive
+                            if (this.weaponName == "Sparkling Centerstage")
+                                this.applyGunBuffs();
                         });
                     }
                 });
@@ -512,7 +647,7 @@ class Doll extends Unit {
                 }
             }
             else
-                this.processPrePostBuffs(skill, supportTarget, null, 0);
+                this.processPrePostBuffs(skill, supportTarget, null, false);
         }
         // suomi applies 1 stack of avalanche for any active skill use by anyone other than herself
         if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
@@ -539,6 +674,10 @@ class Doll extends Unit {
                 }
             }
         }
+        // weapon daydream activates self damage buff after a basic attack
+        if (skillName == SkillNames.BASIC && this.weaponName == "Daydream") {
+            this.applyGunBuffs();
+        }
     }
 
     endTurn() {
@@ -549,9 +688,47 @@ class Doll extends Unit {
             if (this.cooldowns[i] > 0)
                 this.cooldowns[i]--;
         }
+        // check if extra action was executed and invert the flag
+        if (this.executingExtraAction) {
+            this.executingExtraAction = false;
+            // if weapon is planeta, add the passive stacks
+            if (this.weaponName == "Planeta")
+                this.applyGunBuffs();
+        }
     }
 
     processAttack(skill, calculationType, target, skillName) {
+        // active engagement temporarily changes damage type to electric
+        let element = skill[SkillJSONKeys.ELEMENT];
+        if (this.hasBuff("Active Engagement") || this.hasBuff("Active Engagement V5"))
+            element = Elements.ELECTRIC;
+        // check if attack is an active attack or out of turn
+        if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
+            // on move gun effects can only activate when performing active attacks as that is the only time you can move before attacking
+            this.applyGunEffects(WeaponJSONKeys.ON_MOVE);
+            // arctic benediction is only used on active attacks to apply 10 or 20% dmg and 1 stack of frozen
+            if (this.hasBuff("Arctic Benediction")) {
+                target.addBuff("Frozen", this.name, 2, 1);
+                this.damageDealt += 0.1;
+            } 
+            else if (this.hasBuff("Arctic Benediction V1")) {
+                target.addBuff("Frozen", this.name, 2, 1);
+                this.damageDealt += 0.2;
+            }
+        }
+
+        // WILL HAVE TO TEST LATER IF NO MOVE GUN EFFECTS TRIGGERS ON OUT OF TURN ATTACKS
+        this.applyGunEffects(WeaponJSONKeys.NO_MOVE); 
+            
+        // if weapon is scylla, a buff that only works on aoe corrosion damage exists and the current system does not automatically apply it
+        if (element == Elements.CORROSION && skill[SkillJSONKeys.DAMAGE_TYPE] == AttackTypes.AOE)
+            this.applyGunEffects(WeaponJSONKeys.AOE_CORROSION);
+        // additionally check for the specific element that triggers any weapon bonus effects
+        let debuffExploited = false;
+        if (target.hasBuffElement(this.getGunElementExploit(), true)) {
+            this.applyGunEffects(WeaponJSONKeys.ELEMENTAL_DEBUFF);
+            debuffExploited = true;
+        }
         // set whether the attack crits or not
         let isCrit;
         let tempCritDmg = this.critDamage;
@@ -607,7 +784,7 @@ class Doll extends Unit {
                     fixedDamage = this.getAttack();
                     break;
                 default:
-                    console.error([`${data[SkillJSONKeys.FIXED_DAMAGE_STAT]} fixed damage scaling for is not covered`, this]);
+                    console.error([`${data[SkillJSONKeys.FIXED_DAMAGE_STAT]} fixed damage scaling for ${skillName} is not covered`, this]);
             }
             fixedDamage *= data[SkillJSONKeys.FIXED_DAMAGE_SCALING];
         }
@@ -622,10 +799,6 @@ class Doll extends Unit {
                     this.elementDamageDealt.Freeze += 0.15;
             }
         }
-        // active engagement temporarily changes damage type to electric
-        let element = skill[SkillJSONKeys.ELEMENT];
-        if (this.hasBuff("Active Engagement") || this.hasBuff("Active Engagement V5"))
-            element = Elements.ELECTRIC;
         // get the temporary damage boost from skill conditionals when triggered
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
             this.damageDealt += skill[SkillJSONKeys.DAMAGE_BOOST];
@@ -640,15 +813,40 @@ class Doll extends Unit {
             }
         }
         // after doing damage, consume any buffs that are reduced on attack
-        this.consumeAttackBuffs();
-        // for removing edifice stacks normally
-        if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName))
+        // for active attacks
+        if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
+            if (this.hasBuff("Arctic Benediction"))
+                this.damageDealt -= 0.1;
+            else if (this.hasBuff("Arctic Benediction V1")) 
+                this.damageDealt -= 0.2;
+            this.consumeAttackBuffs();
+            // additionally remove on move gun effect
+            this.removeGunEffects(WeaponJSONKeys.ON_MOVE);
+            // for removing edifice stacks normally
             target.takePrimaryDamage();
+        }
+        else {
+            // for support attacks
+            if (skillName == SkillNames.SUPPORT)
+                this.consumeSupportBuffs();
+            // bittersweet caramel passive stacks are gained by doing out of turn attacks
+            if (this.weaponName == "Bittersweet Caramel")
+                this.applyGunBuffs();
+        }
+            
         // add fixed damage
         damage += fixedDamage;
         if (fixedDamage > 0)
             DamageManager.getInstance().applyFixedDamage(fixedDamage, this.name);
 
+        // WILL HAVE TO TEST LATER IF NO MOVE GUN EFFECTS TRIGGERS ON OUT OF TURN ATTACKS
+        this.removeGunEffects(WeaponJSONKeys.NO_MOVE); 
+
+        if (element == Elements.CORROSION && skill[SkillJSONKeys.DAMAGE_TYPE] == AttackTypes.AOE)
+            this.removeGunEffects(WeaponJSONKeys.AOE_CORROSION);
+        if (this.getGunElementExploit() != Elements.PHYSICAL && debuffExploited)
+            this.removeGunEffects(WeaponJSONKeys.ELEMENTAL_DEBUFF);
+            
         return damage;
     }
 
@@ -657,7 +855,7 @@ class Doll extends Unit {
             // if the skill applies buffs before the attack
             if (skill.hasOwnProperty(SkillJSONKeys.PRE_SELF_BUFF)) {
                 let statusEffects = skill[SkillJSONKeys.PRE_SELF_BUFF];
-                // some skills apply multiple buffs so run a foreach loop to ensure all buffs are applies
+                // some skills apply multiple buffs so run a foreach loop to ensure all buffs are applied
                 statusEffects.forEach(buff => {
                     let stacks = 1;
                     if (buff.hasOwnProperty(SkillJSONKeys.BUFF_STACKS))
@@ -678,6 +876,8 @@ class Doll extends Unit {
                     if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
                         duration = buff[SkillJSONKeys.BUFF_DURATION];
                     target.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                    if (this.weaponName == "Sparkling Centerstage" && target != GameStateManager.getInstance().getTarget().getName())
+                        this.applyGunBuffs();
                 });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.PRE_SUPPORT_BUFF)) {
@@ -691,6 +891,9 @@ class Doll extends Unit {
                         if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
                             duration = buff[SkillJSONKeys.BUFF_DURATION];
                         supportTarget.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                        // if source has sparkling centerstage, apply 1 stack of gun passive
+                        if (this.weaponName == "Sparkling Centerstage")
+                            this.applyGunBuffs();
                     });
                 }
                 else
@@ -709,6 +912,9 @@ class Doll extends Unit {
                     if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
                         duration = buff[SkillJSONKeys.BUFF_DURATION];
                     target.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                    // if source has sparkling centerstage and buffs non enemies, apply 1 stack of gun passive
+                    if (this.weaponName == "Sparkling Centerstage" && target != GameStateManager.getInstance().getTarget().getName())
+                        this.applyGunBuffs();
                 });
             }
             if (skill.hasOwnProperty(SkillJSONKeys.POST_SELF_BUFF)) {
@@ -734,6 +940,9 @@ class Doll extends Unit {
                         if (buff.hasOwnProperty(SkillJSONKeys.BUFF_DURATION))
                             duration = buff[SkillJSONKeys.BUFF_DURATION];
                         supportTarget.addBuff(buff[SkillJSONKeys.BUFF_NAME], this.name, duration, stacks);
+                        // if source has sparkling centerstage, apply 1 stack of gun passive
+                        if (this.weaponName == "Sparkling Centerstage")
+                            this.applyGunBuffs();
                     });
                 }
                 else
@@ -741,10 +950,31 @@ class Doll extends Unit {
             }
         }
     }
-    // reduce stacks for any buffs that consume stacks on attack
+    // reduce stacks for any buffs that consume stacks on active attack
     consumeAttackBuffs() {
         this.currentBuffs.forEach((buff) => {
-            if (buff[5] == "Attack") { // check if buff stacks are consumed by defending
+            if (buff[5] == "Attack" || buff[5] == "ActiveAttack") { // check if buff stacks are consumed by any attack or active attacks
+                buff[3]--;
+                // remove buff if 0 stacks
+                if (buff[3] == 0) {
+                    this.removeBuff(buff[0]);
+                }
+                // else check if buff stacks and reduce the effects of 1 stack 
+                else if (buff[1].hasOwnProperty(BuffJSONKeys.STACKABLE)) {
+                    this.removeBuffEffects(buff[0], 1, true);
+                }
+                EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, 1, buff[0]]);
+            }
+            else if (buff[5] == "AllAttack") { // if all stacks are consumed in a single attack rather than gradually
+                EventManager.getInstance().broadcastEvent("stackConsumption", [this.name, buff[3], buff[0]]);
+                this.removeBuff(buff[0]);
+            }
+        });
+    }
+    // reduce stacks for any buffs that consume stacks on support attack
+    consumeSupportBuffs() {
+        this.currentBuffs.forEach((buff) => {
+            if (buff[5] == "Attack" || buff[5] == "Support") { // check if buff stacks are consumed by any attack or support attacks
                 buff[3]--;
                 // remove buff if 0 stacks
                 if (buff[3] == 0) {
@@ -838,7 +1068,7 @@ class Doll extends Unit {
     // to enable turn rewinding, each move uses clones of the previous state and rewind just returns to that set of clones
     cloneUnit(newDoll = null) {
         if (!newDoll)
-            newDoll = new Doll(this.name, this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled);   
+            newDoll = new Doll(this.name, this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);   
         newDoll.CIndex = this.CIndex;
         newDoll.setDefenseIgnore(this.baseDefenseIgnore);
         newDoll.setDamageDealt(this.baseDamageDealt); 
@@ -857,9 +1087,7 @@ class Doll extends Unit {
         newDoll.setStabilityIgnore(this.baseStabilityIgnore);
         newDoll.setAttackBoost(this.baseAttackBoost);
         newDoll.setDefenseBuffs(this.baseDefenseBuffs);
-        if (this.hasPhaseStrike)
-            newDoll.applyPhaseStrike();
-        newDoll.equipWeapon(this.weaponName, this.weaponCalib);
+
         if (!this.buffsEnabled)
             newDoll.disableBuffs();
         else {
@@ -876,6 +1104,7 @@ class Doll extends Unit {
             cds.push(this.cooldowns[i]);
         newDoll.cooldowns = cds;
         newDoll.turnAvailable = this.turnAvailable;
+        newDoll.executingExtraAction = this.executingExtraAction;
 
         newDoll.finishCloning();
         return newDoll;
