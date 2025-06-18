@@ -123,4 +123,18 @@ const WeaponJSONKeys = {
     BUFF_STACKS : "Stacks" // array as certain guns apply more stacks as calib increases
 }
 
-export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes, BuffJSONKeys, WeaponJSONKeys};
+const StatVariants = { // over time stats gained specific attack or element type variants so the initially separate variables are combined into an object instead
+    ALL : "All",
+    TARGETED : "Targeted",
+    AOE : "AoE",
+    PHASE : "Phase",
+    PHYSICAL : "Physical",
+    FREEZE: "Freeze",
+    BURN: "Burn",
+    CORROSION: "Corrosion",
+    HYDRO: "Hydro",
+    ELECTRIC: "Electric",
+    
+}
+
+export {AttackTypes, Elements, AmmoTypes, SkillJSONKeys, SkillNames, CalculationTypes, BuffJSONKeys, WeaponJSONKeys, StatVariants};

@@ -1,7 +1,7 @@
 import ResourceLoader from "./ResourceLoader.js";
 import DamageManager from "./DamageManager.js";
 import EventManager from "./EventManager.js";
-import { AmmoTypes, AttackTypes, BuffJSONKeys, Elements, CalculationTypes } from "./Enums.js";
+import { AmmoTypes, AttackTypes, BuffJSONKeys, Elements, CalculationTypes, StatVariants } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 import TurnManager from "./TurnManager.js";
 // root class for dolls (attackers) and targets (defenders)
@@ -87,13 +87,13 @@ class Unit {
             }
             // klukai key 3 adds a 15% dmg buff on corrosive infusion if the target is stability broken
             if (doll.getKeyEnabled(2) && this.stability == 0)
-                doll.setDamageDealt(doll.getDamageDealt() + 0.15);
+                doll.setDamageDealt(doll.getDamageDealt(StatVariants.ALL) + 0.15, StatVariants.ALL);
             // skillname argument is only used for broadcasting the skill name for dps statistics so it is fine to go outside of the SkillNames enum
             DamageManager.getInstance().calculateDamage(doll, this, doll.getAttack() * 0.12 * dotStacks, Elements.CORROSION, AmmoTypes.NONE,
                                                         AttackTypes.AOE, isCrit, tempCritDmg, 0, 1, "Corrosive Infusion");
                                                         
             if (doll.getKeyEnabled(2) && this.stability == 0)
-                doll.setDamageDealt(doll.getDamageDealt() - 0.15);
+                doll.setDamageDealt(doll.getDamageDealt(StatVariants.ALL) - 0.15, StatVariants.ALL);
         }
         else if (buffName == "Toxic Infiltration") {
             let doll = GameStateManager.getInstance().getDoll(sourceName);

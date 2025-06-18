@@ -8,7 +8,7 @@ import GlobalBuffManager from "./GlobalBuffManager.js"
 import DollFactory from "./DollFactory.js";
 import ActionLog from "./ActionLog.js";
 import Target from "./Target.js";
-import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames, WeaponJSONKeys} from "./Enums.js";
+import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames, WeaponJSONKeys, StatVariants} from "./Enums.js";
 import StatTracker from "./StatTracker.js";
 import ChartMaker from "./ChartMaker.js";
 
@@ -76,7 +76,7 @@ function addDoll() {
     newNode.firstElementChild.textContent = "-";
     newNode.id = "Doll_" + numDolls;
     newNode.children[1].innerHTML = "Doll: ";
-    newNode.children[12].innerHTML = "Weapon: Other Gun";
+    newNode.children[12].innerHTML = "Weapon: C1 Other Gun";
     d3.select(newNode).style("background-color", slotColors[numDolls-1]);
 
     let removeButton = d3.select(newNode).insert("button", "label");
@@ -356,23 +356,23 @@ function createDollsFromInput() {
             document.getElementById("Doll_" + (i + 1)).children[i == 0 ? 16 : 17].checked); // get the phase strike checkbox input
         //newDoll.disableBuffs();
         newDoll.finishCloning();
-        newDoll.setDamageDealt(dollStats[4]);
-        newDoll.setDefenseIgnore(dollStats[3]);
-        newDoll.setTargetedDamage(dollStats[5]);
-        newDoll.setAoEDamage(dollStats[6]);
+        newDoll.setDamageDealt(dollStats[4], StatVariants.ALL);
+        newDoll.setDefenseIgnore(dollStats[3], StatVariants.ALL);
+        newDoll.setDamageDealt(dollStats[5], StatVariants.TARGETED);
+        newDoll.setDamageDealt(dollStats[6], StatVariants.AOE);
         newDoll.setSlowedDamage(dollStats[7]);
         newDoll.setDefDownDamage(dollStats[8]);
         newDoll.setSupportDamage(dollStats[9]);
         newDoll.setCoverIgnore(dollStats[10]);  
-        newDoll.setStabilityDamageModifier(dollStats[11]);
+        newDoll.setStabilityDamageModifier(dollStats[11], StatVariants.ALL);
         newDoll.setStabilityIgnore(dollStats[12]);
-        newDoll.setPhaseDamage(dollStats[14]);
-        newDoll.setElementDamage(Elements.PHYSICAL, dollStats[15]);
-        newDoll.setElementDamage(Elements.FREEZE, dollStats[16]);
-        newDoll.setElementDamage(Elements.BURN, dollStats[17]);
-        newDoll.setElementDamage(Elements.CORROSION, dollStats[18]);
-        newDoll.setElementDamage(Elements.HYDRO, dollStats[19]);
-        newDoll.setElementDamage(Elements.ELECTRIC, dollStats[20]);
+        newDoll.setDamageDealt(dollStats[14], StatVariants.PHASE);
+        newDoll.setDamageDealt(dollStats[15], StatVariants.PHYSICAL);
+        newDoll.setDamageDealt(dollStats[16], StatVariants.FREEZE);
+        newDoll.setDamageDealt(dollStats[17], StatVariants.BURN);
+        newDoll.setDamageDealt(dollStats[18], StatVariants.CORROSION);
+        newDoll.setDamageDealt(dollStats[19], StatVariants.HYDRO);
+        newDoll.setDamageDealt(dollStats[20], StatVariants.ELECTRIC);
         // check if the weapon applies a global buff
         let weaponData = ResourceLoader.getInstance().getWeaponData(selectedWeapons[i]);
         if (weaponData.hasOwnProperty(WeaponJSONKeys.GLOBAL)) {
@@ -1525,33 +1525,33 @@ function updateStatDisplay(dollIndex, statIndex) {
             statName = "Attack";
             break;
         case 1:
-            baseStat = doll.getBaseCrit();
-            finalStat = doll.getCritRate();
+            baseStat = doll.getBaseCrit(StatVariants.ALL);
+            finalStat = doll.getCritRate(StatVariants.ALL);
             statName = "Crit Rate";
             break;
         case 2:
-            baseStat = doll.getBaseCritDamage();
-            finalStat = doll.getCritDamage();
+            baseStat = doll.getBaseCritDamage(StatVariants.ALL);
+            finalStat = doll.getCritDamage(StatVariants.ALL);
             statName = "Crit Damage";
             break;
         case 3:
-            baseStat = doll.getBaseDefenseIgnore();
-            finalStat = doll.getDefenseIgnore();
+            baseStat = doll.getBaseDefenseIgnore(StatVariants.ALL);
+            finalStat = doll.getDefenseIgnore(StatVariants.ALL);
             statName = "Defense Ignore";
             break;
         case 4:
-            baseStat = doll.getBaseDamageDealt();
-            finalStat = doll.getDamageDealt();
+            baseStat = doll.getBaseDamageDealt(StatVariants.ALL);
+            finalStat = doll.getDamageDealt(StatVariants.ALL);
             statName = "Damage Dealt";
             break;
         case 5:
-            baseStat = doll.getBaseTargetedDamage();
-            finalStat = doll.getTargetedDamage();
+            baseStat = doll.getBaseDamageDealt(StatVariants.TARGETED);
+            finalStat = doll.getDamageDealt(StatVariants.TARGETED);
             statName = "Targeted Damage";
             break;
         case 6:
-            baseStat = doll.getBaseAoEDamage();
-            finalStat = doll.getAoEDamage();
+            baseStat = doll.getBaseDamageDealt(StatVariants.AOE);
+            finalStat = doll.getDamageDealt(StatVariants.AOE);
             statName = "AoE Damage";
             break;
         case 7:
@@ -1575,8 +1575,8 @@ function updateStatDisplay(dollIndex, statIndex) {
             statName = "Cover Ignore";
             break;
         case 11:
-            baseStat = doll.getBaseStabilityDamageModifier();
-            finalStat = doll.getStabilityDamageModifier();
+            baseStat = doll.getBaseStabilityDamageModifier(StatVariants.ALL);
+            finalStat = doll.getStabilityDamageModifier(StatVariants.ALL);
             statName = "Stability Damage";
             break;
         case 12:
@@ -1600,38 +1600,38 @@ function updateStatDisplay(dollIndex, statIndex) {
             statName = "Defense Boost";
             break;
         case 16:
-            baseStat = doll.getBasePhaseDamage();
-            finalStat = doll.getPhaseDamage();
+            baseStat = doll.getBaseDamageDealt(StatVariants.PHASE);
+            finalStat = doll.getDamageDealt(StatVariants.PHASE);
             statName = "Phase Damage";
             break;
         case 17:
-            baseStat = doll.getBaseElementDamage(Elements.PHYSICAL);
-            finalStat = doll.getElementDamage(Elements.PHYSICAL);
+            baseStat = doll.getBaseDamageDealt(StatVariants.PHYSICAL);
+            finalStat = doll.getDamageDealt(StatVariants.PHYSICAL);
             statName = "Physical Damage";
             break;
         case 18:
-            baseStat = doll.getBaseElementDamage(Elements.FREEZE);
-            finalStat = doll.getElementDamage(Elements.FREEZE);
+            baseStat = doll.getBaseDamageDealt(StatVariants.FREEZE);
+            finalStat = doll.getDamageDealt(StatVariants.FREEZE);
             statName = "Freeze Damage";
             break;
         case 19:
-            baseStat = doll.getBaseElementDamage(Elements.BURN);
-            finalStat = doll.getElementDamage(Elements.BURN);
+            baseStat = doll.getBaseDamageDealt(StatVariants.BURN);
+            finalStat = doll.getDamageDealt(StatVariants.BURN);
             statName = "Burn Damage";
             break;
         case 20:
-            baseStat = doll.getBaseElementDamage(Elements.CORROSION);
-            finalStat = doll.getElementDamage(Elements.CORROSION);
+            baseStat = doll.getBaseDamageDealt(StatVariants.CORROSION);
+            finalStat = doll.getDamageDealt(StatVariants.CORROSION);
             statName = "Corrosion Damage";
             break;
         case 21:
-            baseStat = doll.getBaseElementDamage(Elements.HYDRO);
-            finalStat = doll.getElementDamage(Elements.HYDRO);
+            baseStat = doll.getBaseDamageDealt(StatVariants.HYDRO);
+            finalStat = doll.getDamageDealt(StatVariants.HYDRO);
             statName = "Hydro Damage";
             break;
         case 22:
-            baseStat = doll.getBaseElementDamage(Elements.ELECTRIC);
-            finalStat = doll.getElementDamage(Elements.ELECTRIC);
+            baseStat = doll.getBaseDamageDealt(StatVariants.ELECTRIC);
+            finalStat = doll.getDamageDealt(StatVariants.ELECTRIC);
             statName = "Electric Damage";
             break;
         default :
@@ -1659,22 +1659,22 @@ function changeDollStat(dollIndex) {
             doll.setAttack(newStat);
             break;
         case 1:
-            doll.setCritRate(newStat);
+            doll.setCritRate(newStat, StatVariants.ALL);
             break;
         case 2:
-            doll.setCritDamage(newStat);
+            doll.setCritDamage(newStat, StatVariants.ALL);
             break;
         case 3:
-            doll.setDefenseIgnore(newStat);
+            doll.setDefenseIgnore(newStat, StatVariants.ALL);
             break;
         case 4:
-            doll.setDamageDealt(newStat);
+            doll.setDamageDealt(newStat, StatVariants.ALL);
             break;
         case 5:
-            doll.setTargetedDamage(newStat);
+            doll.setDamageDealt(newStat, StatVariants.TARGETED);
             break;
         case 6:
-            doll.setAoEDamage(newStat);
+            doll.setDamageDealt(newStat, StatVariants.AOE);
             break;
         case 7:
             doll.setSlowedDamage(newStat);
@@ -1689,7 +1689,7 @@ function changeDollStat(dollIndex) {
             doll.setCoverIgnore(newStat);
             break;
         case 11:
-            doll.setStabilityDamageModifier(newStat);
+            doll.setStabilityDamageModifier(newStat, StatVariants.ALL);
             break;
         case 12:
             doll.setStabilityIgnore(newStat);
@@ -1704,25 +1704,25 @@ function changeDollStat(dollIndex) {
             doll.setDefenseBuffs(newStat);
             break;
         case 16:
-            doll.setPhaseDamage(newStat);
+            doll.setDamageDealt(newStat, StatVariants.PHASE);
             break;
         case 17:
-            doll.setElementDamage(Elements.PHYSICAL, newStat);
+            doll.setDamageDealt(newStat, StatVariants.PHYSICAL);
             break;
         case 18:
-            doll.setElementDamage(Elements.FREEZE, newStat);
+            doll.setDamageDealt(newStat, StatVariants.FREEZE);
             break;
         case 19:
-            doll.setElementDamage(Elements.BURN, newStat);
+            doll.setDamageDealt(newStat, StatVariants.BURN);
             break;
         case 20:
-            doll.setElementDamage(Elements.CORROSION, newStat);
+            doll.setDamageDealt(newStat, StatVariants.CORROSION);
             break;
         case 21:
-            doll.setElementDamage(Elements.HYDRO, newStat);
+            doll.setDamageDealt(newStat, StatVariants.HYDRO);
             break;
         case 22:
-            doll.setElementDamage(Elements.ELECTRIC, newStat);
+            doll.setDamageDealt(newStat, StatVariants.ELECTRIC);
             break;
         default :
             console.error(`${statIndex} out of range of stat array`);

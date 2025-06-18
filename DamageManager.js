@@ -1,6 +1,6 @@
 import GameStateManager from "./GameStateManager.js";
 import EventManager from "./EventManager.js";
-import {AttackTypes, Elements, AmmoTypes, WeaponJSONKeys, SkillNames, BuffJSONKeys} from "./Enums.js";
+import {AttackTypes, Elements, AmmoTypes, WeaponJSONKeys, SkillNames, BuffJSONKeys, StatVariants} from "./Enums.js";
 import GlobalBuffManager from "./GlobalBuffManager.js";
 
 let DamageManagerSingleton;
@@ -34,7 +34,7 @@ class DamageManager {
             }
         });
         // stability modifier buffs on the target or doll, minimum of 0 before phase weakness adds 2 per weakness
-        let totalStabDamage = Math.max(0, stabilityDamage + target.getStabilityDamageModifier() + attacker.getStabilityDamageModifier());
+        let totalStabDamage = Math.max(0, stabilityDamage + target.getStabilityDamageModifier() + attacker.getStabilityDamageModifier(StatVariants.ALL));
         totalStabDamage += weaknesses * 2;
         let weaknessModifier = 1 + weaknesses * 0.1;
         // flammable increases burn stability damage by 2 and gets consumed when it triggers
@@ -50,27 +50,29 @@ class DamageManager {
         // some dolls ignore a set amount of stability
         let effectiveStability = Math.max(target.getStability() - attacker.getStabilityIgnore(),0);
 
-        let totalDefIgnore = attacker.getDefenseIgnore();
+        let totalDefIgnore = attacker.getDefenseIgnore(StatVariants.ALL);
         // targeted and aoe def ignore buffs are not automatically added so add their specific buff effects here
         if (damageType == AttackTypes.TARGETED) {
-            if (attacker.hasBuff("Piercing 1"))
+            /*if (attacker.hasBuff("Piercing 1"))
                 totalDefIgnore += 0.2;
             else if (attacker.hasBuff("Piercing 2"))
-                totalDefIgnore += 0.3;
+                totalDefIgnore += 0.3;*/
+            totalDefIgnore += attacker.getDefenseIgnore(StatVariants.TARGETED);
         }
         else {
-            if (attacker.hasBuff("Domain Penetration 1"))
+            /*if (attacker.hasBuff("Domain Penetration 1"))
                 totalDefIgnore += 0.2;
             else if (attacker.hasBuff("Domain Penetration 2"))
-                totalDefIgnore += 0.3;
+                totalDefIgnore += 0.3;*/
+            totalDefIgnore += attacker.getDefenseIgnore(StatVariants.AOE);
         }
 
         let coverValue = GameStateManager.getInstance().getCover();
         // apply gun effect for attacking out of cover target if value is 0
         if (coverValue == 0)
             attacker.applyGunEffects(WeaponJSONKeys.OUT_OF_COVER);
-        let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - (effectiveStability > 0 && 
-                                                                            !(damageType == AttackTypes.AOE || ammoType == AmmoTypes.MELEE) ? 0.6 : 0);
+        let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - 
+                                                                (effectiveStability > 0 && !(damageType == AttackTypes.AOE || ammoType == AmmoTypes.MELEE) ? 0.6 : 0);
 
         let critModifier = isCrit ? critDamage : 1;
         // there are a lot of damage dealt/taken effects that are specific to certain conditions
@@ -81,7 +83,7 @@ class DamageManager {
             totalBuffs -= target.getDRWithStab();
         }
         totalBuffs += target.getDamageTaken();
-        totalBuffs += attacker.getDamageDealt();
+        totalBuffs += attacker.getDamageDealt(StatVariants.ALL);
         totalBuffs += GlobalBuffManager.getInstance().getGlobalDamage();
         // check if the target has elemental debuffs
         let elements = Object.values(Elements);
@@ -94,13 +96,13 @@ class DamageManager {
         if (attacker.getPhaseStrike() && hasElementalDebuff)
             totalBuffs += 0.15;
         if (damageType == AttackTypes.TARGETED) {
-            totalBuffs += target.getTargetedDamageTaken();
-            totalBuffs += attacker.getTargetedDamage();
+            totalBuffs += target.getTargetedDamageTaken(StatVariants.TARGETED);
+            totalBuffs += attacker.getDamageDealt(StatVariants.TARGETED);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalTargetedDamage();
         }
         else {
-            totalBuffs += target.getAoEDamageTaken();
-            totalBuffs += attacker.getAoEDamage();
+            totalBuffs += target.getAoEDamageTaken(StatVariants.AOE);
+            totalBuffs += attacker.getDamageDealt(StatVariants.AOE);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalAoEDamage();
         }
         // damage increases that require a specific type of debuff
@@ -111,12 +113,12 @@ class DamageManager {
         if (effectiveStability == 0)
             totalBuffs += attacker.getExposedDamage();
         if (element == Elements.PHYSICAL) {
-            totalBuffs += attacker.getElementDamage(Elements.PHYSICAL);
+            totalBuffs += attacker.getDamageDealt(StatVariants.PHYSICAL);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalElementalDamage(Elements.PHYSICAL);
         }
         else {
-            totalBuffs += attacker.getPhaseDamage();
-            totalBuffs += attacker.getElementDamage(element);
+            totalBuffs += attacker.getDamageDealt(StatVariants.PHASE);
+            totalBuffs += attacker.getDamageDealt(element);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalElementalDamage(element);
         }
         }
