@@ -81,19 +81,19 @@ const BuffJSONKeys = {
     STACK_LIMIT : "Stack_Limit", // maximum number of stacks the unit can have, is not necessarily used in conjunction with "stackable"
     ATTACK_PERC : "Attack_Perc",
     DEFENSE_PERC : "Defense_Perc",
-    STABILITY_TAKEN : "Stability_Taken",
-    DAMAGE_PERC : "Damage_Perc",
+    STABILITY_TAKEN : "Stability_Taken", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
+    DAMAGE_PERC : "Damage_Perc", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
     SUPPORT_PERC : "Support_Perc",
     EXPOSED_PERC : "Exposed_Perc",
-    CRIT_RATE : "Crit",
-    CRIT_DAMAGE : "Crit_Damage",
-    DAMAGE_TAKEN : "Damage_Taken",
-    STABILITY_DAMAGE : "Stability_Damage",
-    DEFENSE_IGNORE : "Defense_Ignore",
-    AOE_DAMAGE_TAKEN : "AoE_Damage_Taken",
-    TARGETED_DAMAGE_TAKEN : "Targeted_Damage_Taken",
-    PHASE_DAMAGE : "Phase_Damage",
-    ELEMENTAL_DAMAGE : "Elemental_Damage" // elemental damage buffs, value is an array where 0 index is the element and 1 index is the amount of damage increase
+    CRIT_RATE : "Crit", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
+    CRIT_DAMAGE : "Crit_Damage", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
+    DAMAGE_TAKEN : "Damage_Taken", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
+    STABILITY_DAMAGE : "Stability_Damage", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
+    DEFENSE_IGNORE : "Defense_Ignore", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
+    //AOE_DAMAGE_TAKEN : "AoE_Damage_Taken",
+    //TARGETED_DAMAGE_TAKEN : "Targeted_Damage_Taken",
+    //PHASE_DAMAGE : "Phase_Damage",
+    //ELEMENTAL_DAMAGE : "Elemental_Damage" // elemental damage buffs, value is an array where 0 index is the element and 1 index is the amount of damage increase
 }
 
 const WeaponJSONKeys = {
@@ -111,10 +111,11 @@ const WeaponJSONKeys = {
     DEBUFF_ELEMENT : "Element", // element that triggers elemental debuff bonus
     ON_INSIGHT : "On_Insight", // object containing stat buffs if insight is present
     AOE_CORROSION : "AoE_Corrosion", // array for cluckay gun damage passive which is extremely specific on the damage type boosted
-    ELEMENTAL_DAMAGE : "Elemental_Damage", // array for elemental damage, same format as buff elemental_damage but the 1 index can be array if scaling with calib
-    DAMAGE_PERC : "Damage_Perc",  // array for damage increase, each index corresponds to a calibration level
-    PHASE_DAMAGE : "Phase_Damage", // array for phase damage, same format as above
-    CRIT_DAMAGE : "Crit_Damage", // array for crit damage, same format as above
+    //ELEMENTAL_DAMAGE : "Elemental_Damage", // array for elemental damage, same format as buff elemental_damage but the second element is an array scaling with calib
+    DAMAGE_PERC : "Damage_Perc",  // array for damage increase, each element is an array with the first element corresponding to statvariants,
+    //the second element is another array with values which corresponds to a calibration level. Implemented like this because of samosek needing 2 entries in damage_perc
+    //PHASE_DAMAGE : "Phase_Damage", // array for phase damage, same format as above
+    CRIT_DAMAGE : "Crit_Damage", // array for crit damage, same format as above just in case of another samosek situation in the future
     DEFENSE_IGNORE : "Defense_Ignore", // array for defense ignore, same format as above
     STABILITY_IGNORE : "Stability_Ignore", // array for stability ignore, same format as above
     BUFF : "Buff", // object, buffs that are applied after a condition, condition checks are hardcoded into the doll class, same format as skill buff objects

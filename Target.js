@@ -118,28 +118,46 @@ class Target extends Unit {
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN))
-            this.damageTaken[StatVariants.ALL] += buffData[BuffJSONKeys.DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.AOE_DAMAGE_TAKEN))
-            this.damageTaken[StatVariants.AOE] += buffData[BuffJSONKeys.AOE_DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.TARGETED_DAMAGE_TAKEN))
-            this.damageTaken[StatVariants.TARGETED] += buffData[BuffJSONKeys.TARGETED_DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN))
-            this.stabilityTakenModifier[StatVariants.ALL] += buffData[BuffJSONKeys.STABILITY_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN)) {
+            let buff = buffData[BuffJSONKeys.DAMAGE_TAKEN];
+            if (this.damageTaken.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.damageTaken[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+            //this.damageTaken[StatVariants.ALL] += buffData[BuffJSONKeys.DAMAGE_TAKEN] * stackEffect;
+        //if(buffData.hasOwnProperty(BuffJSONKeys.AOE_DAMAGE_TAKEN))
+        //    this.damageTaken[StatVariants.AOE] += buffData[BuffJSONKeys.AOE_DAMAGE_TAKEN] * stackEffect;
+        //if(buffData.hasOwnProperty(BuffJSONKeys.TARGETED_DAMAGE_TAKEN))
+        //    this.damageTaken[StatVariants.TARGETED] += buffData[BuffJSONKeys.TARGETED_DAMAGE_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN)) {
+            let buff = buffData[BuffJSONKeys.STABILITY_TAKEN];
+            if (this.stabilityTakenModifier.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.stabilityTakenModifier[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+            //this.stabilityTakenModifier[StatVariants.ALL] += buffData[BuffJSONKeys.STABILITY_TAKEN] * stackEffect;
     }
     removeBuffEffects(buffData, stacks = 1, stackable = false) {
         super.removeBuffEffects(buffData, stacks, stackable);
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN))
-            this.damageTaken[StatVariants.ALL] -= buffData[BuffJSONKeys.DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.AOE_DAMAGE_TAKEN))
-            this.damageTaken[StatVariants.AOE] -= buffData[BuffJSONKeys.AOE_DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.TARGETED_DAMAGE_TAKEN))
-            this.damageTaken[StatVariants.TARGETED] -= buffData[BuffJSONKeys.TARGETED_DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN))
-            this.stabilityTakenModifier[StatVariants.ALL] -= buffData[BuffJSONKeys.STABILITY_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN)) {
+            let buff = buffData[BuffJSONKeys.DAMAGE_TAKEN];
+            if (this.damageTaken.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.damageTaken[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN)) {
+            let buff = buffData[BuffJSONKeys.STABILITY_TAKEN];
+            if (this.stabilityTakenModifier.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.stabilityTakenModifier[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
     }
     addBuff(buffName, sourceName, duration = -1, stacks = 1) {
         super.addBuff(buffName, sourceName, duration, stacks);

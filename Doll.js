@@ -439,16 +439,41 @@ class Doll extends Unit {
         if (this.weaponData.hasOwnProperty(objectKey)) {
             let passiveData = this.weaponData[objectKey];
             // passives that have conditions that stack are assumed to have stacked to the max on all attacks unless it requires movement
-            if (passiveData.hasOwnProperty(WeaponJSONKeys.DAMAGE_PERC))
-                this.damageDealt[StatVariants.ALL] += passiveData[WeaponJSONKeys.DAMAGE_PERC][this.weaponCalib - 1];
-            if (passiveData.hasOwnProperty(WeaponJSONKeys.CRIT_DAMAGE))
-                this.critDamage[StatVariants.ALL] += passiveData[WeaponJSONKeys.CRIT_DAMAGE][this.weaponCalib - 1];
-            if (passiveData.hasOwnProperty(WeaponJSONKeys.DEFENSE_IGNORE))
-                this.defenseIgnore[StatVariants.ALL] += passiveData[WeaponJSONKeys.DEFENSE_IGNORE][this.weaponCalib - 1];
-            if (passiveData.hasOwnProperty(WeaponJSONKeys.ELEMENTAL_DAMAGE))
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.DAMAGE_PERC)) {
+                let buffs = passiveData[WeaponJSONKeys.DAMAGE_PERC];
+                // because samosek has both phase and element damage_perc, all damage_perc entries are arrays able to hold multiple variants
+                buffs.forEach(buff => {
+                    if (this.damageDealt.hasOwnProperty(buff[0]))
+                        this.damageDealt[buff[0]] += buff[1][this.weaponCalib - 1];
+                    else
+                        console.error(`${buff[0]} is not covered by StatVariants`);
+                });
+            }
+            //    this.damageDealt[StatVariants.ALL] += passiveData[WeaponJSONKeys.DAMAGE_PERC][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.CRIT_DAMAGE)) {
+                let buffs = passiveData[WeaponJSONKeys.CRIT_DAMAGE];
+                buffs.forEach(buff => {
+                    if (this.critDamage.hasOwnProperty(buff[0]))
+                        this.critDamage[buff[0]] += buff[1][this.weaponCalib - 1];
+                    else
+                        console.error(`${buff[0]} is not covered by StatVariants`);
+                });
+            }
+            //    this.critDamage[StatVariants.ALL] += passiveData[WeaponJSONKeys.CRIT_DAMAGE][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.DEFENSE_IGNORE)) {
+                let buffs = passiveData[WeaponJSONKeys.DEFENSE_IGNORE];
+                buffs.forEach(buff => {
+                    if (this.defenseIgnore.hasOwnProperty(buff[0]))
+                        this.defenseIgnore[buff[0]] += buff[1][this.weaponCalib - 1];
+                    else
+                        console.error(`${buff[0]} is not covered by StatVariants`);
+                });
+            }
+            //    this.defenseIgnore[StatVariants.ALL] += passiveData[WeaponJSONKeys.DEFENSE_IGNORE][this.weaponCalib - 1];
+            /*if (passiveData.hasOwnProperty(WeaponJSONKeys.ELEMENTAL_DAMAGE))
                 this.damageDealt[passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][0]] += passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][1][this.weaponCalib - 1];
             if (passiveData.hasOwnProperty(WeaponJSONKeys.PHASE_DAMAGE))
-                this.damageDealt[StatVariants.PHASE] += passiveData[WeaponJSONKeys.PHASE_DAMAGE][this.weaponCalib - 1];
+                this.damageDealt[StatVariants.PHASE] += passiveData[WeaponJSONKeys.PHASE_DAMAGE][this.weaponCalib - 1];*/
             if (passiveData.hasOwnProperty(WeaponJSONKeys.STABILITY_IGNORE))
                 this.stabilityIgnore += passiveData[WeaponJSONKeys.STABILITY_IGNORE][this.weaponCalib - 1];
 
@@ -528,15 +553,49 @@ class Doll extends Unit {
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC))
-            this.damageDealt[StatVariants.ALL] += buffData[BuffJSONKeys.DAMAGE_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC)) {
+            let buff = buffData[BuffJSONKeys.DAMAGE_PERC];
+            if (this.damageDealt.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.damageDealt[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE)) {
+            let buff = buffData[BuffJSONKeys.CRIT_RATE];
+            if (this.critChance.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.critChance[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE)) {
+            let buff = buffData[BuffJSONKeys.CRIT_DAMAGE];
+            if (this.critDamage.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.critDamage[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_DAMAGE)) {
+            let buff = buffData[BuffJSONKeys.STABILITY_DAMAGE];
+            if (this.stabilityDamageModifier.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.stabilityDamageModifier[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_IGNORE)) {
+            let buff = buffData[BuffJSONKeys.DEFENSE_IGNORE];
+            if (this.defenseIgnore.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.defenseIgnore[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        //    this.damageDealt[StatVariants.ALL] += buffData[BuffJSONKeys.DAMAGE_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.ATTACK_PERC))
             this.attackBoost += buffData[BuffJSONKeys.ATTACK_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.SUPPORT_PERC))
             this.supportDamageDealt += buffData[BuffJSONKeys.SUPPORT_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.EXPOSED_PERC))
             this.exposedDamageDealt += buffData[BuffJSONKeys.EXPOSED_PERC] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
+        /*if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
             this.critChance[StatVariants.ALL] += buffData[BuffJSONKeys.CRIT_RATE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE))
             this.critDamage[StatVariants.ALL] += buffData[BuffJSONKeys.CRIT_DAMAGE] * stackEffect;
@@ -548,21 +607,55 @@ class Doll extends Unit {
             this.damageDealt[StatVariants.PHASE] += buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
         if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENTAL_DAMAGE))
             this.damageDealt[buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][0]] += buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][1] * stackEffect;
+        */
     }
     removeBuffEffects(buffData, stacks = 1, stackable = false) {
         super.removeBuffEffects(buffData);
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC))
-            this.damageDealt[StatVariants.ALL] -= buffData[BuffJSONKeys.DAMAGE_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC)) {
+            let buff = buffData[BuffJSONKeys.DAMAGE_PERC];
+            if (this.damageDealt.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.damageDealt[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE)) {
+            let buff = buffData[BuffJSONKeys.CRIT_RATE];
+            if (this.critChance.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.critChance[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE)) {
+            let buff = buffData[BuffJSONKeys.CRIT_DAMAGE];
+            if (this.critDamage.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.critDamage[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_DAMAGE)) {
+            let buff = buffData[BuffJSONKeys.STABILITY_DAMAGE];
+            if (this.stabilityDamageModifier.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.stabilityDamageModifier[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_IGNORE)) {
+            let buff = buffData[BuffJSONKeys.DEFENSE_IGNORE];
+            if (this.defenseIgnore.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.defenseIgnore[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
         if(buffData.hasOwnProperty(BuffJSONKeys.ATTACK_PERC))
             this.attackBoost -= buffData[BuffJSONKeys.ATTACK_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.SUPPORT_PERC))
             this.supportDamageDealt -= buffData[BuffJSONKeys.SUPPORT_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.EXPOSED_PERC))
             this.exposedDamageDealt -= buffData[BuffJSONKeys.EXPOSED_PERC] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
+        /*if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
             this.critChance[StatVariants.ALL] -= buffData[BuffJSONKeys.CRIT_RATE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE))
             this.critDamage[StatVariants.ALL] -= buffData[BuffJSONKeys.CRIT_DAMAGE] * stackEffect;
@@ -574,6 +667,7 @@ class Doll extends Unit {
             this.damageDealt[StatVariants.PHASE] -= buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
         if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENTAL_DAMAGE))
             this.damageDealt[buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][0]] -= buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][1] * stackEffect;
+        */
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
     // conditionals in skills are set automatically by the respective doll class or by an override checkbox in the menu

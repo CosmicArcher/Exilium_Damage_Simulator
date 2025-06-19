@@ -689,7 +689,7 @@ d3.select("#startButton").on("click", () => {
     newTarget.setDamageTaken(targetStats[5], StatVariants.ALL);
     newTarget.setDamageTaken(targetStats[6], StatVariants.TARGETED);
     newTarget.setDamageTaken(targetStats[7], StatVariants.AOE);
-    newTarget.setStabilityDamageModifier(targetStats[8], StatVariants.ALL);
+    newTarget.setStabilityTakenModifier(targetStats[8], StatVariants.ALL);
     newTarget.applyDRPerStab(targetStats[9]);
     newTarget.applyDRWithStab(targetStats[10]);
     newTarget.setIsLarge(document.getElementById("largeToggle").checked);
@@ -1851,7 +1851,7 @@ function changeTargetStat() {
             target.setDamageTaken(newStat, StatVariants.TARGETED);
             break;
         case 6:
-            target.setStabilityDamageModifier(newStat, StatVariants.ALL);
+            target.setStabilityTakenModifier(newStat, StatVariants.ALL);
             break;
         case 7:
             target.applyDRPerStab(newStat);

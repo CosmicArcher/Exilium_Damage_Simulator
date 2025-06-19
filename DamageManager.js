@@ -34,22 +34,15 @@ class DamageManager {
             }
         });
         // stability modifier buffs on the target or doll, minimum of 0 before phase weakness adds 2 per weakness
-        let totalStabDamage = Math.max(0, stabilityDamage + target.getStabilityTakenModifier(StatVariants.ALL) + attacker.getStabilityDamageModifier(StatVariants.ALL));
-        totalStabDamage += weaknesses * 2;
-        let weaknessModifier = 1 + weaknesses * 0.1;
+        let totalStabDamage = stabilityDamage + target.getStabilityTakenModifier(StatVariants.ALL) + attacker.getStabilityDamageModifier(StatVariants.ALL);
         // flammable increases burn stability damage by 2 and gets consumed when it triggers
-        if (target.hasBuff("Flammable") && element == Elements.BURN)
-            totalStabDamage += 2;
+        //if (target.hasBuff("Flammable") && element == Elements.BURN)
+        //    totalStabDamage += 2;
         
         if (weaknesses > 0) {
-            // if any phase weakness is exploited, stability damage happens before the attack rather than after
-            target.reduceStability(totalStabDamage);
             // apply gun effect for exploiting phase weakness, if element was not exploited use physical as a placeholder to avoid incorrect behavior
             attacker.applyGunEffects(WeaponJSONKeys.PHASE_EXPLOIT, exploitedElement ? element : Elements.PHYSICAL);
         }
-        // some dolls ignore a set amount of stability
-        let effectiveStability = Math.max(target.getStability() - attacker.getStabilityIgnore(),0);
-
         // targeted and aoe def ignore buffs are not automatically added so add their specific buff effects here
         /*if (damageType == AttackTypes.TARGETED) {
             /*if (attacker.hasBuff("Piercing 1"))
@@ -66,66 +59,96 @@ class DamageManager {
             
         }*/
 
-        let coverValue = GameStateManager.getInstance().getCover();
-        // apply gun effect for attacking out of cover target if value is 0
-        if (coverValue == 0)
-            attacker.applyGunEffects(WeaponJSONKeys.OUT_OF_COVER);
-        let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - 
-                                                                (effectiveStability > 0 && !(damageType == AttackTypes.AOE || ammoType == AmmoTypes.MELEE) ? 0.6 : 0);
-
-        let critModifier = isCrit ? critDamage : 1;
+        
         // there are a lot of damage dealt/taken effects that are specific to certain conditions
         let totalBuffs = 1;
         let totalDefIgnore = attacker.getDefenseIgnore(StatVariants.ALL);
-        { // check if there is remaining stability, apply stability based damage reduction
-        if (effectiveStability > 0) {
-            totalBuffs -= target.getDRPerStab() * effectiveStability;
-            totalBuffs -= target.getDRWithStab();
-        }
+        {
         totalBuffs += target.getDamageTaken(StatVariants.ALL);
         totalBuffs += attacker.getDamageDealt(StatVariants.ALL);
         totalBuffs += GlobalBuffManager.getInstance().getGlobalDamage();
         // check if the target has elemental debuffs
         let elements = Object.values(Elements);
         let hasElementalDebuff = false;
-        for (let i = 0; i < elements.length && !hasElementalDebuff ; i++) {
-            if (target.hasBuffElement(elements[i], true))
-                hasElementalDebuff = true; 
-        }
         // check if the attacker has phase strike and add the damage if any elemental debuff is found
-        if (attacker.getPhaseStrike() && hasElementalDebuff)
-            totalBuffs += 0.15;
+        if (attacker.getPhaseStrike()) {
+            for (let i = 0; i < elements.length && !hasElementalDebuff ; i++) {
+                if (target.hasBuffElement(elements[i], true)) {
+                    hasElementalDebuff = true; 
+                    totalBuffs += 0.15;
+                }
+            }
+        }
         if (damageType == AttackTypes.TARGETED) {
             totalBuffs += target.getDamageTaken(StatVariants.TARGETED);
             totalBuffs += attacker.getDamageDealt(StatVariants.TARGETED);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalTargetedDamage();
             totalDefIgnore += attacker.getDefenseIgnore(StatVariants.TARGETED);
+            totalStabDamage += attacker.getStabilityDamageModifier(StatVariants.TARGETED);
+            totalStabDamage += target.getStabilityTakenModifier(StatVariants.TARGETED);
         }
         else {
             totalBuffs += target.getDamageTaken(StatVariants.AOE);
             totalBuffs += attacker.getDamageDealt(StatVariants.AOE);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalAoEDamage();
             totalDefIgnore += attacker.getDefenseIgnore(StatVariants.AOE);
+            totalStabDamage += attacker.getStabilityDamageModifier(StatVariants.AOE);
+            totalStabDamage += target.getStabilityTakenModifier(StatVariants.AOE);
         }
         // damage increases that require a specific type of debuff
         if (target.hasBuffType("Movement", true))
             totalBuffs += attacker.getSlowedDamage();
         if (target.hasBuffType("Defense", true))
             totalBuffs += attacker.getDefDownDamage();
-        if (effectiveStability == 0)
-            totalBuffs += attacker.getExposedDamage();
         if (element == Elements.PHYSICAL) {
+            totalBuffs += target.getDamageTaken(StatVariants.PHYSICAL);
             totalBuffs += attacker.getDamageDealt(StatVariants.PHYSICAL);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalElementalDamage(Elements.PHYSICAL);
+            totalDefIgnore += attacker.getDefenseIgnore(StatVariants.PHYSICAL);
+            totalStabDamage += attacker.getStabilityDamageModifier(StatVariants.PHYSICAL);
+            totalStabDamage += target.getStabilityTakenModifier(StatVariants.PHYSICAL);
         }
         else {
+            totalBuffs += target.getDamageTaken(StatVariants.PHASE);
             totalBuffs += attacker.getDamageDealt(StatVariants.PHASE);
+            totalBuffs += target.getDamageTaken(element);
             totalBuffs += attacker.getDamageDealt(element);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalElementalDamage(element);
+            totalDefIgnore += attacker.getDefenseIgnore(StatVariants.PHASE);
+            totalStabDamage += attacker.getStabilityDamageModifier(StatVariants.PHASE);
+            totalStabDamage += target.getStabilityTakenModifier(StatVariants.PHASE);
+            totalDefIgnore += attacker.getDefenseIgnore(element);
+            totalStabDamage += attacker.getStabilityDamageModifier(element);
+            totalStabDamage += target.getStabilityTakenModifier(element);
         }
+        }
+
+        let critModifier = isCrit ? critDamage : 1;
+        // ensure that stability damage before accounting for weaknesses has a minimum value of 0
+        totalStabDamage = Math.max(totalStabDamage, 0);
+        // add in the stability damage from weakness
+        totalStabDamage += weaknesses * 2;
+        if (weaknesses > 0) {
+            // if any phase weakness is exploited, stability damage happens before the attack rather than after
+            target.reduceStability(totalStabDamage);
+        }
+        let coverValue = GameStateManager.getInstance().getCover();
+        // apply gun effect for attacking out of cover target if value is 0
+        if (coverValue == 0)
+            attacker.applyGunEffects(WeaponJSONKeys.OUT_OF_COVER);
+        // some dolls ignore a set amount of stability
+        let effectiveStability = Math.max(target.getStability() - attacker.getStabilityIgnore(),0);
+        let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - 
+                                                                (effectiveStability > 0 && !(damageType == AttackTypes.AOE || ammoType == AmmoTypes.MELEE) ? 0.6 : 0);
+
+        if (effectiveStability == 0)
+            totalBuffs += attacker.getExposedDamage();
+        else { // if there is remaining stability, apply stability based damage reduction
+            totalBuffs -= target.getDRPerStab() * effectiveStability;
+            totalBuffs -= target.getDRWithStab();
         }
         // check if weapon buffs that conditionally increase damage are present
-        let conditionalWeapons = [/Eulogistic Verse/, /Mourning Whisper/, /Sparkling Centerstage/, /Dazzling Sparkles/, /Resonator/, /Bittersweet Caramel/]
+        let conditionalWeapons = [/Eulogistic Verse/, /Mourning Whisper/, /Dazzling Sparkles/, /Resonator/, /Bittersweet Caramel/]
         attacker.getBuffs().forEach(buff => {
             // check for eulogistic verse, check if freeze debuff is present, check if frigid is present, calculate multiplier from calibration, otherwise do nothing
             if (conditionalWeapons[0].test(buff[0])) {
@@ -155,18 +178,13 @@ class DamageManager {
                 if (target.hasBuff("Overheat Combustion") && damageType == AttackTypes.TARGETED)
                     totalBuffs += 0.05;
             }
-            // sparkling centerstage grants physical attacks 10% def ignore
-            else if (conditionalWeapons[2].test(buff[0])) {
-                if (element == Elements.PHYSICAL)
-                    totalDefIgnore += 0.1;
-            }
             // dazzling sparkles grants active physical attacks 4% def ignore per stack
-            else if (conditionalWeapons[3].test(buff[0])) {
+            else if (conditionalWeapons[2].test(buff[0])) {
                 if (element == Elements.PHYSICAL && [SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName))
                     totalDefIgnore += 0.04 * buff[3];
             }
             // Resonator at max stacks gives a damage buff to active attacks with an additional bonus to aoe skills
-            else if (conditionalWeapons[4].test(buff[0])) {
+            else if (conditionalWeapons[3].test(buff[0])) {
                 if (buff[3] == buff[1][BuffJSONKeys.STACK_LIMIT] && [SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
                     let calib = +buff[0].slice(-1);
                     if (calib == 1)
@@ -189,7 +207,7 @@ class DamageManager {
                 }
             }
             // Resonator at max stacks gives a damage buff to active attacks with an additional bonus to aoe skills
-            else if (conditionalWeapons[5].test(buff[0])) {
+            else if (conditionalWeapons[4].test(buff[0])) {
                 if (buff[3] == buff[1][BuffJSONKeys.STACK_LIMIT] && [SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
                     let calib = +buff[0].slice(-1);
                     // bonus damage scales from 10-20% in 2% intervals
@@ -202,8 +220,10 @@ class DamageManager {
 
         let defenseBuffs = Math.max(0, 1 + target.getDefenseBuffs() - totalDefIgnore);
         let defModifier = attacker.getAttack() / (attacker.getAttack() + target.getBaseDefense() * defenseBuffs);
+        let weaknessModifier = 1 + weaknesses * 0.1;
         // make sure that totalbuffs doesn't become negative
         totalBuffs = Math.max(0, totalBuffs);
+
         console.log([target, attacker, baseDamage, defModifier, coverModifier, critModifier, weaknessModifier, totalBuffs]);
         // damage has a minimum value of 1
         let damage = Math.max(baseDamage * defModifier * critModifier * weaknessModifier * totalBuffs * coverModifier, 1);
