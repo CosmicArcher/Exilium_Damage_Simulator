@@ -133,9 +133,6 @@ class DamageManager {
             target.reduceStability(totalStabDamage);
         }
         let coverValue = GameStateManager.getInstance().getCover();
-        // apply gun effect for attacking out of cover target if value is 0
-        if (coverValue == 0)
-            attacker.applyGunEffects(WeaponJSONKeys.OUT_OF_COVER);
         // some dolls ignore a set amount of stability
         let effectiveStability = Math.max(target.getStability() - attacker.getStabilityIgnore(),0);
         let coverModifier = 1 - Math.max(coverValue - coverIgnore - attacker.getCoverIgnore(), 0) - 
@@ -234,8 +231,6 @@ class DamageManager {
             target.reduceStability(totalStabDamage);
 
         // undo any temporary buff effects from the attacker weapon
-        if (coverValue == 0)
-            attacker.removeGunEffects(WeaponJSONKeys.OUT_OF_COVER);
         if (weaknesses > 0)
             attacker.removeGunEffects(WeaponJSONKeys.PHASE_EXPLOIT, exploitedElement ? element : Elements.PHYSICAL);
         // inform the target that it has been "hit" and reduce the counters of any buffs that last for a number of hits rather than turns

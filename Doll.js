@@ -887,6 +887,10 @@ class Doll extends Unit {
     }
 
     processAttack(skill, calculationType, target, skillName) {
+        // apply gun effect for attacking out of cover target if value is 0
+        let coverValue = GameStateManager.getInstance().getCover();
+        if (coverValue == 0)
+            this.applyGunEffects(WeaponJSONKeys.OUT_OF_COVER);
         // active engagement temporarily changes damage type to electric
         let element = skill[SkillJSONKeys.ELEMENT];
         if (this.hasBuff("Active Engagement") || this.hasBuff("Active Engagement V5"))
@@ -1001,6 +1005,8 @@ class Doll extends Unit {
                     this.elementDamageDealt.Freeze -= 0.15;
             }
         }
+        if (coverValue == 0)
+            this.removeGunEffects(WeaponJSONKeys.OUT_OF_COVER);
         // after doing damage, consume any buffs that are reduced on attack
         // for active attacks
         if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
@@ -1307,8 +1313,9 @@ class Doll extends Unit {
         return newDoll;
     }
     // to be filled by child classes
-    refreshSupportUses() {
+    startTurn() {
         this.turnAvailable = true;
+        super.startTurn();
     }
     // to ensure index consumption/gain does not exceed the bounds of 0-6
     adjustIndex(gain) {
