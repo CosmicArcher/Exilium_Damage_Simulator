@@ -8,7 +8,7 @@ Features present in Turn-by-Turn Simulator:
 - Buffs from corresponding skills automatically applied to final stats
 - Buff skills that target a specific ally, all allies buffing skills implemented already
 - Consumable buffs removed upon respective triggers
-- Turn based buffs tick down after action
+- Turn based buffs tick down after action and round based buffs tick down at the start of the team's turn
 - Edifice buff granting all dolls Siege buff upon cleanse
 - Suomi Avalanche stacks automatically increase and deal stability damage and reset to 0 upon reaching max
 - Extra Actions from skills implemented
@@ -28,15 +28,16 @@ Features present in Turn-by-Turn Simulator:
 - Weapon passives
 - Phase strike conditional damage increase
 - Stat variations like Yoohee buffs introducing physical only defense ignore
+- Editing turns needed to regenerate stability, standard is 2 turns for most bosses but some regenerate in 1 turn, or never regenerate at all
 
 To Do List :
 - Some dolls' keys and automated passives and skill condition checking, mostly unimportant dolls for gunsmoke except for Dushevnaya, Centaureissi, and Mechty and dolls after
 - Buff incompatibilities like defense down 1, 2, and acid corrosion debuffs cannot coexist, only one should be present at any given time
-- Editing turns needed to regenerate stability, standard is 2 turns for most bosses but some regenerate in 1 turn, or never regenerate at all
 - Changing the DPS chart to view specific dolls' damage breakdown (damage per skill, damage per type, crit vs non-crit damage, etc)
 - Random buffs from Cheeta ult and certain AR weapon traits
 - Weird quirks that are present in the game, like Cheeta skill2 under certain conditions grant 2 avalanche stacks rather than 1, since the goal is to simulate the game scenario in a faster manner, this is valuable
 - Presets for faster input in the multitude of input fields
 - Improve UI
+- Clear undone damage logs when rewinding to improve clarity on current situation
 - Error prevention on some buttons being active in situations that would cause errors if clicked
 - Create another page with a grid for the map to more accurately simulate game conditions and automate condition checks for "move x or more/less tiles" additional skill effects
