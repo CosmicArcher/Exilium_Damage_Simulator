@@ -25,11 +25,12 @@ Features present in Turn-by-Turn Simulator:
 - Round tracking, gunsmoke ends after round 7 or start of round 8 if any damage over time effects are present
 - Rewind button, undo the last action, does not remove thoses entries from the action log but will reflect on the status cards on the left column in skill cooldowns, current stability, index, buffs, etc
 - Line chart showing total damage dealt by each doll as the simulation goes on with a legend and colors matching their respective status cards on the left column
-
-To Do List :
 - Weapon passives
 - Phase strike conditional damage increase
-- Some dolls' keys and automated passives and skill condition checking, mostly unimportant dolls for gunsmoke except for Dushevnaya, Centaureissi, and Mechty
+- Stat variations like Yoohee buffs introducing physical only defense ignore
+
+To Do List :
+- Some dolls' keys and automated passives and skill condition checking, mostly unimportant dolls for gunsmoke except for Dushevnaya, Centaureissi, and Mechty and dolls after
 - Buff incompatibilities like defense down 1, 2, and acid corrosion debuffs cannot coexist, only one should be present at any given time
 - Editing turns needed to regenerate stability, standard is 2 turns for most bosses but some regenerate in 1 turn, or never regenerate at all
 - Changing the DPS chart to view specific dolls' damage breakdown (damage per skill, damage per type, crit vs non-crit damage, etc)
