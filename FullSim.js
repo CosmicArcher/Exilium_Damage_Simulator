@@ -686,10 +686,10 @@ d3.select("#startButton").on("click", () => {
     //newTarget.disableBuffs();
     GameStateManager.getInstance().addCover(targetStats[1]);
     newTarget.setDefenseBuffs(targetStats[4]);
-    newTarget.setDamageTaken(targetStats[5]);
-    newTarget.setTargetedDamageTaken(targetStats[6]);
-    newTarget.setAoEDamageTaken(targetStats[7]);
-    newTarget.setStabilityDamageModifier(targetStats[8]);
+    newTarget.setDamageTaken(targetStats[5], StatVariants.ALL);
+    newTarget.setDamageTaken(targetStats[6], StatVariants.TARGETED);
+    newTarget.setDamageTaken(targetStats[7], StatVariants.AOE);
+    newTarget.setStabilityDamageModifier(targetStats[8], StatVariants.ALL);
     newTarget.applyDRPerStab(targetStats[9]);
     newTarget.applyDRWithStab(targetStats[10]);
     newTarget.setIsLarge(document.getElementById("largeToggle").checked);
@@ -1771,23 +1771,23 @@ function updateTargetStatDisplay(statIndex) {
             statName = "Defense Buffs";
             break;
         case 3:
-            baseStat = target.getBaseDamageTaken();
-            finalStat = target.getDamageTaken();
+            baseStat = target.getBaseDamageTaken(StatVariants.ALL);
+            finalStat = target.getDamageTaken(StatVariants.ALL);
             statName = "Damage Taken";
             break;
         case 4:
-            baseStat = target.getBaseAoEDamageTaken();
-            finalStat = target.getAoEDamageTaken();
+            baseStat = target.getBaseDamageTaken(StatVariants.AOE);
+            finalStat = target.getDamageTaken(StatVariants.AOE);
             statName = "AoE Damage Taken";
             break;
         case 5:
-            baseStat = target.getBaseTargetedDamageTaken();
-            finalStat = target.getTargetedDamageTaken();
+            baseStat = target.getBaseDamageTaken(StatVariants.TARGETED);
+            finalStat = target.getDamageTaken(StatVariants.TARGETED);
             statName = "Targeted Damage Taken";
             break;
         case 6:
-            baseStat = target.getBaseStabilityDamageModifier();
-            finalStat = target.getStabilityDamageModifier();
+            baseStat = target.getBaseStabilityTakenModifier(StatVariants.ALL);
+            finalStat = target.getStabilityTakenModifier(StatVariants.ALL);
             statName = "Stability Damage Taken";
             break;
         case 7:
@@ -1842,16 +1842,16 @@ function changeTargetStat() {
             target.setDefenseBuffs(newStat);
             break;
         case 3:
-            target.setDamageTaken(newStat);
+            target.setDamageTaken(newStat, StatVariants.ALL);
             break;
         case 4:
-            target.setAoEDamageTaken(newStat);
+            target.setDamageTaken(newStat, StatVariants.AOE);
             break;
         case 5:
-            target.setTargetedDamageTaken(newStat);
+            target.setDamageTaken(newStat, StatVariants.TARGETED);
             break;
         case 6:
-            target.setStabilityDamageModifier(newStat);
+            target.setStabilityDamageModifier(newStat, StatVariants.ALL);
             break;
         case 7:
             target.applyDRPerStab(newStat);

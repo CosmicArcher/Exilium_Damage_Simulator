@@ -34,7 +34,7 @@ class DamageManager {
             }
         });
         // stability modifier buffs on the target or doll, minimum of 0 before phase weakness adds 2 per weakness
-        let totalStabDamage = Math.max(0, stabilityDamage + target.getStabilityDamageModifier() + attacker.getStabilityDamageModifier(StatVariants.ALL));
+        let totalStabDamage = Math.max(0, stabilityDamage + target.getStabilityTakenModifier(StatVariants.ALL) + attacker.getStabilityDamageModifier(StatVariants.ALL));
         totalStabDamage += weaknesses * 2;
         let weaknessModifier = 1 + weaknesses * 0.1;
         // flammable increases burn stability damage by 2 and gets consumed when it triggers
@@ -50,22 +50,21 @@ class DamageManager {
         // some dolls ignore a set amount of stability
         let effectiveStability = Math.max(target.getStability() - attacker.getStabilityIgnore(),0);
 
-        let totalDefIgnore = attacker.getDefenseIgnore(StatVariants.ALL);
         // targeted and aoe def ignore buffs are not automatically added so add their specific buff effects here
-        if (damageType == AttackTypes.TARGETED) {
+        /*if (damageType == AttackTypes.TARGETED) {
             /*if (attacker.hasBuff("Piercing 1"))
                 totalDefIgnore += 0.2;
             else if (attacker.hasBuff("Piercing 2"))
-                totalDefIgnore += 0.3;*/
-            totalDefIgnore += attacker.getDefenseIgnore(StatVariants.TARGETED);
+                totalDefIgnore += 0.3;
+            
         }
         else {
-            /*if (attacker.hasBuff("Domain Penetration 1"))
+            if (attacker.hasBuff("Domain Penetration 1"))
                 totalDefIgnore += 0.2;
             else if (attacker.hasBuff("Domain Penetration 2"))
-                totalDefIgnore += 0.3;*/
-            totalDefIgnore += attacker.getDefenseIgnore(StatVariants.AOE);
-        }
+                totalDefIgnore += 0.3;
+            
+        }*/
 
         let coverValue = GameStateManager.getInstance().getCover();
         // apply gun effect for attacking out of cover target if value is 0
@@ -77,12 +76,13 @@ class DamageManager {
         let critModifier = isCrit ? critDamage : 1;
         // there are a lot of damage dealt/taken effects that are specific to certain conditions
         let totalBuffs = 1;
+        let totalDefIgnore = attacker.getDefenseIgnore(StatVariants.ALL);
         { // check if there is remaining stability, apply stability based damage reduction
         if (effectiveStability > 0) {
             totalBuffs -= target.getDRPerStab() * effectiveStability;
             totalBuffs -= target.getDRWithStab();
         }
-        totalBuffs += target.getDamageTaken();
+        totalBuffs += target.getDamageTaken(StatVariants.ALL);
         totalBuffs += attacker.getDamageDealt(StatVariants.ALL);
         totalBuffs += GlobalBuffManager.getInstance().getGlobalDamage();
         // check if the target has elemental debuffs
@@ -96,14 +96,16 @@ class DamageManager {
         if (attacker.getPhaseStrike() && hasElementalDebuff)
             totalBuffs += 0.15;
         if (damageType == AttackTypes.TARGETED) {
-            totalBuffs += target.getTargetedDamageTaken(StatVariants.TARGETED);
+            totalBuffs += target.getDamageTaken(StatVariants.TARGETED);
             totalBuffs += attacker.getDamageDealt(StatVariants.TARGETED);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalTargetedDamage();
+            totalDefIgnore += attacker.getDefenseIgnore(StatVariants.TARGETED);
         }
         else {
-            totalBuffs += target.getAoEDamageTaken(StatVariants.AOE);
+            totalBuffs += target.getDamageTaken(StatVariants.AOE);
             totalBuffs += attacker.getDamageDealt(StatVariants.AOE);
             totalBuffs += GlobalBuffManager.getInstance().getGlobalAoEDamage();
+            totalDefIgnore += attacker.getDefenseIgnore(StatVariants.AOE);
         }
         // damage increases that require a specific type of debuff
         if (target.hasBuffType("Movement", true))

@@ -65,126 +65,37 @@ class Doll extends Unit {
         this.baseCoverIgnore = 0;
         this.baseStabilityIgnore = 0;
 
-        this.damageDealt = {
-            "All" : 0,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.stabilityDamageModifier = {
-            "All" : 0,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.defenseIgnore = {
-            "All" : 0,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.critChance = {
-            "All" : baseCrit,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.critDamage = {
-            "All" : baseCritDamage,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.baseDamageDealt = {
-            "All" : 0,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.baseStabilityDamageModifier = {
-            "All" : 0,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.baseDefenseIgnore = {
-            "All" : 0,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.baseCritChance = {
-            "All" : baseCrit,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
-        this.baseCritDamage = {
-            "All" : baseCritDamage,
-            "Targeted" : 0,
-            "AoE" : 0,
-            "Phase" : 0,
-            "Physical" : 0,
-            "Freeze" : 0,
-            "Burn" : 0,
-            "Corrosion" : 0,
-            "Hydro" : 0,
-            "Electric" : 0
-        };
+        let variants = Object.values(StatVariants);
+        this.damageDealt = {};
+        this.stabilityDamageModifier = {};
+        this.defenseIgnore = {};
+        this.critChance = {};
+        this.critDamage = {};
+        this.baseDamageDealt = {};
+        this.baseStabilityDamageModifier = {};
+        this.baseDefenseIgnore = {};
+        this.baseCritChance = {};
+        this.baseCritDamage = {};
+        variants.forEach(variant => {
+            this.damageDealt[variant] = 0;
+            this.stabilityDamageModifier[variant] = 0;
+            this.defenseIgnore[variant] = 0;
+            this.baseDamageDealt[variant] = 0;
+            this.baseStabilityDamageModifier[variant] = 0;
+            this.baseDefenseIgnore[variant] = 0;
+            if (variant == StatVariants.ALL) {
+                this.critChance[variant] = baseCrit;
+                this.critDamage[variant] = baseCritDamage;
+                this.baseCritChance[variant] = baseCrit;
+                this.baseCritDamage[variant] = baseCritDamage;
+            }
+            else {
+                this.critChance[variant] = 0;
+                this.critDamage[variant] = 0;
+                this.baseCritChance[variant] = 0;
+                this.baseCritDamage[variant] = 0;
+            }
+        });
         
         // phase strike is a 15% damage buff if the target has any elemental debuffs
         this.hasPhaseStrike = hasPhaseStrike;

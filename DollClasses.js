@@ -340,7 +340,7 @@ export class Suomi extends Supporter {
                 if (d == Elements.FREEZE || d == AmmoTypes.LIGHT)
                     weaknesses++;
                 });
-                let totalStabDamage = Math.max(0, 4 + target.getStabilityDamageModifier() + this.getStabilityDamageModifier(StatVariants.ALL));
+                let totalStabDamage = Math.max(0, 4 + target.getStabilityTakenModifier() + this.getStabilityDamageModifier(StatVariants.ALL));
                 totalStabDamage += weaknesses * 2;
                 if (totalStabDamage > target.getStability())
                     conditionalTriggered[0] = true;
