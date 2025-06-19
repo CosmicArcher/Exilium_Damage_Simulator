@@ -36,6 +36,8 @@ class GameStateManager {
             GameStateManagerSingleton.actionCount = 0;
             // track which "round" the simulation is currently in
             GameStateManagerSingleton.actionRound = [1];
+            // track whether the player is acting on this action count
+            GameStateManagerSingleton.playerTurn = [1];
         }
         else
             console.error("Singleton not yet initialized");
@@ -45,7 +47,7 @@ class GameStateManager {
             // activate all the turn start effects and apply global weapon buffs
             let globalWeaponPairs = GlobalBuffManager.getInstance().getGlobalWeaponBuffs();
             GameStateManagerSingleton.dolls[0].forEach(doll => {
-                doll.refreshSupportUses();
+                doll.startTurn();
                 globalWeaponPairs.forEach(weaponDoll => {
                     doll.addBuff(weaponDoll[0], weaponDoll[1], -1, 1);
                 });
@@ -62,6 +64,7 @@ class GameStateManager {
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
             GameStateManagerSingleton.actionRound.push(1);
+            GameStateManagerSingleton.playerTurn.push(1);
 
             StatTracker.getInstance().startSimulation();
             ChartMaker.getInstance().createDPSChart();
@@ -86,6 +89,13 @@ class GameStateManager {
     getRounds() {
         if (GameStateManagerSingleton) {
             return GameStateManagerSingleton.actionRound;
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    getPlayerActing() {
+        if (GameStateManagerSingleton) {
+            return GameStateManagerSingleton.playerTurn[GameStateManagerSingleton.actionCount + 1];
         }
         else
             console.error("Singleton not yet initialized");
@@ -188,7 +198,7 @@ class GameStateManager {
                 // if the doll still has turn available, consider their turn skipped and end turn to tick down buffs
                 if (doll.hasTurnAvailable())
                     doll.endTurn();
-                doll.refreshSupportUses();
+                doll.startTurn();
             });
             GameStateManagerSingleton.actionRound[GameStateManagerSingleton.actionCount+1]++;
             GameStateManagerSingleton.lockAction();
@@ -199,8 +209,18 @@ class GameStateManager {
     // "lock in" the effects of the last action and clone all units in preparation for the next action
     lockAction() {
         if (GameStateManagerSingleton) {
-            // clone the latest version of the units
             let target = GameStateManagerSingleton.target[GameStateManagerSingleton.actionCount+1];
+            // check if the latest action ended the player's turn and start the enemy's turn and count down round buffs if applicable
+            let playerActing = 0;
+            if (!this.isPlayerActing()) {
+                // if player turn is over but was still available in the previous action, call target's startTurn() function
+                if (GameStateManagerSingleton.playerTurn[GameStateManagerSingleton.actionCount+1])
+                    target.startTurn();
+            }
+            else
+                playerActing = 1;
+            GameStateManagerSingleton.playerTurn[GameStateManagerSingleton.actionCount+1] = playerActing;
+            // clone the latest version of the units
             let dolls = GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1];
             let newTarget = target.cloneUnit();
             let newDolls = [];
@@ -211,6 +231,7 @@ class GameStateManager {
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
             GameStateManagerSingleton.actionRound.push(GameStateManagerSingleton.actionRound[GameStateManagerSingleton.actionCount+1]);
+            GameStateManagerSingleton.playerTurn.push(playerActing);
             GameStateManagerSingleton.actionCount++;
 
             StatTracker.getInstance().lockAction();
@@ -237,8 +258,10 @@ class GameStateManager {
             GameStateManagerSingleton.target.splice(actionNumber+1, lengthToCut);
             GameStateManagerSingleton.dolls.splice(actionNumber+1, lengthToCut);
             GameStateManagerSingleton.actionRound.splice(actionNumber+1, lengthToCut);
+            GameStateManagerSingleton.playerTurn.splice(actionNumber+1, lengthToCut);
 
             GameStateManagerSingleton.actionRound.push(GameStateManagerSingleton.actionRound[actionNumber]);
+            GameStateManagerSingleton.playerTurn.push(GameStateManagerSingleton.playerTurn[actionNumber]);
             GameStateManagerSingleton.target.push(newTarget);
             GameStateManagerSingleton.dolls.push(newDolls);
 
@@ -266,6 +289,20 @@ class GameStateManager {
                     return GameStateManagerSingleton.calcTypes[i];
             }
             console.error(`${dollName} does not exist in Game State Manager singleton`);
+        }
+        else
+            console.error("Singleton not yet initialized");
+    }
+    // get whether player or enemy is currently playing their turn
+    isPlayerActing() {
+        if (GameStateManagerSingleton) {
+            let readyDolls = 0;
+            GameStateManagerSingleton.dolls[GameStateManagerSingleton.actionCount+1].forEach (doll => {
+                readyDolls += doll.hasTurnAvailable();
+            });
+            if (readyDolls == 0)
+                return false;
+            return true;
         }
         else
             console.error("Singleton not yet initialized");

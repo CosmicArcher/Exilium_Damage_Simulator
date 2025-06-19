@@ -189,7 +189,7 @@ class Unit {
                 else {
                     let buff = this.currentBuffs[index];
                     // check if the buff is turn-based, refresh the duration to the higher of the application or current duration
-                    if (buff[4]) {
+                    if (buff[4] != "None") {
                         buff[2] = Math.max(buff[2], duration);
                     }
                     // if the buff is below its stack limit, increase the stack count based on the stacks parameter
@@ -316,7 +316,7 @@ class Unit {
     
     endTurn() {
         this.currentBuffs.forEach(buff => {
-            if (buff[4]) {
+            if (buff[4] == "Turn") {
                 // apply overburn damage over time effect, damage updates as the source's attack stat changes
                 if (buff[0] == "Overburn" || buff[0] == "Corrosive Infusion" || buff[0] == "Corrosive Infusion V2") {
                     this.applyDoT(buff[0], buff[6]);
@@ -340,6 +340,18 @@ class Unit {
                     if (buff[2] == 0) {
                         this.removeBuff(buff[0]);
                     }
+                }
+            }
+        })
+    }
+
+    startTurn() {
+        this.currentBuffs.forEach(buff => {
+            if (buff[4] == "Round") {
+                // tick down all round-based buffs by 1
+                buff[2]--;
+                if (buff[2] == 0) {
+                    this.removeBuff(buff[0]);
                 }
             }
         })

@@ -173,7 +173,7 @@ class Target extends Unit {
                 }
             }
         }
-        // add temporary freeze weakness if on frost tile
+        // add temporary freeze weakness if on elemental tile
         else if (buffName == "Frost") {
             if (!this.phaseWeaknesses.includes(Elements.FREEZE)) {
                 this.phaseWeaknesses.push(Elements.FREEZE);

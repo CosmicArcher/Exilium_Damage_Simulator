@@ -1866,15 +1866,11 @@ function changeTargetStat() {
 
 function refreshTurnText() {
     let textHTML = document.getElementById("SimControls").children;
-    // get how many dolls can currently act
-    let dolls = GameStateManager.getInstance().getAllDolls();
-    let readyDolls = 0;
-    dolls.forEach(doll => {
-        readyDolls += doll.hasTurnAvailable();
-    });
+    // change round text depending on player or enemy turn
+    let playerActing = GameStateManager.getInstance().getPlayerActing();
     d3.select(textHTML[0]).style("opacity", 0).transition()
                         .duration(200)
                         .style("opacity", 1)
-                        .text(`Round ${GameStateManager.getInstance().getRoundNumber()}: ${readyDolls > 0 ? "Your" : "Enemy"} Turn`);
+                        .text(`Round ${GameStateManager.getInstance().getRoundNumber()}: ${playerActing ? "Your" : "Enemy"} Turn`);
     textHTML[1].textContent = `Total Damage: ${StatTracker.getInstance().getTotalDamage()}`;
 }

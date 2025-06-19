@@ -72,7 +72,7 @@ const CalculationTypes = {
 
 const BuffJSONKeys = {
     BUFF_TYPE : "Buff_Type", // string
-    TURN_BASED : "Turn_Based", // bool, whether duration is reduced per endTurn() called
+    TURN_BASED : "Turn_Based", // string, whether duration is reduced per "Turn"/endTurn(), "Round"/startTurn() or "None" called
     CONSUMPTION_MODE : "Consumption_Mode", // stack consumption mode, Attack, AllAttack, ActiveAttack, Support, Defense, None
     CLEANSEABLE : "Cleanseable", // bool, whether "cleanse" can remove the buff
     ELEMENT : "Element", // element of the buff for certain interactions

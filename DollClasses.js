@@ -24,8 +24,8 @@ class Supporter extends Doll {
         return 0;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         this.supportsUsed = 0;
     }
 
@@ -59,8 +59,8 @@ class Interceptor extends Doll {
         return this.interceptsUsed < this.interceptLimit && this.interceptEnabled;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         this.interceptsUsed = 0;
     }
 
@@ -302,8 +302,8 @@ export class Makiatto extends Interceptor {
             this.interceptEnabled = false;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // key 5 applies murderous intent on the  highest hp enemy, sim is meant for single target
         let target = GameStateManager.getInstance().getBaseTarget();
         if (this.keysEnabled[4] && !target.hasBuff("Murderous Intent")) 
@@ -501,8 +501,8 @@ export class Papasha extends Doll {
         summon.endTurn();
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         if (this.keysEnabled[5]) {
             let summon = GameStateManager.getInstance().getDoll("Papasha Summon");
             if (!summon)
@@ -651,8 +651,8 @@ export class Daiyan extends Interceptor {
             this.adjustIndex(1);
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // passive gives 1 stack of tuning and index at the start of each turn
         this.addBuff("Tuning", this.name, -1, 1);
         this.adjustIndex(1);
@@ -936,8 +936,8 @@ export class Vepley extends Doll {
         this.adjustIndex(1);
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         this.adjustIndex(1);
     }
 
@@ -1068,8 +1068,8 @@ export class Sharkry extends Supporter {
         }
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // passively gains 1 index per turn
         this.adjustIndex(1);
         // v6 also gains 1 zoom in stack per turn
@@ -1122,8 +1122,8 @@ export class Cheeta extends Supporter {
             this.supportEnabled = true;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // the buff called "support" uniquely ticks down at the start of each round rather than the end of her turn
         let foundSupport = 0;
         for (let i = 0; i < this.currentBuffs.length && !foundSupport; i++) {
@@ -1402,8 +1402,8 @@ export class Klukai extends Doll {
         this.isActing = false;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // key 1 applies 1 stack of corrosive infusion and gains 2 index if there is only 1 target which is assumed always true
         if (this.keysEnabled[0]) {
             let target = GameStateManager.getInstance().getTarget();
