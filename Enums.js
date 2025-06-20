@@ -90,6 +90,8 @@ const BuffJSONKeys = {
     DAMAGE_TAKEN : "Damage_Taken", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
     STABILITY_DAMAGE : "Stability_Damage", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
     DEFENSE_IGNORE : "Defense_Ignore", // array of 2 elements, first element is the type of damage following StatVariants enum, and the second is the value
+    GROUP : "Group", // group of buffs it belongs to which are all incompatible with each other
+    PRIORITY : "Priority", // priority in the group, higher priority overwrites pre-existing lower priority buff of same group but give way to same priority buffs
     //AOE_DAMAGE_TAKEN : "AoE_Damage_Taken",
     //TARGETED_DAMAGE_TAKEN : "Targeted_Damage_Taken",
     //PHASE_DAMAGE : "Phase_Damage",
