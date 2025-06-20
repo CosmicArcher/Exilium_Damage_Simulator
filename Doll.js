@@ -1,6 +1,6 @@
 import Unit from "./Unit.js";
 import ResourceLoader from "./ResourceLoader.js";
-import { SkillNames, CalculationTypes, SkillJSONKeys, Elements, BuffJSONKeys, WeaponJSONKeys, AttackTypes } from "./Enums.js";
+import { SkillNames, CalculationTypes, SkillJSONKeys, Elements, BuffJSONKeys, WeaponJSONKeys, AttackTypes, StatVariants } from "./Enums.js";
 import GameStateManager from "./GameStateManager.js";
 import DamageManager from "./DamageManager.js";
 import RNGManager from "./RNGManager.js";
@@ -11,22 +11,19 @@ class Doll extends Unit {
     constructor(name, defense, attack, baseCrit, baseCritDamage, fortification, keys = [0,0,0,0,0,0], weaponName, weaponCalib, hasPhaseStrike = false) {
         super(name, defense);
         this.attack = attack;
+        this.fortification = fortification;
+        // resource used for some skills and doll mechanics
+        this.CIndex = 3;
+        /*
         this.baseCritChance = baseCrit;
         this.baseCritDamage = baseCritDamage;
         this.critChance = baseCrit;
         this.critDamage = baseCritDamage;
-        this.fortification = fortification;
-        // resource used for some skills and doll mechanics
-        this.CIndex = 3;
         // buffs used by attackers
         this.defenseIgnore = 0;
         this.damageDealt = 0;
         this.aoeDamageDealt = 0;
         this.targetedDamageDealt = 0;
-        this.exposedDamageDealt = 0;
-        this.slowedDamageDealt = 0;
-        this.defDownDamageDealt = 0;
-        this.supportDamageDealt = 0;
         this.phaseDamageDealt = 0;
         this.elementDamageDealt = {
             "Freeze" : 0,
@@ -36,19 +33,13 @@ class Doll extends Unit {
             "Electric" : 0,
             "Physical" : 0
         };
-        this.coverIgnore = 0;
         this.stabilityDamageModifier = 0;
-        this.stabilityIgnore = 0;
-        this.attackBoost = 0;
+        
         // base values changed by direct input rather than automatic from buff applications
         this.baseDefenseIgnore = 0;
         this.baseDamageDealt = 0;
         this.baseAoEDamageDealt = 0;
         this.baseTargetedDamageDealt = 0;
-        this.baseExposedDamageDealt = 0;
-        this.baseSlowedDamageDealt = 0;
-        this.baseDefDownDamageDealt = 0;
-        this.baseSupportDamageDealt = 0;
         this.basePhaseDamageDealt = 0;
         this.baseElementDamageDealt = {
             "Freeze" : 0,
@@ -58,10 +49,54 @@ class Doll extends Unit {
             "Electric" : 0,
             "Physical" : 0
         };
-        this.baseCoverIgnore = 0;
-        this.baseStabilityDamageModifier = 0;
-        this.baseStabilityIgnore = 0;
+        this.baseStabilityDamageModifier = 0;*/
+        this.attackBoost = 0;
         this.baseAttackBoost = 0;
+        this.exposedDamageDealt = 0;
+        this.slowedDamageDealt = 0;
+        this.defDownDamageDealt = 0;
+        this.supportDamageDealt = 0;
+        this.coverIgnore = 0;
+        this.stabilityIgnore = 0;
+        this.baseExposedDamageDealt = 0;
+        this.baseSlowedDamageDealt = 0;
+        this.baseDefDownDamageDealt = 0;
+        this.baseSupportDamageDealt = 0;
+        this.baseCoverIgnore = 0;
+        this.baseStabilityIgnore = 0;
+
+        let variants = Object.values(StatVariants);
+        this.damageDealt = {};
+        this.stabilityDamageModifier = {};
+        this.defenseIgnore = {};
+        this.critChance = {};
+        this.critDamage = {};
+        this.baseDamageDealt = {};
+        this.baseStabilityDamageModifier = {};
+        this.baseDefenseIgnore = {};
+        this.baseCritChance = {};
+        this.baseCritDamage = {};
+        variants.forEach(variant => {
+            this.damageDealt[variant] = 0;
+            this.stabilityDamageModifier[variant] = 0;
+            this.defenseIgnore[variant] = 0;
+            this.baseDamageDealt[variant] = 0;
+            this.baseStabilityDamageModifier[variant] = 0;
+            this.baseDefenseIgnore[variant] = 0;
+            if (variant == StatVariants.ALL) {
+                this.critChance[variant] = baseCrit;
+                this.critDamage[variant] = baseCritDamage;
+                this.baseCritChance[variant] = baseCrit;
+                this.baseCritDamage[variant] = baseCritDamage;
+            }
+            else {
+                this.critChance[variant] = 0;
+                this.critDamage[variant] = 0;
+                this.baseCritChance[variant] = 0;
+                this.baseCritDamage[variant] = 0;
+            }
+        });
+        
         // phase strike is a 15% damage buff if the target has any elemental debuffs
         this.hasPhaseStrike = hasPhaseStrike;
         // keys will be arranged numerically
@@ -93,56 +128,84 @@ class Doll extends Unit {
     getKeyEnabled(index) {return this.keysEnabled[index];} 
 
     getAttack() {return this.attack * (1 + this.attackBoost + GlobalBuffManager.getInstance().getGlobalAttack());}
-    getCritRate() {return this.critChance;}
-    getCritDamage() {return this.critDamage;}
-    getBaseCrit() {return this.baseCritChance;}
-    getBaseCritDamage() {return this.baseCritDamage;}
+    getCritRate(variant = StatVariants.ALL) {
+        return this.critChance.hasOwnProperty(variant) ? this.critChance[variant] : 0;
+    }
+    getCritDamage(variant = StatVariants.ALL) {
+        return this.critDamage.hasOwnProperty(variant) ? this.critDamage[variant] : 0;
+    }
+    getBaseCrit(variant = StatVariants.ALL) {
+        return this.baseCritChance.hasOwnProperty(variant) ? this.baseCritChance[variant] : 0;
+    }
+    getBaseCritDamage(variant = StatVariants.ALL) {
+        return this.baseCritDamage.hasOwnProperty(variant) ? this.baseCritDamage[variant] : 0;
+    }
     getBaseAttack() {return this.attack;}
     getPhaseStrike() {return this.hasPhaseStrike;}
     getWeaponName() {return this.weaponName;}
     getWeaponCalibration() {return this.weaponCalib;}
     // get any stats relevant to damage calculation
-    getDefenseIgnore() {return this.defenseIgnore;}
-    getDamageDealt() {return this.damageDealt;}
-    getTargetedDamage() {return this.targetedDamageDealt;}
-    getAoEDamage() {return this.aoeDamageDealt;}
+    getDefenseIgnore(variant = StatVariants.ALL) {
+        return this.defenseIgnore.hasOwnProperty(variant) ? this.defenseIgnore[variant] : 0;
+    }
+    getDamageDealt(variant = StatVariants.ALL) {
+        return this.damageDealt.hasOwnProperty(variant) ? this.damageDealt[variant] : 0;
+    }
+    //getTargetedDamage() {return this.targetedDamageDealt;}
+    //getAoEDamage() {return this.aoeDamageDealt;}
     getExposedDamage() {return this.exposedDamageDealt;}
     getSlowedDamage() {return this.slowedDamageDealt;}
     getDefDownDamage() {return this.defDownDamageDealt;}
     getSupportDamage() {return this.supportDamageDealt;}
-    getPhaseDamage() {return this.phaseDamageDealt;}
-    getElementDamage(elementName) {return this.elementDamageDealt[elementName];}
+    //getPhaseDamage() {return this.phaseDamageDealt;}
+    //getElementDamage(elementName) {return this.elementDamageDealt[elementName];}
     getCoverIgnore() {return this.coverIgnore;}
-    getStabilityDamageModifier() {return this.stabilityDamageModifier;}
+    getStabilityDamageModifier(variant = StatVariants.ALL) {
+        return this.stabilityDamageModifier.hasOwnProperty(variant) ? this.stabilityDamageModifier[variant] : 0;
+    }
     getStabilityIgnore() {return this.stabilityIgnore;}
     getAttackBoost() {return this.attackBoost;}
     // get the base stats for display mid-simulation
-    getBaseDefenseIgnore() {return this.baseDefenseIgnore;}
-    getBaseDamageDealt() {return this.baseDamageDealt;}
-    getBaseTargetedDamage() {return this.baseTargetedDamageDealt;}
-    getBaseAoEDamage() {return this.baseAoEDamageDealt;}
+    getBaseDefenseIgnore(variant = StatVariants.ALL) {
+        return this.baseDefenseIgnore.hasOwnProperty(variant) ? this.baseDefenseIgnore[variant] : 0;
+    }
+    getBaseDamageDealt(variant = StatVariants.ALL) {
+        return this.baseDamageDealt.hasOwnProperty(variant) ? this.baseDamageDealt[variant] : 0;
+    }
+    //getBaseTargetedDamage() {return this.baseTargetedDamageDealt;}
+    //getBaseAoEDamage() {return this.baseAoEDamageDealt;}
     getBaseExposedDamage() {return this.baseExposedDamageDealt;}
     getBaseSlowedDamage() {return this.baseSlowedDamageDealt;}
     getBaseDefDownDamage() {return this.baseDefDownDamageDealt;}
     getBaseSupportDamage() {return this.baseSupportDamageDealt;}
-    getBasePhaseDamage() {return this.basePhaseDamageDealt;}
-    getBaseElementDamage(elementName) {return this.baseElementDamageDealt[elementName];}
+    //getBasePhaseDamage() {return this.basePhaseDamageDealt;}
+    //getBaseElementDamage(elementName) {return this.baseElementDamageDealt[elementName];}
     getBaseCoverIgnore() {return this.baseCoverIgnore;}
-    getBaseStabilityDamageModifier() {return this.baseStabilityDamageModifier;}
+    getBaseStabilityDamageModifier(variant = StatVariants.ALL) {
+        return this.baseStabilityDamageModifier.hasOwnProperty(variant) ? this.baseStabilityDamageModifier[variant] : 0;
+    }
     getBaseStabilityIgnore() {return this.baseStabilityIgnore;}
     getBaseAttackBoost() {return this.baseAttackBoost;}
     // for direct buff input
-    setDefenseIgnore(x) {
-        this.resetDefenseIgnore();
-        this.baseDefenseIgnore = x;
-        this.defenseIgnore += x;
+    setDefenseIgnore(x, variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.resetDefenseIgnore(variant);
+            this.baseDefenseIgnore[variant] = x;
+            this.defenseIgnore[variant] += x;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
-    setDamageDealt(x) {
-        this.resetDamageDealt();
-        this.baseDamageDealt = x;
-        this.damageDealt += x;
+    setDamageDealt(x, variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.resetDamageDealt(variant);
+            this.baseDamageDealt[variant] = x;
+            this.damageDealt[variant] += x;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
-    setAoEDamage(x) {
+    /*setAoEDamage(x) {
         this.resetAoEDamage();
         this.baseAoEDamageDealt = x;
         this.aoeDamageDealt += x;
@@ -151,7 +214,7 @@ class Doll extends Unit {
         this.resetTargetedDamage();
         this.baseTargetedDamageDealt = x;
         this.targetedDamageDealt += x;
-    }
+    }*/
     setExposedDamage(x) {
         this.resetExposedDamage();
         this.baseExposedDamageDealt = x;
@@ -172,7 +235,7 @@ class Doll extends Unit {
         this.baseSupportDamageDealt = x;
         this.supportDamageDealt += x;
     }
-    setPhaseDamage(x) {
+    /*setPhaseDamage(x) {
         this.resetPhaseDamage();
         this.basePhaseDamageDealt = x;
         this.phaseDamageDealt += x;
@@ -181,16 +244,20 @@ class Doll extends Unit {
         this.resetElementDamage(elementName);
         this.baseElementDamageDealt[elementName] = x;
         this.elementDamageDealt[elementName] += x;
-    }
+    }*/
     setCoverIgnore(x) {
         this.resetCoverIgnore();
         this.baseCoverIgnore = x;
         this.coverIgnore += x;
     }
-    setStabilityDamageModifier(x) {
-        this.resetStabilityDamageModifier();
-        this.baseStabilityDamageModifier = x;
-        this.stabilityDamageModifier += x;
+    setStabilityDamageModifier(x, variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.resetStabilityDamageModifier(variant);
+            this.baseStabilityDamageModifier[variant] = x;
+            this.stabilityDamageModifier[variant] += x;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
     setStabilityIgnore(x) {
         this.resetStabilityIgnore();
@@ -203,33 +270,49 @@ class Doll extends Unit {
         this.attackBoost += x;
     }
     setAttack(x) {this.attack = x;}
-    setCritRate(x) {
-        this.resetCrit();
-        this.baseCritChance = x;
-        this.critChance += x;
+    setCritRate(x, variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.resetCrit(variant);
+            this.baseCritChance[variant] = x;
+            this.critChance[variant] += x;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
-    setCritDamage(x) {
-        this.resetCritDamage();
-        this.baseCritDamage = x;
-        this.critDamage += x;
+    setCritDamage(x, variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.resetCritDamage(variant);
+            this.baseCritDamage[variant] = x;
+            this.critDamage[variant] += x;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
     // when using the setters, undo the addition of the previous base multipliers
-    resetDefenseIgnore() {
-        this.defenseIgnore -= this.baseDefenseIgnore;
-        this.baseDefenseIgnore = 0;
+    resetDefenseIgnore(variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.defenseIgnore[variant] -= this.baseDefenseIgnore[variant];
+            this.baseDefenseIgnore[variant] = 0;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
-    resetDamageDealt() {
-        this.damageDealt -= this.baseDamageDealt;
-        this.baseDamageDealt = 0;
+    resetDamageDealt(variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.damageDealt[variant] -= this.baseDamageDealt[variant];
+            this.baseDamageDealt[variant] = 0;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
-    resetAoEDamage() {
+    /*resetAoEDamage() {
         this.aoeDamageDealt -= this.baseAoEDamageDealt;
         this.baseAoEDamageDealt = 0;
     }
     resetTargetedDamage() {
         this.targetedDamageDealt -= this.baseTargetedDamageDealt;
         this.baseTargetedDamageDealt = 0;
-    }
+    }*/
     resetExposedDamage() {
         this.exposedDamageDealt -= this.baseExposedDamageDealt;
         this.baseExposedDamageDealt = 0;
@@ -246,21 +329,25 @@ class Doll extends Unit {
         this.defDownDamageDealt -= this.baseDefDownDamageDealt;
         this.baseDefDownDamageDealt = 0;
     }
-    resetPhaseDamage() {
+    /*resetPhaseDamage() {
         this.phaseDamageDealt -= this.basePhaseDamageDealt;
         this.basePhaseDamageDealt = 0;
     }
     resetElementDamage(elementName) {
         this.elementDamageDealt[elementName] -= this.baseElementDamageDealt[elementName];
         this.baseElementDamageDealt[elementName] = 0;
-    }
+    }*/
     resetCoverIgnore() {
         this.coverIgnore -= this.baseCoverIgnore;
         this.baseCoverIgnore = 0;
     }
-    resetStabilityDamageModifier() {
-        this.stabilityDamageModifier -= this.baseStabilityDamageModifier;
-        this.baseStabilityDamageModifier = 0;
+    resetStabilityDamageModifier(variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.stabilityDamageModifier[variant] -= this.baseStabilityDamageModifier[variant];
+            this.baseStabilityDamageModifier[variant] = 0;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
     resetStabilityIgnore() {
         this.stabilityIgnore -= this.baseStabilityIgnore;
@@ -270,13 +357,21 @@ class Doll extends Unit {
         this.attackBoost -= this.baseAttackBoost;
         this.baseAttackBoost = 0;
     }
-    resetCrit() {
-        this.critChance -= this.baseCritChance;
-        this.baseCritChance = 0;
+    resetCrit(variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.critChance[variant] -= this.baseCritChance[variant];
+            this.baseCritChance[variant] = 0;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
-    resetCritDamage() {
-        this.critDamage -= this.baseCritDamage;
-        this.baseCritDamage = 0;
+    resetCritDamage(variant = StatVariants.ALL) {
+        if (Object.values(StatVariants).includes(variant)) {
+            this.critDamage[variant] -= this.baseCritDamage[variant];
+            this.baseCritDamage[variant] = 0;
+        }
+        else
+            console.error(`${variant} does not exist in StatVariants`);
     }
     // get the data belonging to the doll from the loaded jsons
     initializeSkillData() {
@@ -344,16 +439,41 @@ class Doll extends Unit {
         if (this.weaponData.hasOwnProperty(objectKey)) {
             let passiveData = this.weaponData[objectKey];
             // passives that have conditions that stack are assumed to have stacked to the max on all attacks unless it requires movement
-            if (passiveData.hasOwnProperty(WeaponJSONKeys.DAMAGE_PERC))
-                this.damageDealt += passiveData[WeaponJSONKeys.DAMAGE_PERC][this.weaponCalib - 1];
-            if (passiveData.hasOwnProperty(WeaponJSONKeys.CRIT_DAMAGE))
-                this.critDamage += passiveData[WeaponJSONKeys.CRIT_DAMAGE][this.weaponCalib - 1];
-            if (passiveData.hasOwnProperty(WeaponJSONKeys.DEFENSE_IGNORE))
-                this.defenseIgnore += passiveData[WeaponJSONKeys.DEFENSE_IGNORE][this.weaponCalib - 1];
-            if (passiveData.hasOwnProperty(WeaponJSONKeys.ELEMENTAL_DAMAGE))
-                this.elementDamageDealt[passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][0]] += passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][1][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.DAMAGE_PERC)) {
+                let buffs = passiveData[WeaponJSONKeys.DAMAGE_PERC];
+                // because samosek has both phase and element damage_perc, all damage_perc entries are arrays able to hold multiple variants
+                buffs.forEach(buff => {
+                    if (this.damageDealt.hasOwnProperty(buff[0]))
+                        this.damageDealt[buff[0]] += buff[1][this.weaponCalib - 1];
+                    else
+                        console.error(`${buff[0]} is not covered by StatVariants`);
+                });
+            }
+            //    this.damageDealt[StatVariants.ALL] += passiveData[WeaponJSONKeys.DAMAGE_PERC][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.CRIT_DAMAGE)) {
+                let buffs = passiveData[WeaponJSONKeys.CRIT_DAMAGE];
+                buffs.forEach(buff => {
+                    if (this.critDamage.hasOwnProperty(buff[0]))
+                        this.critDamage[buff[0]] += buff[1][this.weaponCalib - 1];
+                    else
+                        console.error(`${buff[0]} is not covered by StatVariants`);
+                });
+            }
+            //    this.critDamage[StatVariants.ALL] += passiveData[WeaponJSONKeys.CRIT_DAMAGE][this.weaponCalib - 1];
+            if (passiveData.hasOwnProperty(WeaponJSONKeys.DEFENSE_IGNORE)) {
+                let buffs = passiveData[WeaponJSONKeys.DEFENSE_IGNORE];
+                buffs.forEach(buff => {
+                    if (this.defenseIgnore.hasOwnProperty(buff[0]))
+                        this.defenseIgnore[buff[0]] += buff[1][this.weaponCalib - 1];
+                    else
+                        console.error(`${buff[0]} is not covered by StatVariants`);
+                });
+            }
+            //    this.defenseIgnore[StatVariants.ALL] += passiveData[WeaponJSONKeys.DEFENSE_IGNORE][this.weaponCalib - 1];
+            /*if (passiveData.hasOwnProperty(WeaponJSONKeys.ELEMENTAL_DAMAGE))
+                this.damageDealt[passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][0]] += passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][1][this.weaponCalib - 1];
             if (passiveData.hasOwnProperty(WeaponJSONKeys.PHASE_DAMAGE))
-                this.phaseDamageDealt += passiveData[WeaponJSONKeys.PHASE_DAMAGE][this.weaponCalib - 1];
+                this.damageDealt[StatVariants.PHASE] += passiveData[WeaponJSONKeys.PHASE_DAMAGE][this.weaponCalib - 1];*/
             if (passiveData.hasOwnProperty(WeaponJSONKeys.STABILITY_IGNORE))
                 this.stabilityIgnore += passiveData[WeaponJSONKeys.STABILITY_IGNORE][this.weaponCalib - 1];
 
@@ -362,7 +482,7 @@ class Doll extends Unit {
                 if (passiveData.hasOwnProperty(WeaponJSONKeys.EXPLOIT_ELEMENT)) {
                     // the only time this bonus effect exists is in weapon traits for defense ignore which do not scale with calibration
                     if (passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][0] == triggerElement)
-                        this.defenseIgnore += passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][1][this.weaponCalib - 1];
+                        this.defenseIgnore[StatVariants.ALL] += passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][1][this.weaponCalib - 1];
                 }
             }
         }
@@ -374,15 +494,15 @@ class Doll extends Unit {
             let passiveData = this.weaponData[objectKey];
             // passives that have conditions that stack are assumed to have stacked to the max on all attacks unless it requires movement
             if (passiveData.hasOwnProperty(WeaponJSONKeys.DAMAGE_PERC))
-                this.damageDealt -= passiveData[WeaponJSONKeys.DAMAGE_PERC][this.weaponCalib - 1];
+                this.damageDealt[StatVariants.ALL] -= passiveData[WeaponJSONKeys.DAMAGE_PERC][this.weaponCalib - 1];
             if (passiveData.hasOwnProperty(WeaponJSONKeys.CRIT_DAMAGE))
-                this.critDamage -= passiveData[WeaponJSONKeys.CRIT_DAMAGE][this.weaponCalib - 1];
+                this.critDamage[StatVariants.ALL] -= passiveData[WeaponJSONKeys.CRIT_DAMAGE][this.weaponCalib - 1];
             if (passiveData.hasOwnProperty(WeaponJSONKeys.DEFENSE_IGNORE))
-                this.defenseIgnore -= passiveData[WeaponJSONKeys.DEFENSE_IGNORE][this.weaponCalib - 1];
+                this.defenseIgnore[StatVariants.ALL] -= passiveData[WeaponJSONKeys.DEFENSE_IGNORE][this.weaponCalib - 1];
             if (passiveData.hasOwnProperty(WeaponJSONKeys.ELEMENTAL_DAMAGE))
-                this.elementDamageDealt[passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][0]] -= passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][1][this.weaponCalib - 1];
+                this.damageDealt[passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][0]] -= passiveData[WeaponJSONKeys.ELEMENTAL_DAMAGE][1][this.weaponCalib - 1];
             if (passiveData.hasOwnProperty(WeaponJSONKeys.PHASE_DAMAGE))
-                this.phaseDamageDealt -= passiveData[WeaponJSONKeys.PHASE_DAMAGE][this.weaponCalib - 1];
+                this.damageDealt[StatVariants.PHASE] -= passiveData[WeaponJSONKeys.PHASE_DAMAGE][this.weaponCalib - 1];
             if (passiveData.hasOwnProperty(WeaponJSONKeys.STABILITY_IGNORE))
                 this.stabilityIgnore -= passiveData[WeaponJSONKeys.STABILITY_IGNORE][this.weaponCalib - 1];
 
@@ -391,7 +511,7 @@ class Doll extends Unit {
                 if (passiveData.hasOwnProperty(WeaponJSONKeys.EXPLOIT_ELEMENT)) {
                     // the only time this bonus effect exists is in weapon traits for defense ignore
                     if (passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][0] == triggerElement)
-                        this.defenseIgnore -= passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][1][this.weaponCalib - 1];
+                        this.defenseIgnore[StatVariants.ALL] -= passiveData[WeaponJSONKeys.EXPLOIT_ELEMENT][1][this.weaponCalib - 1];
                 }
             }
         }
@@ -433,52 +553,121 @@ class Doll extends Unit {
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC))
-            this.damageDealt += buffData[BuffJSONKeys.DAMAGE_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC)) {
+            let buff = buffData[BuffJSONKeys.DAMAGE_PERC];
+            if (this.damageDealt.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.damageDealt[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE)) {
+            let buff = buffData[BuffJSONKeys.CRIT_RATE];
+            if (this.critChance.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.critChance[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE)) {
+            let buff = buffData[BuffJSONKeys.CRIT_DAMAGE];
+            if (this.critDamage.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.critDamage[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_DAMAGE)) {
+            let buff = buffData[BuffJSONKeys.STABILITY_DAMAGE];
+            if (this.stabilityDamageModifier.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.stabilityDamageModifier[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_IGNORE)) {
+            let buff = buffData[BuffJSONKeys.DEFENSE_IGNORE];
+            if (this.defenseIgnore.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.defenseIgnore[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        //    this.damageDealt[StatVariants.ALL] += buffData[BuffJSONKeys.DAMAGE_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.ATTACK_PERC))
             this.attackBoost += buffData[BuffJSONKeys.ATTACK_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.SUPPORT_PERC))
             this.supportDamageDealt += buffData[BuffJSONKeys.SUPPORT_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.EXPOSED_PERC))
             this.exposedDamageDealt += buffData[BuffJSONKeys.EXPOSED_PERC] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
-            this.critChance += buffData[BuffJSONKeys.CRIT_RATE] * stackEffect;
+        /*if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
+            this.critChance[StatVariants.ALL] += buffData[BuffJSONKeys.CRIT_RATE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE))
-            this.critDamage += buffData[BuffJSONKeys.CRIT_DAMAGE] * stackEffect;
+            this.critDamage[StatVariants.ALL] += buffData[BuffJSONKeys.CRIT_DAMAGE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_DAMAGE))
-            this.stabilityDamageModifier += buffData[BuffJSONKeys.STABILITY_DAMAGE] * stackEffect;
+            this.stabilityDamageModifier[StatVariants.ALL] += buffData[BuffJSONKeys.STABILITY_DAMAGE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_IGNORE))
-            this.defenseIgnore += buffData[BuffJSONKeys.DEFENSE_IGNORE] * stackEffect;
+            this.defenseIgnore[StatVariants.ALL] += buffData[BuffJSONKeys.DEFENSE_IGNORE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.PHASE_DAMAGE))
-            this.phaseDamageDealt += buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
+            this.damageDealt[StatVariants.PHASE] += buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
         if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENTAL_DAMAGE))
-            this.elementDamageDealt[buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][0]] += buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][1] * stackEffect;
+            this.damageDealt[buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][0]] += buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][1] * stackEffect;
+        */
     }
     removeBuffEffects(buffData, stacks = 1, stackable = false) {
         super.removeBuffEffects(buffData);
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC))
-            this.damageDealt -= buffData[BuffJSONKeys.DAMAGE_PERC] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_PERC)) {
+            let buff = buffData[BuffJSONKeys.DAMAGE_PERC];
+            if (this.damageDealt.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.damageDealt[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE)) {
+            let buff = buffData[BuffJSONKeys.CRIT_RATE];
+            if (this.critChance.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.critChance[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE)) {
+            let buff = buffData[BuffJSONKeys.CRIT_DAMAGE];
+            if (this.critDamage.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.critDamage[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_DAMAGE)) {
+            let buff = buffData[BuffJSONKeys.STABILITY_DAMAGE];
+            if (this.stabilityDamageModifier.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.stabilityDamageModifier[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_IGNORE)) {
+            let buff = buffData[BuffJSONKeys.DEFENSE_IGNORE];
+            if (this.defenseIgnore.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.defenseIgnore[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
         if(buffData.hasOwnProperty(BuffJSONKeys.ATTACK_PERC))
             this.attackBoost -= buffData[BuffJSONKeys.ATTACK_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.SUPPORT_PERC))
             this.supportDamageDealt -= buffData[BuffJSONKeys.SUPPORT_PERC] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.EXPOSED_PERC))
             this.exposedDamageDealt -= buffData[BuffJSONKeys.EXPOSED_PERC] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
-            this.critChance -= buffData[BuffJSONKeys.CRIT_RATE] * stackEffect;
+        /*if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_RATE))
+            this.critChance[StatVariants.ALL] -= buffData[BuffJSONKeys.CRIT_RATE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.CRIT_DAMAGE))
-            this.critDamage -= buffData[BuffJSONKeys.CRIT_DAMAGE] * stackEffect;
+            this.critDamage[StatVariants.ALL] -= buffData[BuffJSONKeys.CRIT_DAMAGE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_DAMAGE))
-            this.stabilityDamageModifier -= buffData[BuffJSONKeys.STABILITY_DAMAGE] * stackEffect;
+            this.stabilityDamageModifier[StatVariants.ALL] -= buffData[BuffJSONKeys.STABILITY_DAMAGE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.DEFENSE_IGNORE))
-            this.defenseIgnore -= buffData[BuffJSONKeys.DEFENSE_IGNORE] * stackEffect;
+            this.defenseIgnore[StatVariants.ALL] -= buffData[BuffJSONKeys.DEFENSE_IGNORE] * stackEffect;
         if(buffData.hasOwnProperty(BuffJSONKeys.PHASE_DAMAGE))
-            this.phaseDamageDealt -= buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
+            this.damageDealt[StatVariants.PHASE] -= buffData[BuffJSONKeys.PHASE_DAMAGE] * stackEffect;
         if (buffData.hasOwnProperty(BuffJSONKeys.ELEMENTAL_DAMAGE))
-            this.elementDamageDealt[buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][0]] -= buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][1] * stackEffect;
+            this.damageDealt[buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][0]] -= buffData[BuffJSONKeys.ELEMENTAL_DAMAGE][1] * stackEffect;
+        */
     }
     // pass skill data to the game state manager to calculate damage dealt and then return the result, Expected, Crit, NoCrit, Simulation are options 
     // conditionals in skills are set automatically by the respective doll class or by an override checkbox in the menu
@@ -534,11 +723,11 @@ class Doll extends Unit {
             this.processPrePostBuffs(skill, enemyTarget, supportTarget, true);
             // if out of turn attack, temporarily increase damage dealt stat then undo once damage has been calculated
             if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
-                this.damageDealt += this.supportDamageDealt;
+                this.damageDealt[StatVariants.ALL] += this.supportDamageDealt;
             let damage;
             // if simulating with v1+ makiatto skill2, do the crit roll outside of the function to track the condition flag for the next hit
             if (calculationType == CalculationTypes.SIMULATION && this.name == "Makiatto" && this.fortification > 0 && skillName == SkillNames.SKILL2) {
-                let isCrit = RNGManager.getInstance().getRNG() <= this.critChance;
+                let isCrit = RNGManager.getInstance().getRNG() <= this.critChance[StatVariants.ALL];
                 damage = this.processAttack(skill, isCrit ? CalculationTypes.CRIT : CalculationTypes.NOCRIT, enemyTarget, skillName);
                 // modify the skill data for condition pass if isCrit is true
                 if (isCrit) {
@@ -550,7 +739,7 @@ class Doll extends Unit {
                 damage = this.processAttack(skill, calculationType, enemyTarget, skillName);
 
             if (skillName == SkillNames.SUPPORT || skillName == SkillNames.COUNTERATTACK || skillName == SkillNames.INTERCEPT)
-                this.damageDealt -= this.supportDamageDealt;
+                this.damageDealt[StatVariants.ALL] -= this.supportDamageDealt;
 
             this.processPrePostBuffs(skill, enemyTarget, supportTarget, false);
             // some skills have an extra attack which, unless stated otherwise, have the same data as the first attack 
@@ -698,6 +887,10 @@ class Doll extends Unit {
     }
 
     processAttack(skill, calculationType, target, skillName) {
+        // apply gun effect for attacking out of cover target if value is 0
+        let coverValue = GameStateManager.getInstance().getCover();
+        if (coverValue == 0)
+            this.applyGunEffects(WeaponJSONKeys.OUT_OF_COVER);
         // active engagement temporarily changes damage type to electric
         let element = skill[SkillJSONKeys.ELEMENT];
         if (this.hasBuff("Active Engagement") || this.hasBuff("Active Engagement V5"))
@@ -709,11 +902,11 @@ class Doll extends Unit {
             // arctic benediction is only used on active attacks to apply 10 or 20% dmg and 1 stack of frozen
             if (this.hasBuff("Arctic Benediction")) {
                 target.addBuff("Frozen", this.name, 2, 1);
-                this.damageDealt += 0.1;
+                this.damageDealt[StatVariants.ALL] += 0.1;
             } 
             else if (this.hasBuff("Arctic Benediction V1")) {
                 target.addBuff("Frozen", this.name, 2, 1);
-                this.damageDealt += 0.2;
+                this.damageDealt[StatVariants.ALL] += 0.2;
             }
         }
 
@@ -731,8 +924,8 @@ class Doll extends Unit {
         }
         // set whether the attack crits or not
         let isCrit;
-        let tempCritDmg = this.critDamage;
-        let tempCritRate = this.critChance;
+        let tempCritDmg = this.critDamage[StatVariants.ALL];
+        let tempCritRate = this.critChance[StatVariants.ALL];
         // if attack modifies crit, add it before incorporating it into the calculation type
         if (skill.hasOwnProperty(SkillJSONKeys.CRIT_DAMAGE_MODIFIER))
             tempCritDmg += skill[SkillJSONKeys.CRIT_DAMAGE_MODIFIER];
@@ -761,8 +954,8 @@ class Doll extends Unit {
                     && skill[SkillJSONKeys.STABILITYDAMAGE] == 1) {
                     let noCritRate = 1 - tempCritRate;
                     tempCritDmg = noCritRate * noCritRate; // case 1: Both first and second shots failed to crit
-                    tempCritDmg += noCritRate * tempCritRate * this.critDamage; // case 2: First shot fails to crit and second shot crits
-                    tempCritDmg += tempCritRate * (this.critDamage + 0.8);
+                    tempCritDmg += noCritRate * tempCritRate * this.critDamage[StatVariants.ALL]; // case 2: First shot fails to crit and second shot crits
+                    tempCritDmg += tempCritRate * (this.critDamage[StatVariants.ALL] + 0.8);
                 }
                 break;
             case CalculationTypes.SIMULATION:
@@ -801,24 +994,26 @@ class Doll extends Unit {
         }
         // get the temporary damage boost from skill conditionals when triggered
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
-            this.damageDealt += skill[SkillJSONKeys.DAMAGE_BOOST];
+            this.damageDealt[StatVariants.ALL] += skill[SkillJSONKeys.DAMAGE_BOOST];
         let damage = DamageManager.getInstance().calculateDamage(this, target, this.getAttack() * skill[SkillJSONKeys.MULTIPLIER], element, 
             skill[SkillJSONKeys.AMMO_TYPE], skill[SkillJSONKeys.DAMAGE_TYPE], isCrit, tempCritDmg, skill[SkillJSONKeys.STABILITYDAMAGE], coverIgnore, skillName);
         if (skill.hasOwnProperty(SkillJSONKeys.DAMAGE_BOOST))
-            this.damageDealt -= skill[SkillJSONKeys.DAMAGE_BOOST];
+            this.damageDealt[StatVariants.ALL] -= skill[SkillJSONKeys.DAMAGE_BOOST];
         if (GameStateManager.getInstance().hasDoll("Suomi")) {
             if (GameStateManager.getInstance().getDoll("Suomi").fortification > 1) {
                 if (this.hasBuff("Frost Barrier"))
                     this.elementDamageDealt.Freeze -= 0.15;
             }
         }
+        if (coverValue == 0)
+            this.removeGunEffects(WeaponJSONKeys.OUT_OF_COVER);
         // after doing damage, consume any buffs that are reduced on attack
         // for active attacks
         if ([SkillNames.BASIC, SkillNames.SKILL2, SkillNames.SKILL3, SkillNames.ULT].includes(skillName)) {
             if (this.hasBuff("Arctic Benediction"))
-                this.damageDealt -= 0.1;
+                this.damageDealt[StatVariants.ALL] -= 0.1;
             else if (this.hasBuff("Arctic Benediction V1")) 
-                this.damageDealt -= 0.2;
+                this.damageDealt[StatVariants.ALL] -= 0.2;
             this.consumeAttackBuffs();
             // additionally remove on move gun effect
             this.removeGunEffects(WeaponJSONKeys.ON_MOVE);
@@ -1068,22 +1263,30 @@ class Doll extends Unit {
     // to enable turn rewinding, each move uses clones of the previous state and rewind just returns to that set of clones
     cloneUnit(newDoll = null) {
         if (!newDoll)
-            newDoll = new Doll(this.name, this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);   
+            newDoll = new Doll(this.name, this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);   
         newDoll.CIndex = this.CIndex;
-        newDoll.setDefenseIgnore(this.baseDefenseIgnore);
-        newDoll.setDamageDealt(this.baseDamageDealt); 
-        newDoll.setAoEDamage(this.baseAoEDamageDealt); 
-        newDoll.setTargetedDamage(this.baseTargetedDamageDealt); 
+        //newDoll.setDefenseIgnore(this.baseDefenseIgnore[StatVariants.ALL], StatVariants.ALL);
+        let variants = Object.values(StatVariants);
+        variants.forEach(variant => {
+            newDoll.setDefenseIgnore(this.baseDefenseIgnore[variant], variant);
+            newDoll.setDamageDealt(this.baseDamageDealt[variant], variant);
+            newDoll.setCritRate(this.baseCritChance[variant], variant);
+            newDoll.setCritDamage(this.baseCritDamage[variant], variant);
+            newDoll.setStabilityDamageModifier(this.baseStabilityDamageModifier[variant], variant);
+        });
+        //newDoll.setDamageDealt(this.baseDamageDealt[StatVariants.ALL], StatVariants.ALL); 
+        //newDoll.setAoEDamage(this.baseAoEDamageDealt, StatVariants.ALL); 
+        //newDoll.setTargetedDamage(this.baseTargetedDamageDealt, StatVariants.ALL); 
         newDoll.setSlowedDamage(this.baseSlowedDamageDealt);
         newDoll.setDefDownDamage(this.baseDefDownDamageDealt);
         newDoll.setExposedDamage(this.baseExposedDamageDealt);
         newDoll.setSupportDamage(this.baseSupportDamageDealt); 
-        newDoll.setPhaseDamage(this.basePhaseDamageDealt); 
+        /*newDoll.setPhaseDamage(this.basePhaseDamageDealt, StatVariants.ALL); 
         Object.values(Elements).forEach(d => {
             newDoll.setElementDamage(d, this.baseElementDamageDealt[d]);
-        });
+        });*/
         newDoll.setCoverIgnore(this.baseCoverIgnore); 
-        newDoll.setStabilityDamageModifier(this.baseStabilityDamageModifier);
+        //newDoll.setStabilityDamageModifier(this.baseStabilityDamageModifier[StatVariants.ALL]);
         newDoll.setStabilityIgnore(this.baseStabilityIgnore);
         newDoll.setAttackBoost(this.baseAttackBoost);
         newDoll.setDefenseBuffs(this.baseDefenseBuffs);
@@ -1110,8 +1313,9 @@ class Doll extends Unit {
         return newDoll;
     }
     // to be filled by child classes
-    refreshSupportUses() {
+    startTurn() {
         this.turnAvailable = true;
+        super.startTurn();
     }
     // to ensure index consumption/gain does not exceed the bounds of 0-6
     adjustIndex(gain) {

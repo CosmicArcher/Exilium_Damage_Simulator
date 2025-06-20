@@ -1,6 +1,6 @@
 import DamageManager from "./DamageManager.js";
 import Doll from "./Doll.js";
-import { AmmoTypes, Elements, SkillNames, CalculationTypes, SkillJSONKeys, BuffJSONKeys, AttackTypes } from "./Enums.js";
+import { AmmoTypes, Elements, SkillNames, CalculationTypes, SkillJSONKeys, BuffJSONKeys, AttackTypes, StatVariants } from "./Enums.js";
 import EventManager from "./EventManager.js";
 import GameStateManager from "./GameStateManager.js";
 import RNGManager from "./RNGManager.js";
@@ -24,8 +24,8 @@ class Supporter extends Doll {
         return 0;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         this.supportsUsed = 0;
     }
 
@@ -59,8 +59,8 @@ class Interceptor extends Doll {
         return this.interceptsUsed < this.interceptLimit && this.interceptEnabled;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         this.interceptsUsed = 0;
     }
 
@@ -112,17 +112,17 @@ export class Qiongjiu extends Supporter {
         }
         // if the target is out of cover, qj deals extra damage, enhanced by v6
         if (GameStateManager.getInstance().getCover() == 0) {
-            this.damageDealt += 0.1;
+            this.damageDealt[StatVariants.ALL] += 0.1;
             if (this.fortification == 6)
-                this.damageDealt += 0.1;
+                this.damageDealt[StatVariants.ALL] += 0.1;
         }
         
         let damage = super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
 
         if (GameStateManager.getInstance().getCover() == 0) {
-            this.damageDealt -= 0.1;
+            this.damageDealt[StatVariants.ALL] -= 0.1;
             if (this.fortification == 6)
-                this.damageDealt -= 0.1;
+                this.damageDealt[StatVariants.ALL] -= 0.1;
         }
 
         return damage;
@@ -152,7 +152,7 @@ export class Qiongjiu extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Qiongjiu(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Qiongjiu(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -171,8 +171,8 @@ export class Makiatto extends Interceptor {
         if (keysEnabled[5])
             this.attackBoost += 0.1;
         // Makiatto passive
-        this.critChance += 0.4;
-        this.critDamage -= 0.1;
+        this.critChance[StatVariants.ALL] += 0.4;
+        this.critDamage[StatVariants.ALL] -= 0.1;
     }
 
     getSkillDamage(skillName, target, calculationType = CalculationTypes.SIMULATION, conditionalTriggered = [false]) {
@@ -182,11 +182,11 @@ export class Makiatto extends Interceptor {
                 // check if freeze damage
                 if ((skillName == SkillNames.INTERCEPT || skillName == SkillNames.SKILL2) && this.fortification > 2) {
                     this.stabilityIgnore += 10;
-                    this.damageDealt += 0.3;
+                    this.damageDealt[StatVariants.ALL] += 0.3;
                 }
                 else {
                     this.stabilityIgnore += 6;
-                    this.damageDealt += 0.3;
+                    this.damageDealt[StatVariants.ALL] += 0.3;
                 }
             }
             else if (target.hasBuff("Frozen")) {
@@ -194,20 +194,20 @@ export class Makiatto extends Interceptor {
                 if (skillName == SkillNames.INTERCEPT || skillName == SkillNames.SKILL2) {
                     if (this.fortification > 4) {
                         this.stabilityIgnore += 10;
-                        this.damageDealt += 0.3;
+                        this.damageDealt[StatVariants.ALL] += 0.3;
                     }
                     else if (this.fortification > 2) {
                         this.stabilityIgnore += 6;
-                        this.damageDealt += 0.2;
+                        this.damageDealt[StatVariants.ALL] += 0.2;
                     }
                     else {
                         this.stabilityIgnore += 4;
-                        this.damageDealt += 0.2;
+                        this.damageDealt[StatVariants.ALL] += 0.2;
                     }
                 }
                 else {
                     this.stabilityIgnore += 4;
-                    this.damageDealt += 0.2;
+                    this.damageDealt[StatVariants.ALL] += 0.2;
                 }
             }
             else if (target.hasBuff("Murderous Intent")) {
@@ -215,9 +215,9 @@ export class Makiatto extends Interceptor {
                 if (skillName == SkillNames.INTERCEPT || skillName == SkillNames.SKILL2) {
                     let weaknesses = target.getPhaseWeaknesses();
                     if (weaknesses.includes(Elements.FREEZE) || weaknesses.includes(AmmoTypes.HEAVY)) 
-                        this.damageDealt += 0.3;
+                        this.damageDealt[StatVariants.ALL] += 0.3;
                     else
-                        this.damageDealt += 0.2;
+                        this.damageDealt[StatVariants.ALL] += 0.2;
                 }
             }
         }
@@ -225,7 +225,7 @@ export class Makiatto extends Interceptor {
         if (!conditionalTriggered[0] && calculationType == CalculationTypes.SIMULATION) {
             // do a crit roll outside of the proper function, if it crits then set the onCrit condition to true regardless of the toggle input
             if ((skillName == SkillNames.INTERCEPT && this.fortification == 6))
-                conditionalTriggered[0] = RNGManager.getInstance().getRNG() <= this.critChance;
+                conditionalTriggered[0] = RNGManager.getInstance().getRNG() <= this.critChance[StatVariants.ALL];
         }
         
         let damage = super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
@@ -235,11 +235,11 @@ export class Makiatto extends Interceptor {
                 // check if freeze damage
                 if ((skillName == SkillNames.INTERCEPT || skillName == SkillNames.SKILL2) && this.fortification > 2) {
                     this.stabilityIgnore -= 10;
-                    this.damageDealt -= 0.3;
+                    this.damageDealt[StatVariants.ALL] -= 0.3;
                 }
                 else {
                     this.stabilityIgnore -= 6;
-                    this.damageDealt -= 0.3;
+                    this.damageDealt[StatVariants.ALL] -= 0.3;
                 }
             }
             else if (target.hasBuff("Frozen")) {
@@ -247,20 +247,20 @@ export class Makiatto extends Interceptor {
                 if (skillName == SkillNames.INTERCEPT || skillName == SkillNames.SKILL2) {
                     if (this.fortification > 4) {
                         this.stabilityIgnore -= 10;
-                        this.damageDealt -= 0.3;
+                        this.damageDealt[StatVariants.ALL] -= 0.3;
                     }
                     else if (this.fortification > 2) {
                         this.stabilityIgnore -= 6;
-                        this.damageDealt -= 0.2;
+                        this.damageDealt[StatVariants.ALL] -= 0.2;
                     }
                     else {
                         this.stabilityIgnore -= 4;
-                        this.damageDealt -= 0.2;
+                        this.damageDealt[StatVariants.ALL] -= 0.2;
                     }
                 }
                 else {
                     this.stabilityIgnore -= 4;
-                    this.damageDealt -= 0.2;
+                    this.damageDealt[StatVariants.ALL] -= 0.2;
                 }
             }
             else if (target.hasBuff("Murderous Intent")) {
@@ -268,9 +268,9 @@ export class Makiatto extends Interceptor {
                 if (skillName == SkillNames.INTERCEPT || skillName == SkillNames.SKILL2) {
                     let weaknesses = target.getPhaseWeaknesses();
                     if (weaknesses.includes(Elements.FREEZE) || weaknesses.includes(AmmoTypes.HEAVY)) 
-                        this.damageDealt -= 0.3;
+                        this.damageDealt[StatVariants.ALL] -= 0.3;
                     else
-                        this.damageDealt -= 0.2;
+                        this.damageDealt[StatVariants.ALL] -= 0.2;
                 }
             }
         }
@@ -302,8 +302,8 @@ export class Makiatto extends Interceptor {
             this.interceptEnabled = false;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // key 5 applies murderous intent on the  highest hp enemy, sim is meant for single target
         let target = GameStateManager.getInstance().getBaseTarget();
         if (this.keysEnabled[4] && !target.hasBuff("Murderous Intent")) 
@@ -313,7 +313,7 @@ export class Makiatto extends Interceptor {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Makiatto(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Makiatto(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -340,7 +340,7 @@ export class Suomi extends Supporter {
                 if (d == Elements.FREEZE || d == AmmoTypes.LIGHT)
                     weaknesses++;
                 });
-                let totalStabDamage = Math.max(0, 4 + target.getStabilityDamageModifier() + this.getStabilityDamageModifier());
+                let totalStabDamage = Math.max(0, 4 + target.getStabilityTakenModifier() + this.getStabilityDamageModifier(StatVariants.ALL));
                 totalStabDamage += weaknesses * 2;
                 if (totalStabDamage > target.getStability())
                     conditionalTriggered[0] = true;
@@ -439,7 +439,7 @@ export class Suomi extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Suomi(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Suomi(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -482,12 +482,12 @@ export class Papasha extends Doll {
             }
             // after papasha attack, use summon support, if she used skill2 with key 1, temporarily increase stability damage by 2 regardless of target size
             if (this.keysEnabled[0] && skillName == SkillNames.SKILL2)
-                summon.setStabilityDamageModifier(summon.getBaseStabilityDamageModifier() + 2);
+                summon.setStabilityDamageModifier(summon.getBaseStabilityDamageModifier(StatVariants.ALL) + 2, StatVariants.ALL);
 
             summon.getSkillDamage(SkillNames.SUPPORT, target, calculationType, conditionalTriggered);
 
             if (this.keysEnabled[0] && skillName == SkillNames.SKILL2)
-                summon.setStabilityDamageModifier(summon.getBaseStabilityDamageModifier() - 2);
+                summon.setStabilityDamageModifier(summon.getBaseStabilityDamageModifier(StatVariants.ALL) - 2, StatVariants.ALL);
             // undo the temporary crit chance too
             if (calculationType == CalculationTypes.SIMULATION)
                 summon.crit_chance -= 0.2;
@@ -501,8 +501,8 @@ export class Papasha extends Doll {
         summon.endTurn();
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         if (this.keysEnabled[5]) {
             let summon = GameStateManager.getInstance().getDoll("Papasha Summon");
             if (!summon)
@@ -522,7 +522,7 @@ export class Papasha extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Papasha(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Papasha(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -532,10 +532,10 @@ export class PapashaSummon extends Doll {
 
         // the summon inherits all of papasha's basic stats except crit which are locked to the base values outside of buffs
         if (fortification > 2) {
-            this.baseCritChance = 0.5;
-            this.baseCritDamage = 1.4;
-            this.critChance = 0.5;
-            this.critDamage = 1.4;
+            this.baseCritChance[StatVariants.ALL] = 0.5;
+            this.baseCritDamage[StatVariants.ALL] = 1.4;
+            this.critChance[StatVariants.ALL] = 0.5;
+            this.critDamage[StatVariants.ALL] = 1.4;
             this.addBuff("Power of Unity", this.name, -1, 3);
         }
         if (keysEnabled[2])
@@ -550,7 +550,7 @@ export class PapashaSummon extends Doll {
             conditionalTriggered[0] = true; 
         // if v1+ with courage to endure, ignore 30% def of large targets
         if (skillName == SkillNames.SUPPORT && this.hasBuff("Courage to Endure") && target.getIsLarge()) {
-            this.defenseIgnore += 0.3;
+            this.defenseIgnore[StatVariants.ALL] += 0.3;
         }
         let ppsh = GameStateManager.getInstance().getDoll("Papasha");
 
@@ -559,7 +559,7 @@ export class PapashaSummon extends Doll {
         ppsh.adjustIndex(1);
 
         if (skillName == SkillNames.SUPPORT && this.hasBuff("Courage to Endure") && target.getIsLarge()) {
-            this.defenseIgnore -= 0.3;
+            this.defenseIgnore[StatVariants.ALL] -= 0.3;
         }
         // v2+ papasha has the summon do a support attack after skill3 instead of no support
         if (skillName == SkillNames.SKILL3 && this.fortification > 1) {
@@ -576,7 +576,7 @@ export class PapashaSummon extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new PapashaSummon(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new PapashaSummon(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -605,10 +605,10 @@ export class Daiyan extends Interceptor {
         }
         // passive gives 20% damage buff when more than 3 tuning
         if (totalTuning > 3)
-            this.damageDealt += 0.2;
+            this.damageDealt[StatVariants.ALL] += 0.2;
         // v4+ passive gives another 20% at more than 5 stacks and upgrades her intercept
         if (totalTuning > 5 && this.fortification > 3) {
-            this.damageDealt += 0.2;
+            this.damageDealt[StatVariants.ALL] += 0.2;
             if (skillName == SkillNames.INTERCEPT)
                 conditionalTriggered[0] = true;
         }
@@ -641,9 +641,9 @@ export class Daiyan extends Interceptor {
         }
         // undo temporary buffs
         if (totalTuning > 3)
-            this.damageDealt -= 0.2;
+            this.damageDealt[StatVariants.ALL] -= 0.2;
         if (totalTuning > 5 && this.fortification > 3) 
-            this.damageDealt -= 0.2;
+            this.damageDealt[StatVariants.ALL] -= 0.2;
         if (this.fortification > 4 && permaTuning == 6 && target.getStability() == 0)
             this.coverIgnore -= 0.15;
         // passive gives 1 index if attacking an out of cover target
@@ -651,8 +651,8 @@ export class Daiyan extends Interceptor {
             this.adjustIndex(1);
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // passive gives 1 stack of tuning and index at the start of each turn
         this.addBuff("Tuning", this.name, -1, 1);
         this.adjustIndex(1);
@@ -684,7 +684,7 @@ export class Daiyan extends Interceptor {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Daiyan(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Daiyan(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -803,7 +803,7 @@ export class Tololo extends Doll {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Tololo(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Tololo(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -901,7 +901,7 @@ export class MosinNagant extends Supporter {
     }
 
     cloneUnit() {
-        let doll = new MosinNagant(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);
+        let doll = new MosinNagant(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);
         doll.skill3Uses = this.skill3Uses;
         return super.cloneUnit(doll);
     }
@@ -913,7 +913,7 @@ export class Vepley extends Doll {
 
         // assume that the enemy always has movement debuff with vepley present so key 1 always happens
         if (keysEnabled[0])
-            this.stabilityDamageModifier += 2;
+            this.stabilityDamageModifier[StatVariants.ALL] += 2;
         // passively has 20% damage on targets with movemenet debuffs
         this.slowedDamageDealt += 0.2;
     }
@@ -936,13 +936,13 @@ export class Vepley extends Doll {
         this.adjustIndex(1);
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         this.adjustIndex(1);
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Vepley(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Vepley(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -964,14 +964,14 @@ export class Peritya extends Supporter {
             conditionalTriggered[0] = true;
         // assume that peritya always only hits 1 target with all her skills and that she maxes her passive
         if (skillName == SkillNames.ULT) 
-            this.damageDealt += 0.05;
-        this.damageDealt += 0.3;
+            this.damageDealt[StatVariants.ALL] += 0.05;
+        this.damageDealt[StatVariants.ALL] += 0.3;
 
         super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
 
-        this.damageDealt -= 0.3;
+        this.damageDealt[StatVariants.ALL] -= 0.3;
         if (skillName == SkillNames.ULT) 
-            this.damageDealt -= 0.05;
+            this.damageDealt[StatVariants.ALL] -= 0.05;
         if (skillName == SkillNames.SKILL3)
             this.cooldowns[2]--;
         // it is very likely that peritya will have at least 1 step left each turn so always activate key 2 if present
@@ -991,7 +991,7 @@ export class Peritya extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Peritya(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Peritya(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -1034,13 +1034,13 @@ export class Sharkry extends Supporter {
                 if (buff[0].match("Zoom In"))
                     zoominStacks += buff[3];
             });
-            this.stabilityDamageModifier += zoominStacks;
+            this.stabilityDamageModifier[StatVariants.ALL] += zoominStacks;
         }
 
         super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
 
         if (skillName == SkillNames.SKILL2) {
-            this.stabilityDamageModifier -= zoominStacks;
+            this.stabilityDamageModifier[StatVariants.ALL] -= zoominStacks;
         }
         if (target.hasBuff("Overburn")) {
             // passively gains 20% crit vs overburn targets
@@ -1068,8 +1068,8 @@ export class Sharkry extends Supporter {
         }
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // passively gains 1 index per turn
         this.adjustIndex(1);
         // v6 also gains 1 zoom in stack per turn
@@ -1086,7 +1086,7 @@ export class Sharkry extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Sharkry(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Sharkry(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -1122,8 +1122,8 @@ export class Cheeta extends Supporter {
             this.supportEnabled = true;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // the buff called "support" uniquely ticks down at the start of each round rather than the end of her turn
         let foundSupport = 0;
         for (let i = 0; i < this.currentBuffs.length && !foundSupport; i++) {
@@ -1140,7 +1140,7 @@ export class Cheeta extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Cheeta(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Cheeta(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -1190,22 +1190,22 @@ export class Ksenia extends Supporter {
     addBuff(buffName, sourceName, duration = -1, stacks = 1) {
         // if buffs are already present, temporarily reduce stability to counteract the automatic addition of the passive effect later so that it does not stack
         if (this.hasBuff("Heat Recovery") && buffName == "Heat Recovery")
-            this.stabilityDamageModifier--;
+            this.stabilityDamageModifier[StatVariants.ALL]--;
         if (this.fortification > 1 && this.hasBuff("Blazing Assault 2") && buffName == "Blazing Assault 2")
-            this.stabilityDamageModifier--;
+            this.stabilityDamageModifier[StatVariants.ALL]--;
         super.addBuff(buffName, sourceName, duration, stacks);
         if (buffName ==  "Heat Recovery")
-            this.stabilityDamageModifier++;
+            this.stabilityDamageModifier[StatVariants.ALL]++;
         if (this.fortification > 1 && buffName == "Blazing Assault 2")
-            this.stabilityDamageModifier++;
+            this.stabilityDamageModifier[StatVariants.ALL]++;
     }
 
     removeBuff(buffName) {
         super.removeBuff(buffName);
         if (buffName ==  "Heat Recovery")
-            this.stabilityDamageModifier--;
+            this.stabilityDamageModifier[StatVariants.ALL]--;
         if (this.fortification > 1 && buffName == "Blazing Assault 2")
-            this.stabilityDamageModifier--;
+            this.stabilityDamageModifier[StatVariants.ALL]--;
     }
 
     endTurn() {
@@ -1224,7 +1224,7 @@ export class Ksenia extends Supporter {
     }
 
     cloneUnit() {
-        return super.cloneUnit(new Ksenia(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
+        return super.cloneUnit(new Ksenia(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike));
     }
 }
 
@@ -1272,9 +1272,9 @@ export class Klukai extends Doll {
                 conditionalTriggered[1] = true;
             // key 5 gives 20 or 40% damage boost depending on fortification (ult size)
             if (this.keysEnabled[4]) {
-                this.damageDealt += 0.2;
+                this.damageDealt[StatVariants.ALL] += 0.2;
                 if (this.fortification == 6)
-                    this.damageDealt += 0.2;
+                    this.damageDealt[StatVariants.ALL] += 0.2;
             }
         }
         // check if target already has toxic infiltration for skill3 damage boost
@@ -1297,19 +1297,19 @@ export class Klukai extends Doll {
             else if (skillName == SkillNames.SKILL3)
                 if (conditionalTriggered[1])
                     dmgBuff = 0.3;
-            this.damageDealt += dmgBuff;
+            this.damageDealt[StatVariants.ALL] += dmgBuff;
         }
 
         super.getSkillDamage(skillName, target, calculationType, conditionalTriggered);
 
         if (this.fortification > 4) {
-            this.damageDealt -= dmgBuff;
+            this.damageDealt[StatVariants.ALL] -= dmgBuff;
         }
         if (skillName == SkillNames.ULT) {
             if (this.keysEnabled[4]) {
-                this.damageDealt -= 0.2;
+                this.damageDealt[StatVariants.ALL] -= 0.2;
                 if (this.fortification == 6)
-                    this.damageDealt -= 0.2;
+                    this.damageDealt[StatVariants.ALL] -= 0.2;
             }
         }
         // if target already has corrosive infusion, add 1 or 2 stacks depending on Klukai fortification
@@ -1402,8 +1402,8 @@ export class Klukai extends Doll {
         this.isActing = false;
     }
 
-    refreshSupportUses() {
-        super.refreshSupportUses();
+    startTurn() {
+        super.startTurn();
         // key 1 applies 1 stack of corrosive infusion and gains 2 index if there is only 1 target which is assumed always true
         if (this.keysEnabled[0]) {
             let target = GameStateManager.getInstance().getTarget();
@@ -1424,7 +1424,7 @@ export class Klukai extends Doll {
     }
 
     cloneUnit() {
-        let newDoll = new Klukai(this.defense, this.attack, this.baseCritChance, this.baseCritDamage, this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);
+        let newDoll = new Klukai(this.defense, this.attack, this.baseCritChance[StatVariants.ALL], this.baseCritDamage[StatVariants.ALL], this.fortification, this.keysEnabled, this.weaponName, this.weaponCalib, this.hasPhaseStrike);
         // ensure that tracked index gain is passed onto the clone
         newDoll.IndexGained = this.IndexGained;
         newDoll.isActing = this.isActing;

@@ -21,7 +21,7 @@
             "Stacks" : [1, 1, 1, 1, 1, 2]
         },
         "Passive" : {
-            "Damage_Perc" : [0.1, 0.1, 0.15, 0.2, 0.2, 0.2]
+            "Damage_Perc" : [["All", [0.1, 0.1, 0.15, 0.2, 0.2, 0.2]]]
         }
     },
     "Guerno" : {
@@ -29,7 +29,7 @@
         "Trait" : "Random Buff",
         "Trigger" : "Start",
         "Passive" : {
-            "Damage_Perc" : [0.15, 0.18, 0.21, 0.24, 0.27, 0.3]
+            "Damage_Perc" : [["All", [0.15, 0.18, 0.21, 0.24, 0.27, 0.3]]]
         }
     },
     "Heavy Strings" : {
@@ -38,17 +38,17 @@
         "Trigger" : "Start",
         "On_Move" : {
             "Steps" : [3, 3, 3, 2, 2, 1],
-            "Damage_Perc" : [0.1, 0.15, 0.2, 0.2, 0.2, 0.2]
+            "Damage_Perc" : [["All", [0.1, 0.15, 0.2, 0.2, 0.2, 0.2]]]
         },
         "Out_Of_Cover" : {
-            "Crit_Damage" : [0.1, 0.1, 0.1, 0.1, 0.15, 0.2]
+            "Crit_Damage" : [["All", [0.1, 0.1, 0.1, 0.1, 0.15, 0.2]]]
         }
     },
     "Maid's Rules" : {
         "Type" : "AR",
         "Trait" : "Special",
         "Passive" : {
-            "Damage_Perc" : [0.2, 0.25, 0.3, 0.35, 0.4, 0.4]
+            "Damage_Perc" : [["All", [0.2, 0.25, 0.3, 0.35, 0.4, 0.4]]]
         }
     },
     "Planeta" : {
@@ -65,7 +65,7 @@
         "Type" : "AR",
         "Trait" : "Def Ignore",
         "Phase_Exploit" : {
-            "Defense_Ignore" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            "Defense_Ignore" : [["All", [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]],
             "Element" : ["Corrosion", [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
         },
         "Buff" : {
@@ -74,7 +74,7 @@
             "Stacks" : [1, 1, 1, 1, 1, 1]
         },
         "AoE_Corrosion" : {
-            "Damage_Perc" : [0.15, 0.17, 0.19, 0.21, 0.23, 0.25]
+            "Damage_Perc" : [["All", [0.15, 0.17, 0.19, 0.21, 0.23, 0.25]]]
         }
     },
     "Sparkling Centerstage" : {
@@ -93,7 +93,7 @@
         "Type" : "MG",
         "Trait" : "AoE Debuff",
         "No_Move" : {
-            "Damage_Perc" : [0.15, 0.18, 0.21, 0.24, 0.27, 0.3]
+            "Damage_Perc" : [["All", [0.15, 0.18, 0.21, 0.24, 0.27, 0.3]]]
         }
     },
     "Optical Illusion" : {
@@ -110,7 +110,7 @@
         "Trait" : "Move Buff",
         "On_Move" : {
             "Steps" : [1, 1, 1, 1, 1, 1],
-            "Defense_Ignore" : [0.25, 0.3, 0.35, 0.4, 0.45, 0.5]
+            "Defense_Ignore" : [["All", [0.25, 0.3, 0.35, 0.4, 0.45, 0.5]]]
         }
     },
     "Svarog" : {
@@ -140,11 +140,11 @@
         "Type" : "SMG",
         "Trait" : "Move Buff",
         "Phase_Exploit" : {
-            "Damage_Perc" : [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]
+            "Damage_Perc" : [["All", [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]]]
         },
         "Elemental_Debuff" : {
             "Element" : "Hydro",
-            "Crit_Damage" : [0.15, 0.18, 0.21, 0.24, 0.27, 0.3]
+            "Crit_Damage" : [["All", [0.15, 0.18, 0.21, 0.24, 0.27, 0.3]]]
         }
     },
     "Arcana" : {
@@ -152,7 +152,7 @@
         "Trait" : "Insight Stability Ignore",
         "Passive" : {
             "Stability_Ignore" : [1, 1, 1, 1, 1, 1],
-            "Damage_Perc" : [0.15, 0.18, 0.21, 0.24, 0.27, 0.3]
+            "Damage_Perc" : [["All", [0.15, 0.18, 0.21, 0.24, 0.27, 0.3]]]
         },
         "On_Insight" : {
             "Stability_Ignore" : [1, 1, 1, 1, 1, 1]
@@ -162,8 +162,8 @@
         "Type" : "RF",
         "Trait" : "Def Ignore",
         "Passive" : {
-            "Defense_Ignore" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            "Elemental_Damage" : ["Freeze", [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]]
+            "Defense_Ignore" : [["All", [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]],
+            "Damage_Perc" : [["Freeze", [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]]]
         },
         "Buff" : {
             "Target" : "Self",
@@ -172,18 +172,18 @@
         },
         "Elemental_Debuff" : {
             "Element" : "Freeze",
-            "Defense_Ignore" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+            "Defense_Ignore" : [["All", [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]]
         }
     },
     "Eulogistic Verse" : {
         "Type" : "RF",
         "Trait" : "Def Ignore",
         "Phase_Exploit" : {
-            "Defense_Ignore" : [0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            "Defense_Ignore" : [["All", [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]],
             "Element" : ["Freeze", [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]]
         },
         "On_Insight" : {
-            "Damage_Perc" : [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]
+            "Damage_Perc" : [["All", [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]]]
         },
         "Global" : {
             "Name" : "Eulogistic Verse"
@@ -194,8 +194,7 @@
         "Trait" : "Insight Stability Ignore",
         "Passive" : {
             "Stability_Ignore" : [1, 1, 1, 1, 1, 1],
-            "Phase_Damage" : [0.1, 0.12, 0.14, 0.16, 0.18, 0.2],
-            "Elemental_Damage" : ["Electric", [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]]
+            "Damage_Perc" : [["Phase", [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]], ["Electric", [0.1, 0.12, 0.14, 0.16, 0.18, 0.2]]]
         },
         "On_Insight" : {
             "Stability_Ignore" : [1, 1, 1, 1, 1, 1]

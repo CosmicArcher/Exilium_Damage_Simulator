@@ -1,4 +1,4 @@
-import { BuffJSONKeys, Elements } from "./Enums.js";
+import { BuffJSONKeys, Elements, StatVariants } from "./Enums.js";
 import EventManager from "./EventManager.js";
 import GameStateManager from "./GameStateManager.js";
 import Unit from "./Unit.js";
@@ -14,15 +14,22 @@ class Target extends Unit {
         // phase weaknesses add a 0.1 to the weakness multiplier per weakness matched by the attack
         this.phaseWeaknesses = phaseWeaknesses;
         // damage taken buffs/debuffs are only needed for targets
-        this.damageTaken = 0;
-        this.aoeDamageTaken = 0;
-        this.targetedDamageTaken = 0;
-        this.stabilityDamageModifier = 0;
+        let variants = Object.values(StatVariants);
+        this.damageTaken = {};
+        //this.aoeDamageTaken = 0;
+        //this.targetedDamageTaken = 0;
+        this.stabilityTakenModifier = {};
+        this.baseDamageTaken = {};
+        this.baseStabilityTakenModifier = {};
+        variants.forEach(variant => {
+            this.damageTaken[variant] = 0;
+            this.stabilityTakenModifier[variant] = 0;
+            this.baseDamageTaken[variant] = 0;
+            this.baseStabilityTakenModifier[variant] = 0;
+        });
         // base stats for modifying without using buffs
-        this.baseDamageTaken = 0;
-        this.baseAoEDamageTaken = 0;
-        this.baseTargetedDamageTaken = 0;
-        this.baseStabilityDamageModifier = 0;
+        //this.baseAoEDamageTaken = 0;
+        //this.baseTargetedDamageTaken = 0;
         // some bosses have damage reduction based on stability
         this.drPerStab = 0;
         this.drWithStab = 0;
@@ -43,24 +50,32 @@ class Target extends Unit {
     // assemble total damage reduction with stability
     getDRPerStab() {return this.drPerStab;}
     getDRWithStab() {return this.drWithStab;}
-    getDamageTaken() {return this.damageTaken;}
-    getAoEDamageTaken() {return this.aoeDamageTaken;}
-    getTargetedDamageTaken() {return this.targetedDamageTaken;}
-    getStabilityDamageModifier() {return this.stabilityDamageModifier;}
+    getDamageTaken(variant = StatVariants.ALL) {
+        return this.damageTaken.hasOwnProperty(variant) ? this.damageTaken[variant] : 0;
+    }
+    //getAoEDamageTaken() {return this.aoeDamageTaken;}
+    //getTargetedDamageTaken() {return this.targetedDamageTaken;}
+    getStabilityTakenModifier(variant = StatVariants.ALL) {
+        return this.stabilityTakenModifier.hasOwnProperty(variant) ? this.stabilityTakenModifier[variant] : 0;
+    }
     // base stats for cloning
-    getBaseDamageTaken() {return this.baseDamageTaken;}
-    getBaseAoEDamageTaken() {return this.baseAoEDamageTaken;}
-    getBaseTargetedDamageTaken() {return this.baseTargetedDamageTaken;}
-    getBaseStabilityDamageModifier() {return this.baseStabilityDamageModifier;}
+    getBaseDamageTaken(variant = StatVariants.ALL) {
+        return this.baseDamageTaken.hasOwnProperty(variant) ? this.baseDamageTaken[variant] : 0;
+    }
+    //getBaseAoEDamageTaken() {return this.baseAoEDamageTaken;}
+    //getBaseTargetedDamageTaken() {return this.baseTargetedDamageTaken;}
+    getBaseStabilityTakenModifier(variant = StatVariants.ALL) {
+        return this.baseStabilityTakenModifier.hasOwnProperty(variant) ? this.baseStabilityTakenModifier[variant] : 0;
+    }
     getIsLarge() {return this.isLarge;}
     getIsBoss() {return this.isBoss;}
     // only use these setters for quick direct buff input calcs
-    setDamageTaken(x) {
-        this.resetDamageTaken();
-        this.baseDamageTaken = x;
-        this.damageTaken += x;
+    setDamageTaken(x, variant = StatVariants.ALL) {
+        this.resetDamageTaken(variant);
+        this.baseDamageTaken[variant] = x;
+        this.damageTaken[variant] += x;
     }
-    setAoEDamageTaken(x) {
+    /*setAoEDamageTaken(x) {
         this.resetAoEDamageTaken();
         this.baseAoEDamageTaken = x;
         this.aoeDamageTaken += x;
@@ -69,30 +84,30 @@ class Target extends Unit {
         this.resetTargetedDamageTaken();
         this.baseTargetedDamageTaken = x;
         this.targetedDamageTaken += x;
-    }
-    setStabilityDamageModifier(x) {
-        this.resetStabilityDamageModifier();
-        this.baseStabilityDamageModifier = x;
-        this.stabilityDamageModifier += x;
+    }*/
+    setStabilityTakenModifier(x, variant = StatVariants.ALL) {
+        this.resetStabilityTakenModifier(variant);
+        this.baseStabilityTakenModifier[variant] = x;
+        this.stabilityTakenModifier[variant] += x;
     }
     setIsLarge(x) {this.isLarge = x;}
     setIsBoss(x) {this.isBoss = x;}
     // changing the base buffs requires resetting the added value to 0 first
-    resetDamageTaken() {
-        this.damageTaken -= this.baseDamageTaken;
-        this.baseDamageTaken = 0;
+    resetDamageTaken(variant = StatVariants.ALL) {
+        this.damageTaken[variant] -= this.baseDamageTaken[variant];
+        this.baseDamageTaken[variant] = 0;
     }
-    resetAoEDamageTaken() {
+    /*resetAoEDamageTaken(variant = StatVariants.ALL) {
         this.aoeDamageTaken -= this.aoeDamageTaken;
         this.baseAoEDamageTaken = 0;
     }
     resetTargetedDamageTaken() {
         this.targetedDamageTaken -= this.baseTargetedDamageTaken;
         this.baseTargetedDamageTaken = 0;
-    }
-    resetStabilityDamageModifier() {
-        this.stabilityDamageModifier -= this.baseStabilityDamageModifier;
-        this.baseStabilityDamageModifier = 0;
+    }*/
+    resetStabilityTakenModifier(variant = StatVariants.ALL) {
+        this.stabilityTakenModifier[variant] -= this.baseStabilityTakenModifier[variant];
+        this.baseStabilityTakenModifier[variant] = 0;
     }
     // setters for use when cloning
     setStability(x) {this.stability = x;}
@@ -103,28 +118,46 @@ class Target extends Unit {
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN))
-            this.damageTaken += buffData[BuffJSONKeys.DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.AOE_DAMAGE_TAKEN))
-            this.aoeDamageTaken += buffData[BuffJSONKeys.AOE_DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.TARGETED_DAMAGE_TAKEN))
-            this.targetedDamageTaken += buffData[BuffJSONKeys.TARGETED_DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN))
-            this.stabilityDamageModifier += buffData[BuffJSONKeys.STABILITY_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN)) {
+            let buff = buffData[BuffJSONKeys.DAMAGE_TAKEN];
+            if (this.damageTaken.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.damageTaken[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+            //this.damageTaken[StatVariants.ALL] += buffData[BuffJSONKeys.DAMAGE_TAKEN] * stackEffect;
+        //if(buffData.hasOwnProperty(BuffJSONKeys.AOE_DAMAGE_TAKEN))
+        //    this.damageTaken[StatVariants.AOE] += buffData[BuffJSONKeys.AOE_DAMAGE_TAKEN] * stackEffect;
+        //if(buffData.hasOwnProperty(BuffJSONKeys.TARGETED_DAMAGE_TAKEN))
+        //    this.damageTaken[StatVariants.TARGETED] += buffData[BuffJSONKeys.TARGETED_DAMAGE_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN)) {
+            let buff = buffData[BuffJSONKeys.STABILITY_TAKEN];
+            if (this.stabilityTakenModifier.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.stabilityTakenModifier[buff[0]] += buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+            //this.stabilityTakenModifier[StatVariants.ALL] += buffData[BuffJSONKeys.STABILITY_TAKEN] * stackEffect;
     }
     removeBuffEffects(buffData, stacks = 1, stackable = false) {
         super.removeBuffEffects(buffData, stacks, stackable);
         let stackEffect = 1;
         if (stackable)
             stackEffect = stacks;
-        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN))
-            this.damageTaken -= buffData[BuffJSONKeys.DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.AOE_DAMAGE_TAKEN))
-            this.aoeDamageTaken -= buffData[BuffJSONKeys.AOE_DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.TARGETED_DAMAGE_TAKEN))
-            this.targetedDamageTaken -= buffData[BuffJSONKeys.TARGETED_DAMAGE_TAKEN] * stackEffect;
-        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN))
-            this.stabilityDamageModifier -= buffData[BuffJSONKeys.STABILITY_TAKEN] * stackEffect;
+        if(buffData.hasOwnProperty(BuffJSONKeys.DAMAGE_TAKEN)) {
+            let buff = buffData[BuffJSONKeys.DAMAGE_TAKEN];
+            if (this.damageTaken.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.damageTaken[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
+        if(buffData.hasOwnProperty(BuffJSONKeys.STABILITY_TAKEN)) {
+            let buff = buffData[BuffJSONKeys.STABILITY_TAKEN];
+            if (this.stabilityTakenModifier.hasOwnProperty(buff[0])) // safety check in case of typo/forgotten edit in json
+                this.stabilityTakenModifier[buff[0]] -= buff[1] * stackEffect;
+            else
+                console.error(`${buff[0]} is not covered in StatVariants`);
+        }
     }
     addBuff(buffName, sourceName, duration = -1, stacks = 1) {
         super.addBuff(buffName, sourceName, duration, stacks);
@@ -140,7 +173,7 @@ class Target extends Unit {
                 }
             }
         }
-        // add temporary freeze weakness if on frost tile
+        // add temporary freeze weakness if on elemental tile
         else if (buffName == "Frost") {
             if (!this.phaseWeaknesses.includes(Elements.FREEZE)) {
                 this.phaseWeaknesses.push(Elements.FREEZE);
@@ -261,10 +294,13 @@ class Target extends Unit {
         });
         let targetClone = new Target(this.name, this.defense, this.maxStability, this.turnsToRecoverStability, weaknesses);
         targetClone.tempWeakness = temporaryWeaknesses;
-        targetClone.setDamageTaken(this.baseDamageTaken);
-        targetClone.setAoEDamageTaken(this.baseAoEDamageTaken);
-        targetClone.setTargetedDamageTaken(this.baseTargetedDamageTaken);
-        targetClone.setStabilityDamageModifier(this.baseStabilityDamageModifier);
+        let variants = Object.values(StatVariants);
+        variants.forEach(variant => {
+            targetClone.setDamageTaken(this.baseDamageTaken[variant], variant);
+            targetClone.setStabilityTakenModifier(this.baseStabilityTakenModifier[variant], variant);
+        });
+        //targetClone.setAoEDamageTaken(this.baseAoEDamageTaken);
+        //targetClone.setTargetedDamageTaken(this.baseTargetedDamageTaken);
         targetClone.applyDRPerStab(this.drPerStab);
         targetClone.applyDRWithStab(this.drWithStab);
         targetClone.setDefenseBuffs(this.baseDefenseBuffs);

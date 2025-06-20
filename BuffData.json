@@ -1,90 +1,108 @@
 {
     "Blazing Assault 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Attack_Perc" : 0.15,
         "Stat" : "Attack",
-        "Element" : "Burn"
+        "Element" : "Burn",
+        "Group" : "BasicAttack",
+        "Priority" : 1
     },
     "Attack Up 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Attack_Perc" : 0.1,
-        "Stat" : "Attack"
+        "Stat" : "Attack",
+        "Group" : "BasicAttack",
+        "Priority" : 2
     },
     "Attack Up 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Attack_Perc" : 0.15,
-        "Stat" : "Attack"
+        "Stat" : "Attack",
+        "Group" : "BasicAttack",
+        "Priority" : 1
     },
     "Defense Down 1" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Defense_Perc" : -0.2,
-        "Stat" : "Defense"
+        "Stat" : "Defense",
+        "Group" : "BasicDefenseDown",
+        "Priority" : 2
     },
     "Defense Down 2" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
-        "Consumption_Mode" : "None",
-        "Cleanseable" : 1,
-        "Defense_Perc" : -0.3,
-        "Stat" : "Defense"
-    },
-    "Acid Corrosion 2" : {
-        "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Defense_Perc" : -0.3,
         "Stat" : "Defense",
-        "Element" : "Corrosion"
+        "Group" : "BasicDefenseDown",
+        "Priority" : 1
+    },
+    "Acid Corrosion 2" : {
+        "Buff_Type" : "Debuff",
+        "Turn_Based" : "Turn",
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 1,
+        "Defense_Perc" : -0.3,
+        "Stat" : "Defense",
+        "Element" : "Corrosion",
+        "Group" : "BasicDefenseDown",
+        "Priority" : 1
     },
     "Tenacity" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Defense_Perc" : -0.5,        
-        "Stability_Taken" : 1,
+        "Stability_Taken" : ["All", 1],
         "Stat" : "Defense"
     },
     "Defense Up 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Defense_Perc" : 0.2,
-        "Stat" : "Defense"
+        "Stat" : "Defense",
+        "Group" : "BasicDefenseUp",
+        "Priority" : 3
     },
     "Defense Up 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Defense_Perc" : 0.3, 
-        "Stat" : "Defense"
+        "Stat" : "Defense",
+        "Group" : "BasicDefenseUp",
+        "Priority" : 2
     },
     "Defense Up 3" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Defense_Perc" : 0.4,        
-        "Stat" : "Defense"
+        "Stat" : "Defense",
+        "Group" : "BasicDefenseUp",
+        "Priority" : 1
     },
     "Edifice" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Defense_Perc" : 0.25,
@@ -94,23 +112,23 @@
     },
     "Siege" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Damage_Perc" : 0.15,
+        "Damage_Perc" : ["All", 0.15],
         "Stackable" : 1,
         "Stack_Limit" : 99
     },
     "Overburn" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Burn"
     },
     "Avalanche" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Element" : "Freeze",
@@ -118,7 +136,7 @@
     },
     "Frozen" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Freeze",
@@ -127,7 +145,7 @@
     },
     "Frigid" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Freeze",
@@ -135,55 +153,63 @@
     },
     "Support Boost 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Support_Perc" : 0.15,
         "Exposed_Perc" : 0.1,
-        "Stack_Limit" : 99
+        "Stack_Limit" : 99,
+        "Group" : "SupportBoost",
+        "Priority" : 2
     },
     "Support Boost 1 V1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Support_Perc" : 0.3,
         "Exposed_Perc" : 0.1,
-        "Stack_Limit" : 99
+        "Stack_Limit" : 99,
+        "Group" : "SupportBoost",
+        "Priority" : 2
     },
     "Support Boost 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Support_Perc" : 0.3,
         "Exposed_Perc" : 0.1,
-        "Stack_Limit" : 99
+        "Stack_Limit" : 99,
+        "Group" : "SupportBoost",
+        "Priority" : 1
     },
     "Support Boost 2 V4" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Support_Perc" : 0.3,
         "Exposed_Perc" : 0.1,
-        "Stack_Limit" : 99
+        "Stack_Limit" : 99,
+        "Group" : "SupportBoost",
+        "Priority" : 1
     },
     "Alert" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Frost Barrier" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Cold Conviction" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Attack_Perc" : 0.1,
@@ -193,179 +219,190 @@
     },
     "Lone Wolf" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "ActiveAttack",
         "Cleanseable" : 0
     },
     "Steady Progress" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Murderous Intent" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Tuning" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 10,
-        "Crit" : 0.03,
-        "Crit_Damage" : 0.03
+        "Crit" : ["All", 0.03],
+        "Crit_Damage" : ["All", 0.03]
     },
     "Pitch Perfect" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Permanent Tuning" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 3,
-        "Crit" : 0.03,
-        "Crit_Damage" : 0.03
+        "Crit" : ["All", 0.03],
+        "Crit_Damage" : ["All", 0.03]
     },
     "Permanent Tuning V3" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 6,
-        "Crit" : 0.03,
-        "Crit_Damage" : 0.03
+        "Crit" : ["All", 0.03],
+        "Crit_Damage" : ["All", 0.03]
     },
     "Extra Action" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Extra Movement" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Extra Command" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Movement Down 2" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Stat" : "Movement"
+        "Stat" : "Movement",
+        "Group" : "BasicMovementDown",
+        "Priority" : 1
     },
     "Movement Up 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Stat" : "Movement"
+        "Stat" : "Movement",
+        "Group" : "BasicMovementUp",
+        "Priority" : 2
     },
     "Movement Up 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Stat" : "Movement"
+        "Stat" : "Movement",
+        "Group" : "BasicMovementUp",
+        "Priority" : 1
     },
     "Active Engagement" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
         "Stack_Limit" : 99,
-        "Damage_Perc" : 0.3
+        "Damage_Perc" : ["All", 0.3]
     },
     "Active Engagement V5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
         "Stack_Limit" : 99,
-        "Damage_Perc" : 0.4
+        "Damage_Perc" : ["All", 0.4]
     },
     "Feeling Full" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Vulnerability 1" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Damage_Taken" : 0.1,
-        "Stat" : "DamageTaken"
+        "Damage_Taken" : ["All", 0.1],
+        "Stat" : "DamageTaken",
+        "Group" : "BasicVulnerability",
+        "Priority" : 2
     },
     "Vulnerability 2" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Damage_Taken" : 0.2,
-        "Stat" : "DamageTaken"
+        "Damage_Taken" : ["All", 0.2],
+        "Stat" : "DamageTaken",
+        "Group" : "BasicVulnerability",
+        "Priority" : 1
     },
     "Overzealous" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Stat" : "DamageTaken"
     },
     "Flammable" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
+        "Stability_Taken" : ["Burn", 2],
         "Element" : "Burn",
         "Stack_Limit" : 2
     },
     "Zoom In" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "AllAttack",
         "Cleanseable" : 0,
-        "Damage_Perc" : 0.15,
-        "Stability_Damage" : 2,
+        "Damage_Perc" : ["All", 0.15],
+        "Stability_Damage" : ["All", 2],
         "Stackable" : 1,
         "Stack_Limit" : 2
     },
     "Zoom In V5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "AllAttack",
         "Cleanseable" : 0,
-        "Damage_Perc" : 0.2,
-        "Stability_Damage" : 2,
+        "Damage_Perc" : ["All", 0.2],
+        "Stability_Damage" : ["All", 2],
         "Stackable" : 1,
         "Stack_Limit" : 2
     },
     "Support" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "Round",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Heat Recovery" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "Defense",
         "Cleanseable" : 0,
         "Stack_Limit" : 1,
@@ -373,7 +410,7 @@
     },
     "Cold Snap" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Freeze",
@@ -381,34 +418,34 @@
     },
     "Arctic Benediction" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "ActiveAttack",
         "Cleanseable" : 0,
         "Stack_Limit" : 99
     },
     "Arctic Benediction V1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "ActiveAttack",
         "Cleanseable" : 0,
         "Stack_Limit" : 99
     },
     "Glacial Domain" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Glacial Domain V5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Defense_Ignore" : 0.3
+        "Defense_Ignore" : ["All", 0.3]
     },
     "Corrosive Infusion" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Element" : "Corrosion",
@@ -416,7 +453,7 @@
     },
     "Corrosive Infusion V2" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Element" : "Corrosion",
@@ -425,78 +462,82 @@
     },
     "Toxic Infiltration" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Element" : "Corrosion"
     },
     "Competitive Spirit" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 8,
-        "Elemental_Damage" : ["Corrosion" , 0.05]
+        "Damage_Perc" : ["Corrosion" , 0.05]
     },
     "Competitive Spirit V2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 12,
-        "Elemental_Damage" : ["Corrosion" , 0.05]
+        "Damage_Perc" : ["Corrosion" , 0.05]
     },
     "Damage Up 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Damage_Perc" : 0.1
+        "Damage_Perc" : ["All", 0.1],
+        "Group" : "BasicDamage",
+        "Priority" : 2
     },
     "Damage Up 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Damage_Perc" : 0.2
+        "Damage_Perc" : ["All", 0.2],
+        "Group" : "BasicDamage",
+        "Priority" : 1
     },
     "Standard Approach" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Defense",
         "Cleanseable" : 0,
-        "AoE_Damage_Taken" : 0.25,
+        "Damage_Taken" : ["AoE", -0.25],
         "Stack_Limit" : 3
     },
     "Emergency Plan" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Defense",
         "Cleanseable" : 0,
-        "AoE_Damage_Taken" : 0.25,
+        "Damage_Taken" : ["AoE", -0.25],
         "Stackable" : 1,
         "Stack_Limit" : 3
     },
     "Insight" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Rapture" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 4,
-        "Damage_Perc" : 0.075
+        "Damage_Perc" : ["All", 0.075]
     },
     "Defensive Support" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
@@ -506,118 +547,118 @@
     },
     "Impact Response 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "Defense",
         "Cleanseable" : 0
     },
     "Wintry Bastion" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "Defense",
         "Cleanseable" : 0,
-        "Damage_Taken" : -0.3,
+        "Damage_Taken" : ["All", -0.3],
         "Stack_Limit" : 5,
         "Element" : "Freeze"
     },
     "Shelter" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "Defense",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
-        "Stability_Taken" : -2
+        "Stability_Taken" : ["All", -2]
     },
     "Continuous Healing 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1
     },
     "Courage to Endure" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Support_Perc" : 0.3
     },
     "Power of Unity" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 3,
-        "Targeted_Damage" : 0.1
+        "Damage_Perc" : ["Targeted", 0.1]
     },
     "Tenacity to Withstand" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Resolve to Defend" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Lightspike" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 8,
-        "Crit" : 0.03,
-        "Crit_Damage" : 0.03
+        "Crit" : ["All", 0.03],
+        "Crit_Damage" : ["All", 0.03]
     },
     "Lightspike V5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stackable" : 1,
         "Stack_Limit" : 8,
-        "Crit" : 0.05,
-        "Crit_Damage" : 0.05
+        "Crit" : ["All", 0.05],
+        "Crit_Damage" : ["All", 0.05]
     },
     "Conductivity" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "Defense",
         "Cleanseable" : 1,
         "Element" : "Electric"
     },
     "Shock" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Attack",
         "Cleanseable" : 0,
         "Element" : "Electric"
     },
     "Unshakable Confidence" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 4
     },
     "Mark of Prey" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0
     },
     "Camouflage" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "Defense",
         "Cleanseable" : 0,
         "Stack_Limit" : 2
     },
     "Hunters Talent" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 99
@@ -626,672 +667,878 @@
     },
     "Frost" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Round",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 1
+        "Cleanseable" : 0
+    },
+    "Lava" : {
+        "Buff_Type" : "Neutral",
+        "Turn_Based" : "Round",
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
+    },
+    "Swamp" : {
+        "Buff_Type" : "Neutral",
+        "Turn_Based" : "Round",
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
+    },
+    "Damp" : {
+        "Buff_Type" : "Neutral",
+        "Turn_Based" : "Round",
+        "Consumption_Mode" : "None",
+        "Cleanseable" : 0
     },
     "Critical Damage Up 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Crit_Damage" : 0.1
+        "Crit_Damage" : ["All", 0.1],
+        "Group" : "BasicCritDamage",
+        "Priority" : 2
     },
     "Accolades Brilliance" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Attack_Perc" : 0.1
     },
     "Congestion" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Hydro"
     },
     "Targeted Attack Boost 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Targeted_Damage" : 0.2
+        "Damage_Perc" : ["Targeted", 0.2],
+        "Group" : "BasicTargetedDamage",
+        "Priority" : 1
     },
     "Targeted Attack Boost 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Targeted_Damage" : 0.1
+        "Damage_Perc" : ["Targeted", 0.1],
+        "Group" : "BasicTargetedDamage",
+        "Priority" : 2
     },
     "Critical Rate Boost 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Crit" : 0.2
+        "Crit" : ["All", 0.2],
+        "Group" : "BasicCritRate",
+        "Priority" : 1
     },
     "Critical Rate Boost 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Crit" : 0.1
+        "Crit" : ["All", 0.1],
+        "Group" : "BasicCritRate",
+        "Priority" : 2
     },
     "Phase Boost 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Phase_Damage" : 0.2
+        "Damage_Perc" : ["Phase", 0.2],
+        "Group" : "BasicPhase",
+        "Priority" : 1
     },
     "Phase Boost 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
-        "Phase_Damage" : 0.1
+        "Damage_Perc" : ["Phase", 0.1],
+        "Group" : "BasicPhase",
+        "Priority" : 2
     },
     "Piercing 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 1
+        "Cleanseable" : 1,
+        "Defense_Ignore" : ["Targeted", 0.3],
+        "Group" : "BasicTargetedPierce",
+        "Priority" : 1
     },
     "Piercing 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 1
+        "Cleanseable" : 1,
+        "Defense_Ignore" : ["Targeted", 0.2],
+        "Group" : "BasicTargetedPierce",
+        "Priority" : 2
     },
     "Paralysis" : {
         "Buff_Type" : "Debuff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
         "Cleanseable" : 1,
         "Element" : "Electric"
     },
     "Domain Penetration 1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 1
+        "Cleanseable" : 1,
+        "Defense_Ignore" : ["AoE", 0.2],
+        "Group" : "BasicAoEPierce",
+        "Priority" : 2
     },
     "Domain Penetration 2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 1,
+        "Turn_Based" : "Turn",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 1
+        "Cleanseable" : 1,
+        "Defense_Ignore" : ["AoE", 0.3],
+        "Group" : "BasicAoEPierce",
+        "Priority" : 1
     },
     "Daydream C1" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.1]
+        "Damage_Perc" : ["Corrosion", 0.1],
+        "Group" : "Daydream",
+        "Priority" : 6
     },
     "Daydream C2" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.1]
+        "Damage_Perc" : ["Corrosion", 0.1],
+        "Group" : "Daydream",
+        "Priority" : 5
     },
     "Daydream C3" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.1]
+        "Damage_Perc" : ["Corrosion", 0.1],
+        "Group" : "Daydream",
+        "Priority" : 4
     },
     "Daydream C4" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.1]
+        "Damage_Perc" : ["Corrosion", 0.1],
+        "Group" : "Daydream",
+        "Priority" : 3
     },
     "Daydream C5" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.1]
+        "Damage_Perc" : ["Corrosion", 0.1],
+        "Group" : "Daydream",
+        "Priority" : 2
     },
     "Daydream C6" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.1]
+        "Damage_Perc" : ["Corrosion", 0.1],
+        "Group" : "Daydream",
+        "Priority" : 1
     },
     "Unspoken Calling C1" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Freeze", 0.1]
+        "Damage_Perc" : ["Freeze", 0.1],
+        "Group" : "UnspokenCalling",
+        "Priority" : 6
     },
     "Unspoken Calling C2" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Freeze", 0.12]
+        "Damage_Perc" : ["Freeze", 0.12],
+        "Group" : "UnspokenCalling",
+        "Priority" : 5
     },
     "Unspoken Calling C3" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Freeze", 0.14]
+        "Damage_Perc" : ["Freeze", 0.14],
+        "Group" : "UnspokenCalling",
+        "Priority" : 4
     },
     "Unspoken Calling C4" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Freeze", 0.16]
+        "Damage_Perc" : ["Freeze", 0.16],
+        "Group" : "UnspokenCalling",
+        "Priority" : 3
     },
     "Unspoken Calling C5" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Freeze", 0.18]
+        "Damage_Perc" : ["Freeze", 0.18],
+        "Group" : "UnspokenCalling",
+        "Priority" : 2
     },
     "Unspoken Calling C6" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Freeze", 0.2]
+        "Damage_Perc" : ["Freeze", 0.2],
+        "Group" : "UnspokenCalling",
+        "Priority" : 1
     },
     "Eulogistic Verse C1" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "EulogisticVerse",
+        "Priority" : 6
     },
     "Eulogistic Verse C2" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "EulogisticVerse",
+        "Priority" : 5
     },
     "Eulogistic Verse C3" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "EulogisticVerse",
+        "Priority" : 4
     },
     "Eulogistic Verse C4" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "EulogisticVerse",
+        "Priority" : 3
     },
     "Eulogistic Verse C5" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "EulogisticVerse",
+        "Priority" : 2
     },
     "Eulogistic Verse C6" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "EulogisticVerse",
+        "Priority" : 1
     },
     "Mourning Whisper C1" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "MourningWhisper",
+        "Priority" : 6
     },
     "Mourning Whisper C2" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "MourningWhisper",
+        "Priority" : 5
     },
     "Mourning Whisper C3" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "MourningWhisper",
+        "Priority" : 4
     },
     "Mourning Whisper C4" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "MourningWhisper",
+        "Priority" : 3
     },
     "Mourning Whisper C5" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "MourningWhisper",
+        "Priority" : 2
     },
     "Mourning Whisper C6" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Group" : "MourningWhisper",
+        "Priority" : 1
     },
     "Sparkling Centerstage C1" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Defense_Ignore" : ["Physical", 0.1],
+        "Group" : "SparklingCenterstage",
+        "Priority" : 6
     },
     "Sparkling Centerstage C2" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Defense_Ignore" : ["Physical", 0.1],
+        "Group" : "SparklingCenterstage",
+        "Priority" : 5
     },
     "Sparkling Centerstage C3" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Defense_Ignore" : ["Physical", 0.1],
+        "Group" : "SparklingCenterstage",
+        "Priority" : 4
     },
     "Sparkling Centerstage C4" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Defense_Ignore" : ["Physical", 0.1],
+        "Group" : "SparklingCenterstage",
+        "Priority" : 3
     },
     "Sparkling Centerstage C5" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Defense_Ignore" : ["Physical", 0.1],
+        "Group" : "SparklingCenterstage",
+        "Priority" : 2
     },
     "Sparkling Centerstage C6" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
-        "Cleanseable" : 0
+        "Cleanseable" : 0,
+        "Defense_Ignore" : ["Physical", 0.1],
+        "Group" : "SparklingCenterstage",
+        "Priority" : 1
     },
     "Manifold Dreamscape C1" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.15]
+        "Damage_Perc" : ["Corrosion", 0.15],
+        "Group" : "ManifoldDreamscape",
+        "Priority" : 6
     },
     "Manifold Dreamscape C2" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.19]
+        "Damage_Perc" : ["Corrosion", 0.19],
+        "Group" : "ManifoldDreamscape",
+        "Priority" : 5
     },
     "Manifold Dreamscape C3" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.23]
+        "Damage_Perc" : ["Corrosion", 0.23],
+        "Group" : "ManifoldDreamscape",
+        "Priority" : 4
     },
     "Manifold Dreamscape C4" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.27]
+        "Damage_Perc" : ["Corrosion", 0.27],
+        "Group" : "ManifoldDreamscape",
+        "Priority" : 3
     },
     "Manifold Dreamscape C5" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.31]
+        "Damage_Perc" : ["Corrosion", 0.31],
+        "Group" : "ManifoldDreamscape",
+        "Priority" : 2
     },
     "Manifold Dreamscape C6" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Elemental_Damage" : ["Corrosion", 0.35]
+        "Damage_Perc" : ["Corrosion", 0.35],
+        "Group" : "ManifoldDreamscape",
+        "Priority" : 1
     },
     "Charging C1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Stack_Limit" : 2,
-        "Support_Perc" : 0.1
+        "Support_Perc" : 0.1,
+        "Group" : "Charging",
+        "Priority" : 6
     },
     "Charging C2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Stack_Limit" : 2,
-        "Support_Perc" : 0.15
+        "Support_Perc" : 0.15,
+        "Group" : "Charging",
+        "Priority" : 5
     },
     "Charging C3" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
-        "Support_Perc" : 0.15
+        "Support_Perc" : 0.15,
+        "Group" : "Charging",
+        "Priority" : 4
     },
     "Charging C4" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
-        "Support_Perc" : 0.15
+        "Support_Perc" : 0.15,
+        "Group" : "Charging",
+        "Priority" : 3
     },
     "Charging C5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Stack_Limit" : 4,
-        "Support_Perc" : 0.2
+        "Support_Perc" : 0.2,
+        "Group" : "Charging",
+        "Priority" : 2
     },
     "Charging C6" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "Support",
         "Cleanseable" : 0,
         "Stack_Limit" : 4,
-        "Support_Perc" : 0.2
+        "Support_Perc" : 0.2,
+        "Group" : "Charging",
+        "Priority" : 1
     },
     "Path Patrol C1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 5,
         "Stackable" : 1,
-        "Damage_Perc" : 0.04
+        "Damage_Perc" : ["All", 0.04],
+        "Group" : "PathPatrol",
+        "Priority" : 6
     },
     "Path Patrol C2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 5,
         "Stackable" : 1,
-        "Damage_Perc" : 0.05
+        "Damage_Perc" : ["All", 0.05],
+        "Group" : "PathPatrol",
+        "Priority" : 5
     },
     "Path Patrol C3" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 6,
         "Stackable" : 1,
-        "Damage_Perc" : 0.05
+        "Damage_Perc" : ["All", 0.05],
+        "Group" : "PathPatrol",
+        "Priority" : 4
     },
     "Path Patrol C4" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 7,
         "Stackable" : 1,
-        "Damage_Perc" : 0.05
+        "Damage_Perc" : ["All", 0.05],
+        "Group" : "PathPatrol",
+        "Priority" : 3
     },
     "Path Patrol C5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 8,
         "Stackable" : 1,
-        "Damage_Perc" : 0.05
+        "Damage_Perc" : ["All", 0.05],
+        "Group" : "PathPatrol",
+        "Priority" : 2
     },
     "Path Patrol C6" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 8,
         "Stackable" : 1,
-        "Damage_Perc" : 0.05
+        "Damage_Perc" : ["All", 0.05],
+        "Group" : "PathPatrol",
+        "Priority" : 1
     },
     "Crocodile Tears C1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 5,
         "Stackable" : 1,
-        "Damage_Perc" : 0.02
+        "Damage_Perc" : ["All", 0.02],
+        "Group" : "CrocodileTears",
+        "Priority" : 6
     },
     "Crocodile Tears C2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 5,
         "Stackable" : 1,
-        "Damage_Perc" : 0.024
+        "Damage_Perc" : ["All", 0.024],
+        "Group" : "CrocodileTears",
+        "Priority" : 5
     },
     "Crocodile Tears C3" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 5,
         "Stackable" : 1,
-        "Damage_Perc" : 0.028
+        "Damage_Perc" : ["All", 0.028],
+        "Group" : "CrocodileTears",
+        "Priority" : 4
     },
     "Crocodile Tears C4" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 5,
         "Stackable" : 1,
-        "Damage_Perc" : 0.032
+        "Damage_Perc" : ["All", 0.032],
+        "Group" : "CrocodileTears",
+        "Priority" : 3
     },
     "Crocodile Tears C5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 5,
         "Stackable" : 1,
-        "Damage_Perc" : 0.036
+        "Damage_Perc" : ["All", 0.036],
+        "Group" : "CrocodileTears",
+        "Priority" : 2
     },
     "Crocodile Tears C6" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 5,
         "Stackable" : 1,
-        "Damage_Perc" : 0.04
+        "Damage_Perc" : ["All", 0.04],
+        "Group" : "CrocodileTears",
+        "Priority" : 1
     },
     "Dazzling Sparkles C1" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 5
+        "Stack_Limit" : 5,
+        "Group" : "DazzlingSparkles",
+        "Priority" : 6
     },
     "Dazzling Sparkles C2" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 6
+        "Stack_Limit" : 6,
+        "Group" : "DazzlingSparkles",
+        "Priority" : 5
     },
     "Dazzling Sparkles C3" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 7
+        "Stack_Limit" : 7,
+        "Group" : "DazzlingSparkles",
+        "Priority" : 4
     },
     "Dazzling Sparkles C4" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 8
+        "Stack_Limit" : 8,
+        "Group" : "DazzlingSparkles",
+        "Priority" : 3
     },
     "Dazzling Sparkles C5" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 9
+        "Stack_Limit" : 9,
+        "Group" : "DazzlingSparkles",
+        "Priority" : 2
     },
     "Dazzling Sparkles C6" : {
         "Buff_Type" : "Hidden",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 10
+        "Stack_Limit" : 10,
+        "Group" : "DazzlingSparkles",
+        "Priority" : 1
     },
     "Resonator C1" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 3
+        "Stack_Limit" : 3,
+        "Group" : "Resonator",
+        "Priority" : 6
     },
     "Resonator C2" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 3
+        "Stack_Limit" : 3,
+        "Group" : "Resonator",
+        "Priority" : 5
     },
     "Resonator C3" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 3
+        "Stack_Limit" : 3,
+        "Group" : "Resonator",
+        "Priority" : 4
     },
     "Resonator C4" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 3
+        "Stack_Limit" : 3,
+        "Group" : "Resonator",
+        "Priority" : 3
     },
     "Resonator C5" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 2
+        "Stack_Limit" : 2,
+        "Group" : "Resonator",
+        "Priority" : 2
     },
     "Resonator C6" : {
         "Buff_Type" : "Buff",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 2
+        "Stack_Limit" : 2,
+        "Group" : "Resonator",
+        "Priority" : 1
     },
     "Guiding Glory C1" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
         "Stackable" : 1,
-        "Crit" : 0.1
+        "Crit" : ["All", 0.1],
+        "Group" : "GuidingGlory",
+        "Priority" : 6
     },
     "Guiding Glory C2" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
         "Stackable" : 1,
-        "Crit" : 0.1
+        "Crit" : ["All", 0.1],
+        "Group" : "GuidingGlory",
+        "Priority" : 5
     },
     "Guiding Glory C3" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
         "Stackable" : 1,
-        "Crit" : 0.1
+        "Crit" : ["All", 0.1],
+        "Group" : "GuidingGlory",
+        "Priority" : 4
     },
     "Guiding Glory C4" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
         "Stackable" : 1,
-        "Crit" : 0.1
+        "Crit" : ["All", 0.1],
+        "Group" : "GuidingGlory",
+        "Priority" : 3
     },
     "Guiding Glory C5" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
         "Stackable" : 1,
-        "Crit" : 0.1
+        "Crit" : ["All", 0.1],
+        "Group" : "GuidingGlory",
+        "Priority" : 2
     },
     "Guiding Glory C6" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
         "Stack_Limit" : 3,
         "Stackable" : 1,
-        "Crit" : 0.1
+        "Crit" : ["All", 0.1],
+        "Group" : "GuidingGlory",
+        "Priority" : 1
     },
     "Bittersweet Caramel C1" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 4
+        "Stack_Limit" : 4,
+        "Group" : "BittersweetCaramel",
+        "Priority" : 6
     },
     "Bittersweet Caramel C2" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 4
+        "Stack_Limit" : 4,
+        "Group" : "BittersweetCaramel",
+        "Priority" : 5
     },
     "Bittersweet Caramel C3" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 3
+        "Stack_Limit" : 3,
+        "Group" : "BittersweetCaramel",
+        "Priority" : 4
     },
     "Bittersweet Caramel C4" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 3
+        "Stack_Limit" : 3,
+        "Group" : "BittersweetCaramel",
+        "Priority" : 3
     },
     "Bittersweet Caramel C5" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 2
+        "Stack_Limit" : 2,
+        "Group" : "BittersweetCaramel",
+        "Priority" : 2
     },
     "Bittersweet Caramel C6" : {
         "Buff_Type" : "Neutral",
-        "Turn_Based" : 0,
+        "Turn_Based" : "None",
         "Consumption_Mode" : "None",
         "Cleanseable" : 0,
-        "Stack_Limit" : 2
+        "Stack_Limit" : 2,
+        "Group" : "BittersweetCaramel",
+        "Priority" : 1
     }
 } 
