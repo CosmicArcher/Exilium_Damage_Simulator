@@ -6,6 +6,7 @@ Currently, effort is focused on adding new features to the turn-by-turn simulato
 Features present in Turn-by-Turn Simulator:
 - Papasha Summon inheriting her base stats
 - Buffs from corresponding skills automatically applied to final stats
+- Buff incompatibilities like defense down 1, 2, and acid corrosion debuffs cannot coexist, only one should be present at any given time
 - Buff skills that target a specific ally, all allies buffing skills implemented already
 - Consumable buffs removed upon respective triggers
 - Turn based buffs tick down after action and round based buffs tick down at the start of the team's turn
@@ -32,7 +33,7 @@ Features present in Turn-by-Turn Simulator:
 
 To Do List :
 - Some dolls' keys and automated passives and skill condition checking, mostly unimportant dolls for gunsmoke except for Dushevnaya, Centaureissi, and Mechty and dolls after
-- Buff incompatibilities like defense down 1, 2, and acid corrosion debuffs cannot coexist, only one should be present at any given time
+- Mod keys for all dolls
 - Changing the DPS chart to view specific dolls' damage breakdown (damage per skill, damage per type, crit vs non-crit damage, etc)
 - Random buffs from Cheeta ult and certain AR weapon traits
 - Weird quirks that are present in the game, like Cheeta skill2 under certain conditions grant 2 avalanche stacks rather than 1, since the goal is to simulate the game scenario in a faster manner, this is valuable

@@ -81,7 +81,12 @@
         <a href="./index.html" class="pageTab">Simple Sim</a>
         <a href="./FullSim.html" id = "refreshPage" class="pageTab" style="float: right;">Return to Start</a>
         <h1 style="text-align: center; margin-top: -20px;">Turn-by-Turn Combat Sim</h1>
-        <div class="column" style="background-color: lightgray;">
+        <div id = "Preset" style="background-color: lemonchiffon;">
+            <label>Preset Input</label>
+            <input id = "PresetInput" type="text" style="width: 300px;">
+            <button id = "PresetSubmit">Submit</button><button id = "PresetCancel" style="margin-left: 150px;">Cancel</button><br>
+        </div>
+        <div class="column" id = "Target" style="background-color: lightgray;">
             <div id = "TargetColumn" style="margin-top: -30px;">
                 <h2 style="margin-bottom: -10px;">Target Stats</h2>
                 <label for = "targetDef">Defense:</label>

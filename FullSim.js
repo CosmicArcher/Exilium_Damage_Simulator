@@ -11,7 +11,9 @@ import Target from "./Target.js";
 import {Elements, AmmoTypes, CalculationTypes, SkillJSONKeys, SkillNames, WeaponJSONKeys, StatVariants} from "./Enums.js";
 import StatTracker from "./StatTracker.js";
 import ChartMaker from "./ChartMaker.js";
+import PresetManager from "./PresetManager.js";
 
+var targetName = "6p62";
 var selectedPhases = [];
 var selectedDolls = [""];
 var selectedFortifications = [0];
@@ -574,6 +576,7 @@ DollFactory.getInstance();
 GlobalBuffManager.getInstance();
 StatTracker.getInstance();
 ChartMaker.getInstance();
+PresetManager.getInstance();
 slotColors = ChartMaker.getDollColors();
 }
 
@@ -643,6 +646,27 @@ d3.select("#AddSupport").on("click", () => {
     if (numDolls < 5)
         addDoll();
 });
+// initialize preset buttons
+d3.select("#PresetSubmit").on("click", () => {
+    let stringData = PresetManager.getInstance().parsePresetData();
+    PresetManager.getInstance().closePresetInput();
+
+    if (PresetManager.getInstance().getPresetMode() == "Target") {
+        targetName = stringData[0];
+        // before adding the preset weaknesses, check if the weakness string exists in the enums
+        let elements = Object.values(Elements);
+        let ammo = Object.values(AmmoTypes);
+        stringData[1].forEach(weakness => {
+            if (elements.includes(weakness) || ammo.includes(weakness)) 
+                selectPhase(weakness);
+            else
+                console.error(`${weakness} weakness does not exist`);
+        });
+    }
+});
+d3.select("#PresetCancel").on("click", () => {
+    PresetManager.getInstance().closePresetInput();
+});
 
 initializeDollButtons(0);
 
@@ -680,7 +704,7 @@ d3.select("#startButton").on("click", () => {
     // get input values and create target
     let targetStats = getTargetStats();
     let globalBuffs = getGlobalStats();
-    let newTarget = new Target("6p62", targetStats[0], targetStats[2], targetStats[3], selectedPhases);
+    let newTarget = new Target(targetName, targetStats[0], targetStats[2], targetStats[3], selectedPhases);
     GameStateManager.getInstance().registerTarget(newTarget);
     newTarget.finishCloning();
     //newTarget.disableBuffs();
@@ -763,8 +787,10 @@ var targetStatDropdown;
 var targetStatIndex = -1;
 // after starting the simulation, change the layout of the page
 function startSimulation() {
+    // delete the preset input since it is no longer needed
+    d3.select("#PresetInput").remove();
     // delete both of the first two columns' contents
-    let col1 = d3.select("div").select("div");
+    let col1 = d3.select("#Target");
     col1.selectAll("*").remove();
     let col2 = d3.select("#Dolls");
     col2.selectAll("*").remove();
