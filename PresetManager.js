@@ -32,6 +32,8 @@ class PresetManager {
     }
 
     closePresetInput() {
+        // clear the text box after finishing so that it appears neater for the next preset input if needed
+        document.getElementById("PresetInput").value = "";
         d3.select("#Preset").style("display", "None");
     }
 
@@ -150,7 +152,7 @@ class PresetManager {
                         data[i] = data[i].split(",");
                     stringData = PresetManagerSingleton.applyDollPreset(data);
                 }
-
+        
                 return stringData;
             }
         }
