@@ -672,11 +672,13 @@ d3.select("#AddSupport").on("click", () => {
 // initialize preset buttons
 d3.select("#PresetSubmit").on("click", () => {
     // add/remove doll slots to match the preset number of dolls
-    let presetNumDolls = document.getElementById("PresetInput").value.split(";").length;
-    while (presetNumDolls > numDolls)
-        addDoll();
-    while (presetNumDolls < numDolls)
-        removeDoll(1);
+    if (PresetManager.getInstance().getPresetMode() == "Dolls") {
+        let presetNumDolls = document.getElementById("PresetInput").value.split(";").length;
+        while (presetNumDolls > numDolls)
+            addDoll();
+        while (presetNumDolls < numDolls)
+            removeDoll(1);                    
+    }
     let stringData = PresetManager.getInstance().parsePresetData();
     PresetManager.getInstance().closePresetInput();
     // the string data needs to be processed differently depending on whether it is the target or doll presets
@@ -717,6 +719,13 @@ d3.select("#PresetSubmit").on("click", () => {
 });
 d3.select("#PresetCancel").on("click", () => {
     PresetManager.getInstance().closePresetInput();
+});
+// doll and target preset buttons do the same thing but set the mode differently
+d3.select("#TargetPreset").on("click", () => {
+    PresetManager.getInstance().inputTargetPreset();
+});
+d3.select("#DollPreset").on("click", () => {
+    PresetManager.getInstance().inputDollPreset();
 });
 
 initializeDollButtons(0);

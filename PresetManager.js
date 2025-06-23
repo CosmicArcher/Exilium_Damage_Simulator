@@ -9,7 +9,7 @@ class PresetManager {
             console.log("Preset Manager Instantiated");
             PresetManagerSingleton = this;
             // default starting value of mode
-            PresetManagerSingleton.mode = "Dolls";
+            PresetManagerSingleton.mode = "Target";
         }
     }
 
@@ -37,6 +37,7 @@ class PresetManager {
 
     inputTargetPreset() {
         if (PresetManagerSingleton) {
+            PresetManagerSingleton.mode = "Target";
             PresetManagerSingleton.displayPresetInputBox();
         }
         else
@@ -45,6 +46,7 @@ class PresetManager {
 
     inputDollPreset() {
         if (PresetManagerSingleton) {
+            PresetManagerSingleton.mode = "Dolls";
             PresetManagerSingleton.displayPresetInputBox();
         }
         else
