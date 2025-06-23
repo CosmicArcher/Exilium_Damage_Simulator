@@ -177,10 +177,74 @@ function removeDoll(index) {
     d3.select("#Conditional_" + (index + 1)).remove();
     // shift the id numbers of the ones after that set
     for (let i = index; i < numDolls + numSummons; i++) {
-        let shiftedSlot = document.getElementById("Conditional_" + (i + 2));
-        shiftedSlot.id = "Conditional_" + (i + 1);
+        let shiftedSetting = document.getElementById("Settings_" + (i + 2));
+        shiftedSetting.id = "Settings_" + (i + 1);
+        let shiftedConditional = document.getElementById("Conditional_" + (i + 2));
+        shiftedConditional.id = "Conditional_" + (i + 1);
     }
 }
+
+function selectDoll(htmlElement, index, dollName) {
+    selectedDolls[index] = dollName;
+    updateSelectedDoll(index);
+    // enable the fortification dropdown button since a doll is now selected
+    htmlElement[index == 0 ? 3 : 4].disabled = false;
+    htmlElement[index == 0 ? 5 : 6].disabled = false;
+    htmlElement[index == 0 ? 7 : 8].disabled = false;
+    htmlElement[index == 0 ? 9 : 10].disabled = false;
+    // enable the weapon dropdown buttons as well
+    htmlElement[index == 0 ? 13 : 14].disabled = false;
+    htmlElement[index == 0 ? 14 : 15].disabled = false;
+    // clear the displayed keys from the previous doll
+    htmlElement[index == 0 ? 6 : 7].textContent = "None";
+    htmlElement[index == 0 ? 8 : 9].textContent = "None";
+    htmlElement[index == 0 ? 10 : 11].textContent = "None";
+    selectedKeys[index] = [0,0,0,0,0,0];
+    // selecting a doll in every slot re-enables the start button
+    let dollsSet = true;
+    for (let i = 0; i < numDolls && dollsSet; i++) {
+        // if any of the doll slots still does not have a selected doll, exit the loop early
+        if (selectedDolls[i] == "")
+            dollsSet = false;
+    }
+    if (dollsSet)
+        document.getElementById("startButton").disabled = false;
+}
+
+function selectFortification(index, fortification) {
+    selectedFortifications[index] = fortification;
+    updateSelectedDoll(index);
+}
+
+function selectWeapon(index, weaponName) {
+    selectedWeapons[index] = weaponName;
+    updateSelectedWeapon(index);
+}
+
+function selectCalibration(index, calibration) {
+    selectedCalibrations[index] = calibration;
+    updateSelectedWeapon(index);
+}
+
+function selectKey(htmlElement, index, keyName, keys) {
+    if (keyName != "None") {
+        // if a key has already been selected in this slot, deselect it in the selected keys
+        if (htmlElement.textContent != "None") {
+            selectedKeys[index][keys.indexOf(htmlElement.textContent)] = 0;
+        }
+        // add the key in the selected keys of the doll
+        selectedKeys[index][keys.indexOf(keyName)] = 1;
+        htmlElement.textContent = keyName;
+    }
+    else {
+        // if a key has already been selected in this slot, deselect it in the selected keys
+        if (htmlElement.textContent != "None") {
+            selectedKeys[index][keys.indexOf(htmlElement.textContent)] = 0;
+        }
+        htmlElement.textContent = "None";
+    }
+}
+
 // because initializing doll buttons will be repeated each time a new doll is added
 function initializeDollButtons(index) {
     let dollNum = index + 1;
@@ -211,30 +275,7 @@ function initializeDollButtons(index) {
                             .text(d)
                             .on("click", (event) => {
                                 let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
-                                selectedDolls[dollIndex] = d;
-                                updateSelectedDoll(dollIndex);
-                                // enable the fortification dropdown button since a doll is now selected
-                                dollStats[index == 0 ? 3 : 4].disabled = false;
-                                dollStats[index == 0 ? 5 : 6].disabled = false;
-                                dollStats[index == 0 ? 7 : 8].disabled = false;
-                                dollStats[index == 0 ? 9 : 10].disabled = false;
-                                // enable the weapon dropdown buttons as well
-                                dollStats[index == 0 ? 13 : 14].disabled = false;
-                                dollStats[index == 0 ? 14 : 15].disabled = false;
-                                // clear the displayed keys from the previous doll
-                                dollStats[index == 0 ? 6 : 7].textContent = "None";
-                                dollStats[index == 0 ? 8 : 9].textContent = "None";
-                                dollStats[index == 0 ? 10 : 11].textContent = "None";
-                                selectedKeys[dollIndex] = [0,0,0,0,0,0];
-                                // selecting a doll in every slot re-enables the start button
-                                let dollsSet = true;
-                                for (let i = 0; i < numDolls && dollsSet; i++) {
-                                    // if any of the doll slots still does not have a selected doll, exit the loop early
-                                    if (selectedDolls[i] == "")
-                                        dollsSet = false;
-                                }
-                                if (dollsSet)
-                                    document.getElementById("startButton").disabled = false;
+                                selectDoll(dollStats, dollIndex, d);
                             });
             });
         }
@@ -249,8 +290,7 @@ function initializeDollButtons(index) {
                             .text("V" + i)
                             .on("click", (event) => {
                                 let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
-                                selectedFortifications[dollIndex] = i;
-                                updateSelectedDoll(dollIndex);
+                                selectFortification(dollIndex, i);
                             });
             }
         } // if dropdown has already been created, reuse it by transferring it as a child of a new fortification button
@@ -276,8 +316,7 @@ function initializeDollButtons(index) {
                             .text(weapon)
                             .on("click", (event) => {
                                 let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
-                                selectedWeapons[dollIndex] = weapon;
-                                updateSelectedWeapon(dollIndex);
+                                selectWeapon(dollIndex, weapon);
                             });
             });
         } // if dropdown has already been created, reuse it by transferring it as a child of a new weapon button
@@ -302,8 +341,7 @@ function initializeDollButtons(index) {
                             .text("C" + i)
                             .on("click", (event) => {
                                 let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
-                                selectedCalibrations[dollIndex] = i;
-                                updateSelectedWeapon(dollIndex);
+                                selectCalibration(dollIndex, i);
                             });
             }
         } // if dropdown has already been created, reuse it by transferring it as a child of a new weapon button
@@ -420,22 +458,7 @@ function createKeyDropdown(index, htmlElement) {
                     .on("click", (event) => {
                         let dollIndex = +event.target.parentNode.parentNode.parentNode.id.slice(5) - 1;
                         let keyDisplay = event.target.parentNode.parentNode.nextElementSibling;
-                        if (key_name != "None") {
-                            // if a key has already been selected in this slot, deselect it in the selected keys
-                            if (keyDisplay.textContent != "None") {
-                                selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
-                            }
-                            // add the key in the selected keys of the doll
-                            selectedKeys[dollIndex][keys.indexOf(key_name)] = 1;
-                            keyDisplay.textContent = key_name;
-                        }
-                        else {
-                            // if a key has already been selected in this slot, deselect it in the selected keys
-                            if (keyDisplay.textContent != "None") {
-                                selectedKeys[dollIndex][keys.indexOf(keyDisplay.textContent)] = 0;
-                            }
-                            keyDisplay.textContent = "None";
-                        }
+                        selectKey(keyDisplay, dollIndex, key_name, keys);
                     });
     });
 }
@@ -648,9 +671,15 @@ d3.select("#AddSupport").on("click", () => {
 });
 // initialize preset buttons
 d3.select("#PresetSubmit").on("click", () => {
+    // add/remove doll slots to match the preset number of dolls
+    let presetNumDolls = document.getElementById("PresetInput").value.split(";").length;
+    while (presetNumDolls > numDolls)
+        addDoll();
+    while (presetNumDolls < numDolls)
+        removeDoll(1);
     let stringData = PresetManager.getInstance().parsePresetData();
     PresetManager.getInstance().closePresetInput();
-
+    // the string data needs to be processed differently depending on whether it is the target or doll presets
     if (PresetManager.getInstance().getPresetMode() == "Target") {
         targetName = stringData[0];
         // before adding the preset weaknesses, check if the weakness string exists in the enums
@@ -661,6 +690,28 @@ d3.select("#PresetSubmit").on("click", () => {
                 selectPhase(weakness);
             else
                 console.error(`${weakness} weakness does not exist`);
+        });
+    }
+    else {
+        stringData.forEach((dollData, i) => {
+            let dollStats = document.getElementById("Doll_" + (i+1)).children
+
+            selectDoll(dollStats, i, dollData[0]);
+            selectFortification(i, dollData[1]);
+
+            let keys = Object.keys(getDollKeys(i));
+            keys.push("None");
+            let keyBase = i == 0 ? 6 : 7;
+            let keysEquipped = 0;
+            dollData[2].forEach((keyFlag, index) => {
+                if (keyFlag) {
+                    selectKey(dollStats[keyBase + keysEquipped * 2], i, keys[index], keys);
+                    keysEquipped++;
+                }
+            });
+
+            selectWeapon(i, dollData[3]);
+            selectCalibration(i, dollData[4]);
         });
     }
 });
@@ -788,7 +839,7 @@ var targetStatIndex = -1;
 // after starting the simulation, change the layout of the page
 function startSimulation() {
     // delete the preset input since it is no longer needed
-    d3.select("#PresetInput").remove();
+    d3.select("#Preset").remove();
     // delete both of the first two columns' contents
     let col1 = d3.select("#Target");
     col1.selectAll("*").remove();
