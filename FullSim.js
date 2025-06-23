@@ -25,6 +25,11 @@ var numDolls = 1;
 // papasha summon does not count towards the limit of 4 supports
 var numSummons = 0;
 
+var targetPresets = { "Deichgraff" : "Deichgraff,Burn Freeze Medium Heavy,1,1,8046,0,65,2,0,0,0,0,-2,0.02,0",
+                        "Nemertea" : "Nemertea,Burn Corrosion Medium Heavy,1,1,4089,0,65,2,0,0,0,0,0,0,0.5"
+                    };
+var presetOptions;
+
 var dollOptions;
 var keyOptions;
 var phaseDiv = [null];
@@ -464,6 +469,8 @@ function createKeyDropdown(index, htmlElement) {
 }
 // when any button is pressed, hide all currently displayed dropdowns
 function hideDropdowns() {
+    if (presetOptions)
+        presetOptions.style("display", "none");
     if (elementOptions)
         elementOptions.style("display", "none");
     if (ammoOptions)
@@ -580,6 +587,26 @@ function selectPhase(phaseAttribute) {
     updatePhaseText();
 }
 
+function loadPreset(key) {
+    // to ensure that when choosing a preset boss, the preset manager is in "Target" mode
+    PresetManager.getInstance().inputTargetPreset();
+    document.getElementById("PresetInput").value = targetPresets[key];
+    let stringData = PresetManager.getInstance().parsePresetData();
+    PresetManager.getInstance().closePresetInput();
+    targetName = stringData[0];
+    // clear the currently selected phase weaknesses in preparation for getting the weaknesses of the preset
+    selectedPhases = [];
+    // before adding the preset weaknesses, check if the weakness string exists in the enums
+    let elements = Object.values(Elements);
+    let ammo = Object.values(AmmoTypes);
+    stringData[1].forEach(weakness => {
+        if (elements.includes(weakness) || ammo.includes(weakness)) 
+            selectPhase(weakness);
+        else
+            console.error(`${weakness} weakness does not exist`);
+    });
+}
+
 
 // initialize the singletons
 {
@@ -684,6 +711,8 @@ d3.select("#PresetSubmit").on("click", () => {
     // the string data needs to be processed differently depending on whether it is the target or doll presets
     if (PresetManager.getInstance().getPresetMode() == "Target") {
         targetName = stringData[0];
+        // clear the currently selected phase weaknesses in preparation for getting the weaknesses of the preset
+        selectedPhases = [];
         // before adding the preset weaknesses, check if the weakness string exists in the enums
         let elements = Object.values(Elements);
         let ammo = Object.values(AmmoTypes);
@@ -727,6 +756,15 @@ d3.select("#TargetPreset").on("click", () => {
 d3.select("#DollPreset").on("click", () => {
     PresetManager.getInstance().inputDollPreset();
 });
+// some preset bosses are coded at the top of this file, extra functionality tied with boss skills per turn planned in the future
+d3.select("#StandardTargets").on("click", () => {
+    if (presetOptions.style("display") == "none") {
+        hideDropdowns();
+        presetOptions.style("display", "block");
+    }
+    else
+        hideDropdowns();
+});
 
 initializeDollButtons(0);
 
@@ -754,6 +792,17 @@ initializeDollButtons(0);
         }
         else
             hideDropdowns();
+    });
+}
+// initialize preset dropdown
+{
+    presetOptions = d3.select("#StandardTargets").append("div").attr("class", "dropdownBox").style("display", "none");
+    Object.keys(targetPresets).forEach(target => {
+        presetOptions.append("a")
+                        .text(target)
+                        .on("click", () => {
+                            loadPreset(target);
+                        });
     });
 }
 
