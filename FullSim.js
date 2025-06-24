@@ -828,18 +828,50 @@ d3.select("#SaveTarget").on("click", () => {
     createTargetPreset();
     // put the finished string into the user's clipboard so they can paste it somewhere to save or share
     navigator.clipboard.writeText(targetPresetString);
+    // change text to alert the user that they have clicked the button then change back
+    d3.select("#SaveTarget").text("Copied");
+    let timer = d3.timer((elapsed) => {
+        if (elapsed > 1000) { 
+            d3.select("#SaveTarget").text("Save As Preset");
+            timer.stop();
+        }
+    });                        
 });
 d3.select("#SaveDolls").on("click", () => {
     createDollPreset();
     // put the finished string into the user's clipboard so they can paste it somewhere to save or share
     navigator.clipboard.writeText(dollPresetString);
+    // change text to alert the user that they have clicked the button then change back
+    d3.select("#SaveDolls").text("Copied");
+    let timer = d3.timer((elapsed) => {
+        if (elapsed > 1000) { 
+            d3.select("#SaveDolls").text("Save As Preset");
+            timer.stop();
+        }
+    });    
 });
 // this pair of save preset buttons can only be clicked once the stats have been locked in so there is no need to call the create functions
-d3.select("SaveTargetPreset").on("click", () => {
+d3.select("#SaveTargetPreset").on("click", () => {
     navigator.clipboard.writeText(targetPresetString);
+    // change text to alert the user that they have clicked the button then change back
+    d3.select("#SaveTargetPreset").text("Copied")
+    let timer = d3.timer((elapsed) => {
+        if (elapsed > 1000) { 
+            d3.select("#SaveTargetPreset").text("Save Target");
+            timer.stop();
+        }
+    });    
 });
 d3.select("#SaveDollPreset").on("click", () => {
     navigator.clipboard.writeText(dollPresetString);
+    // change text to alert the user that they have clicked the button then change back
+    d3.select("#SaveDollPreset").text("Copied")
+    let timer = d3.timer((elapsed) => {
+        if (elapsed > 1000) { 
+            d3.select("#SaveDollPreset").text("Save Dolls");
+            timer.stop();
+        }
+    });    
 });
 
 
