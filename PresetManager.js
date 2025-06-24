@@ -146,7 +146,7 @@ class PresetManager {
                     stringData = PresetManagerSingleton.applyTargetPreset(data);
                 }
                 else if (PresetManagerSingleton.mode == "Dolls") {
-                    // the individual doll presets should follow a csv format while each doll is separated via colons
+                    // the individual doll presets should follow a csv format while each doll is separated via semicolons
                     let data = presetData.split(";");
                     for (let i = 0; i < data.length; i++)
                         data[i] = data[i].split(",");
