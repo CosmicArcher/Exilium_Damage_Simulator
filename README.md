@@ -30,6 +30,7 @@ Features present in Turn-by-Turn Simulator:
 - Phase strike conditional damage increase
 - Stat variations like Yoohee buffs introducing physical only defense ignore
 - Editing turns needed to regenerate stability, standard is 2 turns for most bosses but some regenerate in 1 turn, or never regenerate at all
+- Presets for faster input in the multitude of input fields
 
 To Do List :
 - Some dolls' keys and automated passives and skill condition checking, mostly unimportant dolls for gunsmoke except for Dushevnaya, Centaureissi, and Mechty and dolls after
@@ -37,7 +38,6 @@ To Do List :
 - Changing the DPS chart to view specific dolls' damage breakdown (damage per skill, damage per type, crit vs non-crit damage, etc)
 - Random buffs from Cheeta ult and certain AR weapon traits
 - Weird quirks that are present in the game, like Cheeta skill2 under certain conditions grant 2 avalanche stacks rather than 1, since the goal is to simulate the game scenario in a faster manner, this is valuable
-- Presets for faster input in the multitude of input fields
 - Improve UI
 - Clear undone damage logs when rewinding to improve clarity on current situation
 - Error prevention on some buttons being active in situations that would cause errors if clicked
