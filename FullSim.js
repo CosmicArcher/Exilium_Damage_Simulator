@@ -29,6 +29,9 @@ var targetPresets = { "Deichgraff" : "Deichgraff,Burn Freeze Medium Heavy,1,1,80
                         "Nemertea" : "Nemertea,Burn Corrosion Medium Heavy,1,1,4089,0,65,2,0,0,0,0,0,0,0.5"
                     };
 var presetOptions;
+// to store the preset string after the simulation starts in case the user is satisfied with their current set up and wants to save the preset after starting
+var targetPresetString;
+var dollPresetString;
 
 var dollOptions;
 var keyOptions;
@@ -607,6 +610,61 @@ function loadPreset(key) {
     });
 }
 
+function createTargetPreset() {
+    // construct the preset string using csv format and space for weakness
+    let targetStats = getTargetStats();
+    // order of variables in string is [name, weaknesses, isLarge, isBoss, def, max stability, ... dr with stability]
+    let presetString = targetName;
+    // construct the phase weaknesses string with spaces in between each one then append it to the preset string with a comma separator
+    let weaknessString = "";
+    if (selectedPhases.length > 0)
+        weaknessString = selectedPhases[0];
+    for (let i = 1; i < selectedPhases.length; i++) {
+        weaknessString += " " + selectedPhases[i];
+    }
+    presetString += "," + weaknessString;
+    // use binary flags for saving the toggles in the preset
+    presetString += "," + (document.getElementById("largeToggle").checked ? 1 : 0);
+    presetString += "," + (document.getElementById("bossToggle").checked ? 1 : 0);
+    targetStats.forEach(stat => {
+        presetString += "," + stat;
+    });
+    targetPresetString = presetString;
+}
+
+function createDollPreset() {
+    // order of variables in string is [name, fortification, keys, weapon, calibration, hasPhaseStrike, attack, ... elemental damage] 
+    let presetString = ""
+    for (let i = 0; i < numDolls; i++) {
+        // ensure that each slot that will be saved in the preset contains a doll so skip any slots that have not yet selected one
+        if (selectedDolls[i] != "") {
+            // insert a semicolon to separate with the previous doll preset
+            if (presetString != "")
+                presetString += ";";
+            // construct the preset string using csv format and space for weakness, semicolons to separate each doll
+            let dollStats = getDollStats(i);
+
+            presetString += selectedDolls[i] + "," + selectedFortifications[i];
+            // construct the key string with spaces in between each one then append it to the preset string with a comma separator
+            let keyString = "";
+            for (let j = 0; j < 6; j++) {
+                if (j > 0)
+                    keyString += " ";
+                keyString += selectedKeys[i][j];
+            }
+            presetString += "," + keyString;
+
+            presetString += "," + selectedWeapons[i] + "," + selectedCalibrations[i];
+            // use binary flags for saving the toggles in the preset
+            presetString += "," + (document.getElementById("Doll_" + (i + 1)).children[i > 0 ? 17 : 16].checked ? 1 : 0);
+            dollStats.forEach(stat => {
+                presetString += "," + stat;
+            });
+        }
+    }
+    dollPresetString = presetString;
+}
+
 
 // initialize the singletons
 {
@@ -767,59 +825,21 @@ d3.select("#StandardTargets").on("click", () => {
 });
 // save as preset buttons so that custom teams and boss stats are easier to copy to the next session
 d3.select("#SaveTarget").on("click", () => {
-    // construct the preset string using csv format and space for weakness
-    let targetStats = getTargetStats();
-    // order of variables in string is [name, weaknesses, isLarge, isBoss, def, max stability, ... dr with stability]
-    let presetString = targetName;
-    // construct the phase weaknesses string with spaces in between each one then append it to the preset string with a comma separator
-    let weaknessString = "";
-    if (selectedPhases.length > 0)
-        weaknessString = selectedPhases[0];
-    for (let i = 1; i < selectedPhases.length; i++) {
-        weaknessString += " " + selectedPhases[i];
-    }
-    presetString += "," + weaknessString;
-    // use binary flags for saving the toggles in the preset
-    presetString += "," + (document.getElementById("largeToggle").checked ? 1 : 0);
-    presetString += "," + (document.getElementById("bossToggle").checked ? 1 : 0);
-    targetStats.forEach(stat => {
-        presetString += "," + stat;
-    });
+    createTargetPreset();
     // put the finished string into the user's clipboard so they can paste it somewhere to save or share
-    navigator.clipboard.writeText(presetString);
+    navigator.clipboard.writeText(targetPresetString);
 });
 d3.select("#SaveDolls").on("click", () => {
-    // order of variables in string is [name, fortification, keys, weapon, calibration, hasPhaseStrike, attack, ... elemental damage] 
-    let presetString = ""
-    for (let i = 0; i < numDolls; i++) {
-        // ensure that each slot that will be saved in the preset contains a doll so skip any slots that have not yet selected one
-        if (selectedDolls[i] != "") {
-            // insert a semicolon to separate with the previous doll preset
-            if (presetString != "")
-                presetString += ";";
-            // construct the preset string using csv format and space for weakness, semicolons to separate each doll
-            let dollStats = getDollStats(i);
-
-            presetString += selectedDolls[i] + "," + selectedFortifications[i];
-            // construct the key string with spaces in between each one then append it to the preset string with a comma separator
-            let keyString = "";
-            for (let j = 0; j < 6; j++) {
-                if (j > 0)
-                    keyString += " ";
-                keyString += selectedKeys[i][j];
-            }
-            presetString += "," + keyString;
-
-            presetString += "," + selectedWeapons[i] + "," + selectedCalibrations[i];
-            // use binary flags for saving the toggles in the preset
-            presetString += "," + (document.getElementById("Doll_" + (i + 1)).children[i > 0 ? 17 : 16].checked ? 1 : 0);
-            dollStats.forEach(stat => {
-                presetString += "," + stat;
-            });
-        }
-    }
+    createDollPreset();
     // put the finished string into the user's clipboard so they can paste it somewhere to save or share
-    navigator.clipboard.writeText(presetString);
+    navigator.clipboard.writeText(dollPresetString);
+});
+// this pair of save preset buttons can only be clicked once the stats have been locked in so there is no need to call the create functions
+d3.select("SaveTargetPreset").on("click", () => {
+    navigator.clipboard.writeText(targetPresetString);
+});
+d3.select("#SaveDollPreset").on("click", () => {
+    navigator.clipboard.writeText(dollPresetString);
 });
 
 
@@ -867,6 +887,9 @@ d3.select("#startButton").on("click", () => {
     hideDropdowns();
     TurnManager.getInstance().resetLists();
     GameStateManager.getInstance().resetSimulation();
+    // store the inputs in preset strings in case the user wants to save them after starting the simulation
+    createDollPreset();
+    createTargetPreset();
     // get input values and create target
     let targetStats = getTargetStats();
     let globalBuffs = getGlobalStats();
@@ -1075,6 +1098,9 @@ function startSimulation() {
     });
     document.getElementById("enemyAttack").disabled = false;
     document.getElementById("startRound").disabled = false;
+    // Show the save presets in the second column in case the user wants to save the presets after testing it out in the sim for a bit
+    document.getElementById("Dolls").appendChild(document.getElementById("SavePresets"));
+    d3.select("#SavePresets").style("display", "block");
     // move the hidden ui to the middle column and reveal them
     document.getElementById("Dolls").appendChild(document.getElementById("CalcSettings"));
     document.getElementById("Dolls").appendChild(document.getElementById("Skill"));
